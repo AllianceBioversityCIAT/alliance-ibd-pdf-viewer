@@ -4,20 +4,20 @@ import "../styles/global.css";
 export const prerender = false;
 
 const url = new URL(Astro.request.url);
-const id = url.searchParams.get('id');
+const uuid = url.searchParams.get('uuid');
 const isTest = url.searchParams.get('test') === 'true';
 
 let data: any = null;
 
-if (id) {
+if (uuid) {
   const runtime = Astro.locals.runtime;
   const db = runtime.env.DB;
 
-  const row = await db.prepare('SELECT json FROM remaining_jsons WHERE rowid = ?').bind(id).first();
+  const row = await db.prepare('SELECT json FROM remaining_jsons WHERE uuid = ?').bind(uuid).first();
   if (row) {
     data = JSON.parse(row.json as string);
     if (!isTest) {
-      await db.prepare('DELETE FROM remaining_jsons WHERE rowid = ?').bind(id).run();
+      await db.prepare('DELETE FROM remaining_jsons WHERE uuid = ?').bind(uuid).run();
     }
   }
 }
