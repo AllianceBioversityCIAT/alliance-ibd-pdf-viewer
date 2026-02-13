@@ -1,0 +1,24 @@
+{
+	"main": "dist/_worker.js/index.js",
+	"name": "ibd-pdf-generator",
+  "compatibility_date": "2026-02-11",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./dist"
+	},
+	"observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pdfs",
+      "database_id": "0b0348dd-4d24-47c2-a739-7f8deaf1d7e3",
+      "remote": true
+    }
+  ]
+}
