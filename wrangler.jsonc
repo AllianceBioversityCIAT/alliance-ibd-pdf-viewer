@@ -16,8 +16,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "pdfs",
-      "database_id": "0b0348dd-4d24-47c2-a739-7f8deaf1d7e3",
+      "database_name": "remaining_jsons",
+      "database_id": "f1c06e1b-f2c5-4170-bcf2-3000b14a4295",
       "remote": true
     }
   ]
