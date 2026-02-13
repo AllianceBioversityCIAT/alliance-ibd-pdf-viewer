@@ -5,6 +5,8 @@ export const prerender = false;
 
 const url = new URL(Astro.request.url);
 const uuid = url.searchParams.get('uuid');
+const paperWidth = url.searchParams.get('paperWidth') ?? '600';
+const paperHeight = url.searchParams.get('paperHeight') ?? '1000';
 const isTest = url.searchParams.get('test') === 'true';
 
 let data: any = null;
@@ -23,7 +25,7 @@ if (uuid) {
 }
 ---
 
-<div class="w-[600px] h-[1000px] flex font-sans text-[11px] leading-[1.4]">
+<div style={`width:${paperWidth}px;height:${paperHeight}px`} class="flex font-sans text-[11px] leading-[1.4]">
   <div class="flex-1 flex flex-col">
     <!-- Header verde -->
     <div class="bg-[#02211A] px-6 py-5">
@@ -99,5 +101,5 @@ if (uuid) {
   </div>
 
   <!-- Franja verde derecha -->
-  <img src="/img.png" class="w-[20px] h-[1000px] object-cover" alt="" />
+  <img src="/img.png" style={`height:${paperHeight}px`} class="w-[20px] object-cover" alt="" />
 </div>
