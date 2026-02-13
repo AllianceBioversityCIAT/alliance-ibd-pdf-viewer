@@ -13,11 +13,11 @@ if (id) {
   const runtime = Astro.locals.runtime;
   const db = runtime.env.DB;
 
-  const row = await db.prepare('SELECT json FROM data WHERE rowid = ?').bind(id).first();
+  const row = await db.prepare('SELECT json FROM remaining_jsons WHERE rowid = ?').bind(id).first();
   if (row) {
     data = JSON.parse(row.json as string);
     if (!isTest) {
-      await db.prepare('DELETE FROM data WHERE rowid = ?').bind(id).run();
+      await db.prepare('DELETE FROM remaining_jsons WHERE rowid = ?').bind(id).run();
     }
   }
 }
