@@ -16,7 +16,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "remaining_jsons",
+      "database_name": "pdf-remaining-information",
       "database_id": "f1c06e1b-f2c5-4170-bcf2-3000b14a4295",
       "remote": true
     }
