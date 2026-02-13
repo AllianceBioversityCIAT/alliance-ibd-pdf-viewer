@@ -1,6 +1,6 @@
 {
 	"main": "dist/_worker.js/index.js",
-	"name": "ibd-pdf-generator",
+	"name": "alliance-ibd-pdf-viewer",
   "compatibility_date": "2026-02-11",
   "compatibility_flags": [
     "nodejs_compat",
