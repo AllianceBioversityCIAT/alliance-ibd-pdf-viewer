@@ -1,14 +1,16 @@
 ---
-interface Props {
-  data: any;
-  paperWidth: string;
-  paperHeight: string;
+interface ExampleData {
+  title: string;
 }
 
-const { data, paperWidth, paperHeight } = Astro.props;
+interface Props {
+  data: ExampleData | null;
+}
+
+const { data } = Astro.props;
 ---
 
-<div style={`width:${paperWidth}px;height:${paperHeight}px`} class="flex font-sans text-[11px] leading-[1.4]">
+<div class="flex font-sans text-[11px] leading-[1.4] h-full">
   <div class="flex-1 flex flex-col">
     <!-- Header verde -->
     <div class="bg-[#02211A] px-6 py-5">
@@ -84,5 +86,5 @@ const { data, paperWidth, paperHeight } = Astro.props;
   </div>
 
   <!-- Franja verde derecha -->
-  <img src="/img.png" style={`height:${paperHeight}px`} class="w-[20px] object-cover" alt="" />
+  <img src="/img.png" class="w-[20px] h-full object-cover" alt="" />
 </div>
