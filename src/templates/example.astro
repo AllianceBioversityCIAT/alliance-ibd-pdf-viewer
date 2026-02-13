@@ -1,28 +1,11 @@
 ---
-import "../styles/global.css";
-
-export const prerender = false;
-
-const url = new URL(Astro.request.url);
-const uuid = url.searchParams.get('uuid');
-const paperWidth = url.searchParams.get('paperWidth') ?? '600';
-const paperHeight = url.searchParams.get('paperHeight') ?? '1000';
-const isTest = url.searchParams.get('test') === 'true';
-
-let data: any = null;
-
-if (uuid) {
-  const runtime = Astro.locals.runtime;
-  const db = runtime.env.DB;
-
-  const row = await db.prepare('SELECT json FROM remaining_jsons WHERE uuid = ?').bind(uuid).first();
-  if (row) {
-    data = JSON.parse(row.json as string);
-    if (!isTest) {
-      await db.prepare('DELETE FROM remaining_jsons WHERE uuid = ?').bind(uuid).run();
-    }
-  }
+interface Props {
+  data: any;
+  paperWidth: string;
+  paperHeight: string;
 }
+
+const { data, paperWidth, paperHeight } = Astro.props;
 ---
 
 <div style={`width:${paperWidth}px;height:${paperHeight}px`} class="flex font-sans text-[11px] leading-[1.4]">
