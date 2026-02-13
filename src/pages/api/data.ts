@@ -8,14 +8,18 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   try {
     const json = await request.json();
-    const uuid = crypto.randomUUID();
-    const result = await db
+    const timestamp = Date.now().toString(36);
+    const bytes = new Uint8Array(4);
+    crypto.getRandomValues(bytes);
+    const random = [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
+    const uuid = timestamp + '-' + random;
+    await db
       .prepare('INSERT INTO remaining_jsons (json, uuid) VALUES (?, ?)')
       .bind(JSON.stringify(json), uuid)
       .run();
 
     return new Response(
-      JSON.stringify({ id: result.meta.last_row_id, uuid }),
+      JSON.stringify({ uuid }),
       {
         status: 201,
         headers: { 'Content-Type': 'application/json' },
