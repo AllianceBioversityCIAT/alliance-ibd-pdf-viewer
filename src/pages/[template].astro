@@ -3,14 +3,14 @@ import "../styles/global.css";
 
 export const prerender = false;
 
-// Auto-discover all templates from src/templates/
-const templateModules = import.meta.glob('../templates/*.astro', { eager: true });
+// Auto-discover all templates from src/templates/**/
+const templateModules = import.meta.glob('../templates/**/*.astro', { eager: true });
 
-// Build registry: "example" → Component
+// Build registry: "example" → Component (filename only, folder is just organization)
 const registry: Record<string, any> = {};
 for (const [path, mod] of Object.entries(templateModules)) {
-  const name = path.replace('../templates/', '').replace('.astro', '');
-  registry[name] = (mod as any).default;
+  const filename = path.split('/').pop()!.replace('.astro', '');
+  registry[filename] = (mod as any).default;
 }
 
 // Resolve template from URL param
