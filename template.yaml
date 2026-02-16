@@ -74,16 +74,6 @@ Resources:
     Properties:
       TargetFunctionArn: !GetAtt AstroSSRFunction.Arn
       AuthType: NONE
-      Cors:
-        AllowOrigins:
-          - '*'
-        AllowMethods:
-          - GET
-          - POST
-          - OPTIONS
-        AllowHeaders:
-          - '*'
-        MaxAge: 300
 
   # Optional: API Gateway HTTP API (alternative to Function URL)
   # Uncomment if you prefer API Gateway over Function URL
