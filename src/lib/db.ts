@@ -27,8 +27,9 @@ let docClient: DynamoDBDocumentClient | null = null;
  */
 function getDynamoDBClient(): DynamoDBDocumentClient {
   if (!docClient) {
+    // AWS_REGION is automatically set by Lambda runtime, no need to set it manually
     const client = new DynamoDBClient({ 
-      region: process.env.AWS_REGION || 'us-east-1',
+      // Region is automatically detected from Lambda environment
       // Optional: Configure retry, timeout, etc.
     });
     docClient = DynamoDBDocumentClient.from(client, {

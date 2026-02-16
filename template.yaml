@@ -61,7 +61,6 @@ Resources:
       Environment:
         Variables:
           DYNAMODB_TABLE_NAME: !Sub '${DynamoDBTableName}-${Environment}'
-          AWS_REGION: !Ref AWS::Region
           NODE_ENV: production
       Policies:
         - DynamoDBCrudPolicy:
