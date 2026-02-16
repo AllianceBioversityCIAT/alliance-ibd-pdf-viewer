@@ -236,6 +236,9 @@ export default function Example({ data }: TemplateProps) {
           <p className="font-bold text-[#1a7a5a]">CGIAR</p>
         </div>
       </div>
+
+      {/* Right green strip */}
+      <img src="/img.png" className="w-[20px] h-full object-cover" alt="" />
     </div>
   );
 }
