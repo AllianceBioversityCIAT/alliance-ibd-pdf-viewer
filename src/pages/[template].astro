@@ -32,15 +32,12 @@ const isTest = url.searchParams.get('test') === 'true';
 let data: any = null;
 
 if (uuid) {
-  const runtime = Astro.locals.runtime;
-  const db = runtime.env.DB;
+  const { getDatabase } = await import('../lib/db');
+  const db = getDatabase();
 
-  const row = await db.prepare('SELECT json FROM remaining_jsons WHERE uuid = ?').bind(uuid).first();
-  if (row) {
-    data = JSON.parse(row.json as string);
-    if (!isTest) {
-      await db.prepare('DELETE FROM remaining_jsons WHERE uuid = ?').bind(uuid).run();
-    }
+  data = await db.get(uuid);
+  if (data && !isTest) {
+    await db.delete(uuid);
   }
 }
 ---

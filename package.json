@@ -5,16 +5,23 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:lambda": "astro build",
     "preview": "astro preview",
+    "package:lambda": "npm run build:lambda && sam build",
+    "deploy:lambda": "sam deploy --guided",
+    "deploy:lambda:prod": "sam deploy --stack-name alliance-ibd-pdf-viewer-prod",
+    "test:lambda": "sam local start-api",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.6.12",
+    "@astrojs/node": "^8.0.0",
+    "@aws-sdk/client-dynamodb": "^3.700.0",
+    "@aws-sdk/lib-dynamodb": "^3.700.0",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.17.1",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
-    "wrangler": "^4.65.0"
+    "@types/aws-lambda": "^8.10.145"
   }
 }

@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Alliance IBD PDF Viewer - Astro SSR on AWS Lambda
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Deployment environment
+
+  DynamoDBTableName:
+    Type: String
+    Default: remaining_jsons
+    Description: DynamoDB table name for storing JSON data
+
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 1024
+    Runtime: nodejs20.x
+    Architectures:
+      - x86_64
+
+Resources:
+  # DynamoDB Table
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${DynamoDBTableName}-${Environment}'
+      AttributeDefinitions:
+        - AttributeName: uuid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: uuid
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      # Optional: Enable TTL for auto-deletion of old records
+      # TimeToLiveSpecification:
+      #   Enabled: true
+      #   AttributeName: createdAt
+      Tags:
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Application
+          Value: alliance-ibd-pdf-viewer
+
+  # Lambda Function
+  AstroSSRFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'alliance-ibd-pdf-viewer-${Environment}'
+      CodeUri: .
+      Handler: lambda/handler.handler
+      Description: Astro SSR application for PDF viewer
+      Timeout: 60
+      MemorySize: 1024
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+          AWS_REGION: !Ref AWS::Region
+          NODE_ENV: production
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+        - CloudWatchLogsFullAccess
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowOrigins:
+            - '*'
+          AllowMethods:
+            - GET
+            - POST
+            - OPTIONS
+          AllowHeaders:
+            - '*'
+          MaxAge: 300
+
+  # Optional: API Gateway HTTP API (alternative to Function URL)
+  # Uncomment if you prefer API Gateway over Function URL
+  # AstroSSRApi:
+  #   Type: AWS::Serverless::HttpApi
+  #   Properties:
+  #     StageName: !Ref Environment
+  #     CorsConfiguration:
+  #       AllowOrigins:
+  #         - '*'
+  #       AllowMethods:
+  #         - GET
+  #         - POST
+  #         - OPTIONS
+  #       AllowHeaders:
+  #         - '*'
+  #       MaxAge: 300
+
+Outputs:
+  FunctionUrl:
+    Description: Lambda Function URL
+    Value: !GetAtt AstroSSRFunction.FunctionUrl
+    Export:
+      Name: !Sub '${AWS::StackName}-FunctionUrl'
+
+  FunctionName:
+    Description: Lambda Function Name
+    Value: !Ref AstroSSRFunction
+    Export:
+      Name: !Sub '${AWS::StackName}-FunctionName'
+
+  DynamoDBTableName:
+    Description: DynamoDB Table Name
+    Value: !Ref DynamoDBTable
+    Export:
+      Name: !Sub '${AWS::StackName}-TableName'
+
+  # API Gateway URL (if using API Gateway instead of Function URL)
+  # ApiUrl:
+  #   Description: API Gateway HTTP API URL
+  #   Value: !Sub 'https://${AstroSSRApi}.execute-api.${AWS::Region}.amazonaws.com/${Environment}'
+  #   Export:
+  #     Name: !Sub '${AWS::StackName}-ApiUrl'

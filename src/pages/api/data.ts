@@ -1,11 +1,9 @@
 import type { APIRoute } from 'astro';
+import { getDatabase } from '../../lib/db';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  const runtime = locals.runtime;
-  const db = runtime.env.DB;
-
+export const POST: APIRoute = async ({ request }) => {
   try {
     const json = await request.json();
     const timestamp = Date.now().toString(36);
@@ -13,10 +11,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
     crypto.getRandomValues(bytes);
     const random = [...bytes].map(b => b.toString(16).padStart(2, '0')).join('');
     const uuid = timestamp + '-' + random;
-    await db
-      .prepare('INSERT INTO remaining_jsons (json, uuid) VALUES (?, ?)')
-      .bind(JSON.stringify(json), uuid)
-      .run();
+    
+    const db = getDatabase();
+    await db.insert(uuid, json);
 
     return new Response(
       JSON.stringify({ uuid }),
@@ -26,8 +23,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
     );
   } catch (e: any) {
+    // Log error without exposing request body or sensitive data
+    console.error('API error:', {
+      message: e.message,
+      stack: e.stack,
+      // Don't log request body or UUID in production
+    });
+    // Return generic error message to client (don't expose internal details)
     return new Response(
-      JSON.stringify({ error: e.message }),
+      JSON.stringify({ error: 'Internal server error' }),
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
