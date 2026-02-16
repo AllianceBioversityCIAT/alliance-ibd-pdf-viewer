@@ -60,7 +60,7 @@ Resources:
       MemorySize: 1024
       Environment:
         Variables:
-          DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+          DYNAMODB_TABLE_NAME: !Sub '${DynamoDBTableName}-${Environment}'
           AWS_REGION: !Ref AWS::Region
           NODE_ENV: production
       Policies:
