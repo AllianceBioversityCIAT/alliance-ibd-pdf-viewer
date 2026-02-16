@@ -12,7 +12,7 @@
     "deploy:lambda:prod": "sam deploy --stack-name alliance-ibd-pdf-viewer-prod",
     "test:lambda": "sam local start-api",
     "astro": "astro",
-    "postinstall": "echo 'Installation complete'"
+    "postinstall": "node -e \"console.log('Installation complete')\""
   },
   "dependencies": {
     "@astrojs/node": "^8.0.0",
