@@ -67,18 +67,23 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref DynamoDBTable
         - CloudWatchLogsFullAccess
-      FunctionUrlConfig:
-        AuthType: NONE
-        Cors:
-          AllowOrigins:
-            - '*'
-          AllowMethods:
-            - GET
-            - POST
-            - OPTIONS
-          AllowHeaders:
-            - '*'
-          MaxAge: 300
+
+  # Lambda Function URL
+  AstroSSRFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt AstroSSRFunction.Arn
+      AuthType: NONE
+      Cors:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - '*'
+        MaxAge: 300
 
   # Optional: API Gateway HTTP API (alternative to Function URL)
   # Uncomment if you prefer API Gateway over Function URL
@@ -100,7 +105,7 @@ Resources:
 Outputs:
   FunctionUrl:
     Description: Lambda Function URL
-    Value: !GetAtt AstroSSRFunction.FunctionUrl
+    Value: !GetAtt AstroSSRFunctionUrl.FunctionUrl
     Export:
       Name: !Sub '${AWS::StackName}-FunctionUrl'
 
