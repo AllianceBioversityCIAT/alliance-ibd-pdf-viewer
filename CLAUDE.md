@@ -60,10 +60,12 @@ app/templates/
 | Token | Hex | Usage |
 |-------|-----|-------|
 | Dark green | `#02211a` | Headers, dark backgrounds |
-| Deep green | `#033529` | QA box sidebar, emphasis |
+| Deep green | `#033529` | QA box sidebar, table headers, emphasis |
 | Mid green | `#065f4a` | Section titles, links |
 | Teal | `#11d4b3` | Accent, highlighted links, badges |
 | Off-white | `#e2e0df` | Card backgrounds |
 | Dark text | `#1d1d1d` | Labels |
 | Body text | `#393939` | Values, descriptions |
 | Muted | `#818181` | Secondary info, fine print |
+
+**Figma MCP color warning:** The Figma MCP `get_design_context` sometimes returns incorrect colors in its code output. Always visually verify colors against the `get_screenshot` result and prefer these brand tokens when the screenshot clearly matches a known token.

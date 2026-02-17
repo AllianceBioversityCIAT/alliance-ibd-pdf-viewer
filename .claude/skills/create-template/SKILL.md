@@ -91,6 +91,13 @@ export default function MyTemplate({ data }: TemplateProps) {
 - Match the Figma design pixel-for-pixel: exact font sizes, colors, gaps, paddings
 - All font sizes use `text-[Xpx]` syntax (e.g., `text-[10px]`, `text-[8px]`)
 
+**Color verification (CRITICAL):**
+
+- **NEVER trust raw color values from `get_design_context` blindly.** The Figma MCP code output sometimes returns incorrect or placeholder colors (e.g., blue `#1d4ed8` instead of the actual green `#033529`).
+- **ALWAYS visually verify colors** by comparing the `get_screenshot` output against the colors you're using. The screenshot is the source of truth, not the raw code.
+- **Prefer CGIAR brand tokens** from CLAUDE.md when the screenshot clearly shows a brand color. If a header looks dark green in the screenshot, use `#033529` — don't copy an incorrect hex from the MCP output.
+- When in doubt, fetch the screenshot again and compare side-by-side before finalizing any color value.
+
 ### Step 5: Audit and download static assets
 
 **Before downloading anything**, launch an Explore subagent to scan all existing assets:
@@ -141,3 +148,4 @@ Before finishing, confirm:
 - [ ] No pagination, no fixed-height layouts, no absolute positioning on content
 - [ ] Demo JSON created with realistic test data
 - [ ] TypeScript compiles cleanly
+- [ ] **Colors visually verified** against Figma screenshot — not just copied from MCP code output

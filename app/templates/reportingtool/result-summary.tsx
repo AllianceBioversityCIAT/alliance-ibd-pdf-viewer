@@ -168,7 +168,7 @@ function DataTable({ columns, rows }: { columns: string[]; rows: string[][] }) {
           {columns.map((col, i) => (
             <th
               key={i}
-              className="bg-[#eff6ff] text-[#1d4ed8] font-bold text-left border-b border-[#e5e7eb]"
+              className="bg-[#033529] text-white font-bold text-left border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
               {col}
