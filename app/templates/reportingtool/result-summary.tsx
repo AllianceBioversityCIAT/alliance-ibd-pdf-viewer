@@ -26,8 +26,6 @@ interface ResultSummaryData {
   lead_contact_email: string;
   impact_areas: ImpactArea[];
   qa_adjustments: QAAdjustment[];
-  page_number: number;
-  total_pages: number;
 }
 
 function ImpactAreaCard({ area }: { area: ImpactArea }) {
@@ -46,21 +44,15 @@ function ImpactAreaCard({ area }: { area: ImpactArea }) {
       </div>
       <div className="flex flex-col gap-[8px]">
         <p className="text-[9px] leading-[1.15]">
-          <span className="font-bold text-[#1d1d1d]" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
-            Score:
-          </span>{" "}
-          <span className="text-[#393939]" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
+          <span className="font-bold text-[#1d1d1d]">Score:</span>{" "}
+          <span className="text-[#393939]">
             {area.score} - {area.score_label}
           </span>
         </p>
         {area.components && (
           <p className="text-[9px] leading-[1.15]">
-            <span className="font-bold text-[#1d1d1d]" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
-              Component(s):
-            </span>{" "}
-            <span className="text-[#393939]" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
-              {area.components}
-            </span>
+            <span className="font-bold text-[#1d1d1d]">Component(s):</span>{" "}
+            <span className="text-[#393939]">{area.components}</span>
           </p>
         )}
       </div>
@@ -70,7 +62,7 @@ function ImpactAreaCard({ area }: { area: ImpactArea }) {
 
 function QABox({ adjustments }: { adjustments: QAAdjustment[] }) {
   return (
-    <div className="bg-[#e2e0df] flex overflow-hidden" style={{ height: 125 }}>
+    <div className="bg-[#e2e0df] flex overflow-hidden">
       <div
         className="bg-[#033529] flex items-center justify-center shrink-0"
         style={{ width: 106, padding: "8px 17px" }}
@@ -83,13 +75,10 @@ function QABox({ adjustments }: { adjustments: QAAdjustment[] }) {
       </div>
       <div className="flex flex-col gap-[12px] py-[15px] px-[22px] flex-1 min-w-0">
         <div className="flex flex-col gap-[8px]">
-          <p
-            className="text-[#02211a] text-[11px] font-bold leading-[1.15]"
-            style={{ fontFamily: "'Noto Sans', sans-serif" }}
-          >
+          <p className="text-[#02211a] text-[11px] font-bold leading-[1.15]">
             Result quality assured by two assessors and subsequently reviewed by a senior third party
           </p>
-          <p className="text-[#818181] text-[8px] leading-[1.5]" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
+          <p className="text-[#818181] text-[8px] leading-[1.5]">
             This result underwent two rounds of quality assurance, including review by a senior
             third-party subject matter expert following the CGIAR standard{" "}
             <a
@@ -103,15 +92,12 @@ function QABox({ adjustments }: { adjustments: QAAdjustment[] }) {
         </div>
         {adjustments.length > 0 && (
           <div className="flex flex-col gap-[5px]">
-            <p
-              className="text-[#1d1d1d] text-[9px] font-bold leading-[1.15]"
-              style={{ fontFamily: "'Noto Sans', sans-serif" }}
-            >
+            <p className="text-[#1d1d1d] text-[9px] font-bold leading-[1.15]">
               Core data points that were adjusted during the QA process:
             </p>
             <div className="flex flex-col gap-[3px]">
               {adjustments.map((adj, i) => (
-                <div key={i} className="flex items-center gap-[5px] text-[9px]" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
+                <div key={i} className="flex items-center gap-[5px] text-[9px]">
                   <span className="text-[#393939]">
                     <span className="font-medium">{adj.label}:</span> {adj.from_value}
                   </span>
@@ -129,10 +115,7 @@ function QABox({ adjustments }: { adjustments: QAAdjustment[] }) {
 
 function LabelValue({ label, value, multiline }: { label: string; value: string; multiline?: boolean }) {
   return (
-    <p
-      className="text-[10px] leading-[1.15]"
-      style={{ fontFamily: "'Noto Sans', sans-serif", lineHeight: multiline ? 1.5 : 1.15 }}
-    >
+    <p className="text-[10px]" style={{ lineHeight: multiline ? 1.5 : 1.15 }}>
       <span className="font-bold text-[#1d1d1d]">{label}:</span>{" "}
       <span className="text-[#393939]">{value}</span>
     </p>
@@ -143,47 +126,27 @@ export default function ResultSummary({ data }: TemplateProps) {
   const d = data as ResultSummaryData | null;
 
   return (
-    <div className="bg-white relative h-full overflow-hidden" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
-      {/* Google Fonts */}
-      {/* eslint-disable-next-line @next/next/no-css-tags */}
+    <div className="bg-white" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;700&family=Noto+Serif:wght@400;500&display=swap');`}</style>
 
-      {/* Dark green header background */}
-      <div className="absolute top-0 left-0 w-full bg-[#02211a]" style={{ height: 281 }} />
+      {/* Header */}
+      <div className="bg-[#02211a] relative overflow-hidden" style={{ padding: "42px 43px 30px" }}>
+        {/* Right sidebar decorative strip */}
+        <div className="absolute top-0 right-0 h-full overflow-hidden" style={{ width: 13 }}>
+          <img src="/assets/prms/sidebar-pattern.png" alt="" className="h-full object-cover" style={{ width: 844 }} />
+        </div>
 
-      {/* Right sidebar decorative strip */}
-      <div
-        className="absolute top-0 right-0 h-full overflow-hidden"
-        style={{ width: 13 }}
-      >
-        <img
-          src="/assets/prms/sidebar-pattern.png"
-          alt=""
-          className="h-full object-cover"
-          style={{ width: 844 }}
-        />
-      </div>
-
-      {/* CGIAR Logo */}
-      <div className="absolute" style={{ left: 43, top: 42 }}>
+        {/* Logo */}
         <img
           src="/assets/prms/cgiar-logo.png"
           alt="CGIAR"
-          className="object-contain"
+          className="object-contain mb-[15px]"
           style={{ width: 120, height: 44 }}
         />
-      </div>
 
-      {/* Header text content */}
-      <div
-        className="absolute flex flex-col"
-        style={{ left: 43, top: 101, width: 509, gap: 14 }}
-      >
-        <div className="flex flex-col" style={{ gap: 5 }}>
-          <p
-            className="text-white text-[10px] leading-[1.15]"
-            style={{ fontFamily: "'Noto Sans', sans-serif", width: 500 }}
-          >
+        {/* Result type + Title */}
+        <div className="flex flex-col gap-[5px] mb-[14px]" style={{ maxWidth: 509 }}>
+          <p className="text-white text-[10px] leading-[1.15]">
             {d?.result_type ?? "Result Type"}
           </p>
           <p
@@ -194,17 +157,16 @@ export default function ResultSummary({ data }: TemplateProps) {
           </p>
         </div>
 
-        {/* Intro paragraphs */}
+        {/* Intro text */}
         <div
           className="text-[#e2e0df] text-[8px] font-light leading-[1.367]"
-          style={{ fontFamily: "'Noto Sans', sans-serif" }}
+          style={{ maxWidth: 509 }}
         >
-          <p className="mb-0">
+          <p className="mb-[8px]">
             This report was generated from the CGIAR Performance and Results Management System
             (PRMS) on {d?.generated_date ?? "—"}. Please note that the contents of this report are
             subject to change as future updates are made to the result metadata.
           </p>
-          <p className="mb-0">&nbsp;</p>
           <p>
             The present result summary presents a standalone result reported for the{" "}
             {d?.reporting_phase ?? "—"} cycle through the CGIAR Performance and Results Management
@@ -235,24 +197,18 @@ export default function ResultSummary({ data }: TemplateProps) {
         </div>
       </div>
 
-      {/* Main content below header */}
-      <div
-        className="absolute flex flex-col"
-        style={{ left: 43, top: 301, width: 509, gap: 20 }}
-      >
+      {/* Body content */}
+      <div className="flex flex-col gap-[20px]" style={{ padding: "20px 43px 40px", maxWidth: 552 }}>
         {/* QA Assessment box */}
         <QABox adjustments={d?.qa_adjustments ?? []} />
 
         {/* Result details section */}
-        <div className="flex flex-col" style={{ gap: 10 }}>
-          <p
-            className="text-[#065f4a] text-[14px] font-bold leading-[1.15]"
-            style={{ fontFamily: "'Noto Sans', sans-serif" }}
-          >
+        <div className="flex flex-col gap-[10px]">
+          <p className="text-[#065f4a] text-[14px] font-bold leading-[1.15]">
             Result details
           </p>
 
-          <div className="flex flex-col" style={{ gap: 8 }}>
+          <div className="flex flex-col gap-[8px]">
             {d?.short_title && <LabelValue label="Short title" value={d.short_title} />}
             {d?.result_description && (
               <LabelValue label="Result description" value={d.result_description} multiline />
@@ -273,26 +229,19 @@ export default function ResultSummary({ data }: TemplateProps) {
 
             {/* Impact Areas */}
             {d?.impact_areas && d.impact_areas.length > 0 && (
-              <div className="flex flex-col" style={{ gap: 5 }}>
-                <p
-                  className="text-[#1d1d1d] text-[10px] font-bold leading-[1.15]"
-                  style={{ fontFamily: "'Noto Sans', sans-serif" }}
-                >
+              <div className="flex flex-col gap-[5px]">
+                <p className="text-[#1d1d1d] text-[10px] font-bold leading-[1.15]">
                   Impact Areas targeted
                 </p>
-                <div className="flex flex-col" style={{ gap: 10 }}>
-                  {/* Impact area cards in rows of 2 */}
-                  <div className="flex" style={{ gap: 10 }}>
+                <div className="flex flex-col gap-[10px]">
+                  <div className="flex gap-[10px]">
                     {d.impact_areas.map((area, i) => (
                       <ImpactAreaCard key={i} area={area} />
                     ))}
                   </div>
 
-                  {/* OECD DAC criteria explanation */}
-                  <div
-                    className="text-[#818181] text-[8px] leading-[1.367]"
-                    style={{ fontFamily: "'Noto Sans', sans-serif" }}
-                  >
+                  {/* OECD DAC criteria */}
+                  <div className="text-[#818181] text-[8px] leading-[1.367]">
                     <p className="mb-0">
                       Following the OECD DAC criteria, Impact Areas scores are defined as follows:
                     </p>
@@ -320,39 +269,6 @@ export default function ResultSummary({ data }: TemplateProps) {
               </div>
             )}
           </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div
-        className="absolute flex flex-col"
-        style={{ left: 43, bottom: 0, width: 509, gap: 3 }}
-      >
-        <div className="w-full" style={{ height: 0, borderTop: "0.8px solid #c4c4c4" }} />
-        <div className="flex items-center justify-between pb-[10px]">
-          <div className="flex items-center" style={{ gap: 4 }}>
-            <span
-              className="text-[#010d09] text-[7px] font-bold leading-[1.15]"
-              style={{ fontFamily: "'Noto Sans', sans-serif" }}
-            >
-              PRMS Result
-            </span>
-            <span className="text-[#c4c4c4]" style={{ fontSize: 7 }}>
-              |
-            </span>
-            <span
-              className="text-[#7e8197] text-[7px] leading-[1.15]"
-              style={{ fontFamily: "'Noto Sans', sans-serif" }}
-            >
-              Page {d?.page_number ?? 1} of {d?.total_pages ?? 1}
-            </span>
-          </div>
-          <span
-            className="text-[#7e8197] text-[7px] leading-[1.15]"
-            style={{ fontFamily: "'Noto Sans', sans-serif" }}
-          >
-            CGIAR
-          </span>
         </div>
       </div>
     </div>
