@@ -1,7 +1,7 @@
 /**
  * AWS Lambda Handler for Next.js Standalone Server
  * 
- * Adapts Next.js standalone server to Lambda.
+ * Directly uses Next.js request handler without starting HTTP server.
  * Supports both Lambda Function URL and API Gateway events.
  */
 
@@ -26,28 +26,47 @@ async function getRequestHandler() {
   }
 
   try {
-    // Import Next.js server
+    // Import Next.js server module
+    // Note: This may trigger server startup, but we'll intercept the handler
     const serverModule = await import(SERVER_PATH);
     
-    // Next.js standalone exports a request handler
-    // It might be default export or named export
-    requestHandler = serverModule.default || serverModule.requestHandler || serverModule;
+    console.log('Server module imported. Keys:', Object.keys(serverModule));
+    
+    // Next.js standalone typically exports the request handler
+    // Look for common Next.js handler exports
+    if (serverModule.requestHandler) {
+      requestHandler = serverModule.requestHandler;
+    } else if (serverModule.default && typeof serverModule.default === 'function') {
+      // Default export might be the handler
+      requestHandler = serverModule.default;
+    } else if (serverModule.handler) {
+      requestHandler = serverModule.handler;
+    } else {
+      // Try to access the internal Next.js request handler
+      // Next.js stores it in different places depending on version
+      throw new Error('Could not find request handler in server module. Available keys: ' + Object.keys(serverModule).join(', '));
+    }
+    
+    if (typeof requestHandler !== 'function') {
+      throw new Error(`Request handler is not a function. Type: ${typeof requestHandler}`);
+    }
     
     return requestHandler;
   } catch (error) {
-    console.error('Failed to load Next.js server:', error);
+    console.error('Failed to load Next.js request handler:', error);
     throw error;
   }
 }
 
 /**
- * Convert Lambda event to Next.js request/response
+ * Convert Lambda event to Next.js Request object
  */
-function createRequestResponse(event) {
+function createNextRequest(event) {
   const url = event.rawPath || event.path || '/';
   const queryString = event.rawQueryString || '';
   const fullUrl = queryString ? `${url}?${queryString}` : url;
   const method = event.requestContext?.http?.method || event.httpMethod || 'GET';
+  const host = event.requestContext?.domainName || 'localhost';
   
   const headers = new Headers();
   Object.entries(event.headers || {}).forEach(([key, value]) => {
@@ -60,54 +79,41 @@ function createRequestResponse(event) {
     ? (event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body)
     : undefined;
 
-  const request = new Request(`https://${event.requestContext?.domainName || 'localhost'}${fullUrl}`, {
+  return new Request(`https://${host}${fullUrl}`, {
     method,
     headers,
-    body: body ? (typeof body === 'string' ? body : JSON.stringify(body)) : undefined,
+    body: body,
+  });
+}
+
+/**
+ * Convert Next.js Response to Lambda response format
+ */
+async function convertResponse(response) {
+  const headers = {};
+  response.headers.forEach((value, key) => {
+    headers[key] = value;
   });
 
-  let responseBody = '';
-  let responseHeaders = {};
-  let statusCode = 200;
+  let body;
   let isBase64Encoded = false;
 
-  const response = {
-    status: (code) => {
-      statusCode = code;
-      return response;
-    },
-    setHeader: (name, value) => {
-      responseHeaders[name] = value;
-      return response;
-    },
-    getHeader: (name) => responseHeaders[name],
-    write: (chunk) => {
-      responseBody += chunk.toString();
-      return response;
-    },
-    end: (chunk) => {
-      if (chunk) {
-        responseBody += chunk.toString();
-      }
-      return response;
-    },
-    json: (data) => {
-      responseHeaders['Content-Type'] = 'application/json';
-      responseBody = JSON.stringify(data);
-      return response;
-    },
-    send: (data) => {
-      responseBody = typeof data === 'string' ? data : JSON.stringify(data);
-      return response;
-    },
-  };
+  // Check if response is binary
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.startsWith('image/') || contentType.startsWith('application/pdf') || contentType.startsWith('application/octet-stream')) {
+    const arrayBuffer = await response.arrayBuffer();
+    body = Buffer.from(arrayBuffer).toString('base64');
+    isBase64Encoded = true;
+  } else {
+    body = await response.text();
+  }
 
-  return { request, response, getResult: () => ({
-    statusCode,
-    headers: responseHeaders,
-    body: responseBody,
+  return {
+    statusCode: response.status,
+    headers,
+    body,
     isBase64Encoded,
-  })};
+  };
 }
 
 /**
@@ -118,24 +124,29 @@ export const handler = async (event, context) => {
     // Initialize request handler if needed
     const handlerFn = await getRequestHandler();
 
-    // Create request/response objects
-    const { request, response, getResult } = createRequestResponse(event);
+    if (!handlerFn || typeof handlerFn !== 'function') {
+      throw new Error('Request handler is not a function');
+    }
+
+    // Create Next.js Request from Lambda event
+    const request = createNextRequest(event);
 
     // Call Next.js request handler
-    await handlerFn(request, response);
+    const response = await handlerFn(request);
 
-    // Get the result
-    return getResult();
+    // Convert Next.js Response to Lambda format
+    return await convertResponse(response);
   } catch (error) {
     console.error('Lambda handler error:', {
       message: error.message,
       stack: error.stack,
+      errorType: error.constructor.name,
     });
 
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'text/plain' },
-      body: 'Internal Server Error',
+      body: 'Internal Server Error: ' + error.message,
       isBase64Encoded: false,
     };
   }
