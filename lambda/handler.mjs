@@ -118,17 +118,6 @@ async function getRequestHandler() {
       }
     }
 
-    // If we still don't have a handler, try to access the server
-    // through the global state or by waiting for it to initialize
-    // Next.js might store the server in a global variable
-
-    // Check global state
-    if (global.nextServer) {
-      console.log('Found server in global.nextServer');
-      requestHandler = createServerRequestHandler(global.nextServer);
-      return requestHandler;
-    }
-
     throw new Error('Could not find Next.js request handler. Server may not have initialized correctly.');
 
   } catch (error) {
@@ -136,6 +125,134 @@ async function getRequestHandler() {
     console.error('Error stack:', error.stack);
     throw error;
   }
+}
+
+/**
+ * Create a complete mock ServerResponse object
+ * This needs to have all the properties and methods that Next.js expects
+ */
+function createMockResponse() {
+  let statusCode = 200;
+  const headers = {};
+  const headersSent = false;
+  let body = '';
+  let responseComplete = false;
+
+  // Create a mock response object that extends EventEmitter-like behavior
+  const res = {
+    statusCode: 200,
+    statusMessage: 'OK',
+    headersSent: false,
+    finished: false,
+    _hasBody: true,
+    _header: null,
+    _headerSent: false,
+    _implicitHeader: function () {
+      // This is called by compression middleware
+      if (!this._headerSent) {
+        this._headerSent = true;
+      }
+    },
+    status: function (code) {
+      this.statusCode = code;
+      statusCode = code;
+      return this;
+    },
+    setHeader: function (name, value) {
+      headers[name] = value;
+      return this;
+    },
+    getHeader: function (name) {
+      return headers[name];
+    },
+    removeHeader: function (name) {
+      delete headers[name];
+    },
+    getHeaders: function () {
+      return { ...headers };
+    },
+    hasHeader: function (name) {
+      return name in headers;
+    },
+    write: function (chunk) {
+      if (chunk) {
+        body += chunk.toString();
+      }
+      return true;
+    },
+    writeHead: function (code, statusMessage, headersObj) {
+      this.statusCode = code;
+      if (typeof statusMessage === 'string') {
+        this.statusMessage = statusMessage;
+      } else if (statusMessage && typeof statusMessage === 'object') {
+        headersObj = statusMessage;
+      }
+      if (headersObj) {
+        Object.assign(headers, headersObj);
+      }
+      this._headerSent = true;
+      return this;
+    },
+    end: function (chunk, encoding, callback) {
+      if (chunk) {
+        body += chunk.toString();
+      }
+      this.finished = true;
+      responseComplete = true;
+      if (typeof callback === 'function') {
+        callback();
+      }
+      return this;
+    },
+    json: function (data) {
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(data);
+      this.finished = true;
+      responseComplete = true;
+      return this;
+    },
+    send: function (data) {
+      body = typeof data === 'string' ? data : JSON.stringify(data);
+      this.finished = true;
+      responseComplete = true;
+      return this;
+    },
+    // EventEmitter methods
+    on: function (event, listener) {
+      // Mock event listener
+      return this;
+    },
+    once: function (event, listener) {
+      // Mock event listener
+      return this;
+    },
+    emit: function (event, ...args) {
+      // Mock event emitter
+      return true;
+    },
+    // Stream methods
+    pipe: function (dest) {
+      return dest;
+    },
+    // Additional methods that might be needed
+    setEncoding: function (encoding) {
+      return this;
+    },
+    pause: function () {
+      return this;
+    },
+    resume: function () {
+      return this;
+    },
+  };
+
+  // Store references for closure access
+  res._statusCode = statusCode;
+  res._headers = headers;
+  res._body = body;
+  res._responseComplete = responseComplete;
+
+  return res;
 }
 
 /**
@@ -152,50 +269,19 @@ function createServerRequestHandler(server) {
       headers: Object.fromEntries(request.headers),
       getHeader: function (name) { return this.headers[name.toLowerCase()]; },
       body: request.body,
-    };
-
-    let statusCode = 200;
-    const headers = {};
-    let body = '';
-    let responseComplete = false;
-
-    const res = {
-      statusCode: 200,
-      status: function (code) {
-        this.statusCode = code;
-        statusCode = code;
-        return this;
+      // Additional properties that might be needed
+      socket: {
+        remoteAddress: '127.0.0.1',
+        remotePort: 0,
       },
-      setHeader: function (name, value) {
-        headers[name] = value;
-        return this;
-      },
-      getHeader: function (name) {
-        return headers[name];
-      },
-      write: function (chunk) {
-        body += chunk ? chunk.toString() : '';
-        return this;
-      },
-      end: function (chunk) {
-        if (chunk) {
-          body += chunk.toString();
-        }
-        responseComplete = true;
-        return this;
-      },
-      json: function (data) {
-        headers['Content-Type'] = 'application/json';
-        body = JSON.stringify(data);
-        responseComplete = true;
-        return this;
-      },
-      send: function (data) {
-        body = typeof data === 'string' ? data : JSON.stringify(data);
-        responseComplete = true;
-        return this;
+      connection: {
+        remoteAddress: '127.0.0.1',
+        remotePort: 0,
       },
     };
+
+    // Create a complete mock response object
+    const res = createMockResponse();
 
     // Handle the request using the server's request event
     return new Promise((resolve, reject) => {
@@ -208,9 +294,15 @@ function createServerRequestHandler(server) {
 
       // Wait for response to complete
       const checkInterval = setInterval(() => {
-        if (responseComplete) {
+        if (res._responseComplete || res.finished) {
           clearInterval(checkInterval);
           clearTimeout(timeout);
+
+          // Get the response data
+          const statusCode = res.statusCode || 200;
+          const headers = res._headers || {};
+          const body = res._body || '';
+
           resolve(new Response(body, {
             status: statusCode,
             headers: headers,
