@@ -82,13 +82,36 @@ export default function AdminPage() {
 
   function handleSubmit() {
     if (!isValid || !secret) return;
-    sileo.action({
+    const id = sileo.action({
       title: "Ready to upload?",
-      description: `This will save the JSON and open the "${form.template}" template`,
-      button: {
-        title: "Upload",
-        onClick: () => executeUpload(),
-      },
+      description: (
+        <div className="flex flex-col gap-3">
+          <span>This will save the JSON and open the &quot;{form.template}&quot; template</span>
+          <div className="flex gap-2">
+            <span
+              role="button"
+              tabIndex={0}
+              data-sileo-button="true"
+              onClick={(e) => { e.stopPropagation(); sileo.dismiss(id); executeUpload(); }}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(id); executeUpload(); } }}
+              className="flex-1 text-center bg-white text-neutral-900 text-sm font-medium py-2 rounded-lg cursor-pointer hover:bg-neutral-200 transition-colors"
+            >
+              Upload
+            </span>
+            <span
+              role="button"
+              tabIndex={0}
+              data-sileo-button="true"
+              onClick={(e) => { e.stopPropagation(); sileo.dismiss(id); }}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(id); } }}
+              className="flex-1 text-center bg-neutral-800 text-neutral-300 text-sm font-medium py-2 rounded-lg cursor-pointer hover:bg-neutral-700 hover:text-white transition-colors"
+            >
+              Cancel
+            </span>
+          </div>
+        </div>
+      ),
+      duration: null,
     });
   }
 

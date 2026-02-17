@@ -82,14 +82,37 @@ export default function ListPage() {
     }
   }
 
-  function requestDelete(id: string) {
-    sileo.action({
+  function requestDelete(recordId: string) {
+    const toastId = sileo.action({
       title: "Remove this record permanently?",
-      description: id,
-      button: {
-        title: "Delete",
-        onClick: () => executeDelete(id),
-      },
+      description: (
+        <div className="flex flex-col gap-3">
+          <span className="font-mono text-xs">{recordId}</span>
+          <div className="flex gap-2">
+            <span
+              role="button"
+              tabIndex={0}
+              data-sileo-button="true"
+              onClick={(e) => { e.stopPropagation(); sileo.dismiss(toastId); executeDelete(recordId); }}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(toastId); executeDelete(recordId); } }}
+              className="flex-1 text-center bg-red-500 text-white text-sm font-medium py-2 rounded-lg cursor-pointer hover:bg-red-600 transition-colors"
+            >
+              Delete
+            </span>
+            <span
+              role="button"
+              tabIndex={0}
+              data-sileo-button="true"
+              onClick={(e) => { e.stopPropagation(); sileo.dismiss(toastId); }}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(toastId); } }}
+              className="flex-1 text-center bg-neutral-800 text-neutral-300 text-sm font-medium py-2 rounded-lg cursor-pointer hover:bg-neutral-700 hover:text-white transition-colors"
+            >
+              Cancel
+            </span>
+          </div>
+        </div>
+      ),
+      duration: null,
     });
   }
 
