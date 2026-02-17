@@ -20,10 +20,6 @@ COPY public ./public
 # Copy Lambda handler
 COPY lambda/handler.mjs ./
 
-# Install serverless-http (required by handler)
-# The standalone build includes Next.js deps, but not our additional deps
-RUN npm install serverless-http@^3.2.0 --production --no-save
-
 # Create index.mjs fallback (for Lambda compatibility)
 RUN echo "export { handler } from './handler.mjs';" > index.mjs
 
