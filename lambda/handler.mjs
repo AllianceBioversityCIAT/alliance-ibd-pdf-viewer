@@ -9,6 +9,7 @@ import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import http from 'http';
+import { EventEmitter } from 'events';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -128,122 +129,228 @@ async function getRequestHandler() {
 }
 
 /**
+ * Create a complete mock IncomingMessage object
+ * This needs to have all the properties and methods that Next.js expects
+ */
+function createMockRequest(url, method, headers, body) {
+  // Create an EventEmitter-like object for the request
+  const req = Object.create(EventEmitter.prototype);
+
+  // Set properties
+  req.url = url;
+  req.method = method;
+  req.headers = headers;
+  req.headersDistinct = {};
+  req.rawHeaders = [];
+  Object.entries(headers).forEach(([key, value]) => {
+    req.rawHeaders.push(key, value);
+  });
+
+  req.httpVersion = '1.1';
+  req.httpVersionMajor = 1;
+  req.httpVersionMinor = 1;
+  req.complete = false;
+  req.aborted = false;
+  req.upgrade = false;
+  req.readable = true;
+  req.socket = {
+    remoteAddress: '127.0.0.1',
+    remotePort: 0,
+    localAddress: '127.0.0.1',
+    localPort: 0,
+  };
+  req.connection = req.socket;
+
+  // Body handling
+  if (body) {
+    if (typeof body === 'string') {
+      req.body = body;
+    } else if (Buffer.isBuffer(body)) {
+      req.body = body;
+    }
+  }
+
+  // EventEmitter methods (delegate to EventEmitter)
+  req.on = EventEmitter.prototype.on.bind(req);
+  req.once = EventEmitter.prototype.once.bind(req);
+  req.emit = EventEmitter.prototype.emit.bind(req);
+  req.removeListener = EventEmitter.prototype.removeListener.bind(req);
+  req.removeAllListeners = EventEmitter.prototype.removeAllListeners.bind(req);
+  req.setMaxListeners = EventEmitter.prototype.setMaxListeners.bind(req);
+  req.getMaxListeners = EventEmitter.prototype.getMaxListeners.bind(req);
+  req.listeners = EventEmitter.prototype.listeners.bind(req);
+  req.listenerCount = EventEmitter.prototype.listenerCount.bind(req);
+
+  // Stream methods
+  req.read = function (size) {
+    return null;
+  };
+  req.setEncoding = function (encoding) {
+    return this;
+  };
+  req.pause = function () {
+    return this;
+  };
+  req.resume = function () {
+    return this;
+  };
+  req.pipe = function (dest) {
+    return dest;
+  };
+  req.unpipe = function (dest) {
+    return this;
+  };
+  req.unshift = function (chunk) {
+    return this;
+  };
+  req.wrap = function (stream) {
+    return this;
+  };
+
+  // Additional methods
+  req.getHeader = function (name) {
+    return this.headers[name.toLowerCase()];
+  };
+  req.setHeader = function (name, value) {
+    this.headers[name.toLowerCase()] = value;
+    return this;
+  };
+  req.removeHeader = function (name) {
+    delete this.headers[name.toLowerCase()];
+    return this;
+  };
+  req.getHeaders = function () {
+    return { ...this.headers };
+  };
+  req.hasHeader = function (name) {
+    return name.toLowerCase() in this.headers;
+  };
+
+  return req;
+}
+
+/**
  * Create a complete mock ServerResponse object
  * This needs to have all the properties and methods that Next.js expects
  */
 function createMockResponse() {
+  // Create an EventEmitter-like object for the response
+  const res = Object.create(EventEmitter.prototype);
+
   let statusCode = 200;
   const headers = {};
-  const headersSent = false;
   let body = '';
   let responseComplete = false;
 
-  // Create a mock response object that extends EventEmitter-like behavior
-  const res = {
-    statusCode: 200,
-    statusMessage: 'OK',
-    headersSent: false,
-    finished: false,
-    _hasBody: true,
-    _header: null,
-    _headerSent: false,
-    _implicitHeader: function () {
-      // This is called by compression middleware
-      if (!this._headerSent) {
-        this._headerSent = true;
-      }
-    },
-    status: function (code) {
-      this.statusCode = code;
-      statusCode = code;
-      return this;
-    },
-    setHeader: function (name, value) {
-      headers[name] = value;
-      return this;
-    },
-    getHeader: function (name) {
-      return headers[name];
-    },
-    removeHeader: function (name) {
-      delete headers[name];
-    },
-    getHeaders: function () {
-      return { ...headers };
-    },
-    hasHeader: function (name) {
-      return name in headers;
-    },
-    write: function (chunk) {
-      if (chunk) {
-        body += chunk.toString();
-      }
-      return true;
-    },
-    writeHead: function (code, statusMessage, headersObj) {
-      this.statusCode = code;
-      if (typeof statusMessage === 'string') {
-        this.statusMessage = statusMessage;
-      } else if (statusMessage && typeof statusMessage === 'object') {
-        headersObj = statusMessage;
-      }
-      if (headersObj) {
-        Object.assign(headers, headersObj);
-      }
+  // Set properties
+  res.statusCode = 200;
+  res.statusMessage = 'OK';
+  res.headersSent = false;
+  res.finished = false;
+  res._hasBody = true;
+  res._header = null;
+  res._headerSent = false;
+  res._implicitHeader = function () {
+    // This is called by compression middleware
+    if (!this._headerSent) {
       this._headerSent = true;
-      return this;
-    },
-    end: function (chunk, encoding, callback) {
-      if (chunk) {
-        body += chunk.toString();
-      }
-      this.finished = true;
-      responseComplete = true;
-      if (typeof callback === 'function') {
-        callback();
-      }
-      return this;
-    },
-    json: function (data) {
-      headers['Content-Type'] = 'application/json';
-      body = JSON.stringify(data);
-      this.finished = true;
-      responseComplete = true;
-      return this;
-    },
-    send: function (data) {
-      body = typeof data === 'string' ? data : JSON.stringify(data);
-      this.finished = true;
-      responseComplete = true;
-      return this;
-    },
-    // EventEmitter methods
-    on: function (event, listener) {
-      // Mock event listener
-      return this;
-    },
-    once: function (event, listener) {
-      // Mock event listener
-      return this;
-    },
-    emit: function (event, ...args) {
-      // Mock event emitter
-      return true;
-    },
-    // Stream methods
-    pipe: function (dest) {
-      return dest;
-    },
-    // Additional methods that might be needed
-    setEncoding: function (encoding) {
-      return this;
-    },
-    pause: function () {
-      return this;
-    },
-    resume: function () {
-      return this;
-    },
+    }
+  };
+
+  // HTTP methods
+  res.status = function (code) {
+    this.statusCode = code;
+    statusCode = code;
+    return this;
+  };
+  res.setHeader = function (name, value) {
+    headers[name] = value;
+    return this;
+  };
+  res.getHeader = function (name) {
+    return headers[name];
+  };
+  res.removeHeader = function (name) {
+    delete headers[name];
+    return this;
+  };
+  res.getHeaders = function () {
+    return { ...headers };
+  };
+  res.hasHeader = function (name) {
+    return name in headers;
+  };
+  res.write = function (chunk) {
+    if (chunk) {
+      body += chunk.toString();
+    }
+    return true;
+  };
+  res.writeHead = function (code, statusMessage, headersObj) {
+    this.statusCode = code;
+    if (typeof statusMessage === 'string') {
+      this.statusMessage = statusMessage;
+    } else if (statusMessage && typeof statusMessage === 'object') {
+      headersObj = statusMessage;
+    }
+    if (headersObj) {
+      Object.assign(headers, headersObj);
+    }
+    this._headerSent = true;
+    this.headersSent = true;
+    return this;
+  };
+  res.end = function (chunk, encoding, callback) {
+    if (chunk) {
+      body += chunk.toString();
+    }
+    this.finished = true;
+    responseComplete = true;
+    if (typeof callback === 'function') {
+      callback();
+    }
+    this.emit('finish');
+    return this;
+  };
+  res.json = function (data) {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify(data);
+    this.finished = true;
+    responseComplete = true;
+    this.emit('finish');
+    return this;
+  };
+  res.send = function (data) {
+    body = typeof data === 'string' ? data : JSON.stringify(data);
+    this.finished = true;
+    responseComplete = true;
+    this.emit('finish');
+    return this;
+  };
+
+  // EventEmitter methods (delegate to EventEmitter)
+  res.on = EventEmitter.prototype.on.bind(res);
+  res.once = EventEmitter.prototype.once.bind(res);
+  res.emit = EventEmitter.prototype.emit.bind(res);
+  res.removeListener = EventEmitter.prototype.removeListener.bind(res);
+  res.removeAllListeners = EventEmitter.prototype.removeAllListeners.bind(res);
+  res.setMaxListeners = EventEmitter.prototype.setMaxListeners.bind(res);
+  res.getMaxListeners = EventEmitter.prototype.getMaxListeners.bind(res);
+  res.listeners = EventEmitter.prototype.listeners.bind(res);
+  res.listenerCount = EventEmitter.prototype.listenerCount.bind(res);
+
+  // Stream methods
+  res.pipe = function (dest) {
+    return dest;
+  };
+  res.setEncoding = function (encoding) {
+    return this;
+  };
+  res.pause = function () {
+    return this;
+  };
+  res.resume = function () {
+    return this;
   };
 
   // Store references for closure access
@@ -263,24 +370,24 @@ function createServerRequestHandler(server) {
   return async (request) => {
     // Convert Web Request to Node.js request format
     const url = new URL(request.url);
-    const req = {
-      url: url.pathname + url.search,
-      method: request.method,
-      headers: Object.fromEntries(request.headers),
-      getHeader: function (name) { return this.headers[name.toLowerCase()]; },
-      body: request.body,
-      // Additional properties that might be needed
-      socket: {
-        remoteAddress: '127.0.0.1',
-        remotePort: 0,
-      },
-      connection: {
-        remoteAddress: '127.0.0.1',
-        remotePort: 0,
-      },
-    };
+    const urlPath = url.pathname + url.search;
+    const method = request.method;
+    const headers = Object.fromEntries(request.headers);
 
-    // Create a complete mock response object
+    // Get body if present
+    let body = null;
+    if (request.body) {
+      if (typeof request.body === 'string') {
+        body = request.body;
+      } else if (Buffer.isBuffer(request.body)) {
+        body = request.body;
+      } else {
+        body = Buffer.from(request.body);
+      }
+    }
+
+    // Create complete mock request and response objects
+    const req = createMockRequest(urlPath, method, headers, body);
     const res = createMockResponse();
 
     // Handle the request using the server's request event
@@ -300,12 +407,12 @@ function createServerRequestHandler(server) {
 
           // Get the response data
           const statusCode = res.statusCode || 200;
-          const headers = res._headers || {};
-          const body = res._body || '';
+          const responseHeaders = res._headers || {};
+          const responseBody = res._body || '';
 
-          resolve(new Response(body, {
+          resolve(new Response(responseBody, {
             status: statusCode,
-            headers: headers,
+            headers: responseHeaders,
           }));
         }
       }, 10);
