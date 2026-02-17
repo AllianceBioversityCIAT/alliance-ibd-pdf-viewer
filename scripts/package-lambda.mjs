@@ -64,29 +64,7 @@ if (existsSync(PUBLIC_DIR)) {
   cpSync(PUBLIC_DIR, join(PACKAGE_DIR, 'public'), { recursive: true });
 }
 
-// Ensure serverless-http is available in root node_modules (handler imports from root)
-const NODE_MODULES = join(ROOT_DIR, 'node_modules');
-const SERVERLESS_HTTP_PATH = join(NODE_MODULES, 'serverless-http');
-const PACKAGE_NODE_MODULES = join(PACKAGE_DIR, 'node_modules');
-
-if (existsSync(SERVERLESS_HTTP_PATH)) {
-  console.log('Copying serverless-http to package node_modules...');
-  if (!existsSync(PACKAGE_NODE_MODULES)) {
-    mkdirSync(PACKAGE_NODE_MODULES, { recursive: true });
-  }
-  cpSync(SERVERLESS_HTTP_PATH, join(PACKAGE_NODE_MODULES, 'serverless-http'), { recursive: true });
-  console.log('serverless-http copied successfully');
-} else {
-  console.warn('WARNING: serverless-http not found in node_modules. It should be installed as a dependency.');
-  console.warn('Attempting to install serverless-http in package directory...');
-  try {
-    execSync(`cd ${PACKAGE_DIR} && npm install serverless-http@^3.2.0 --production --no-save`, { stdio: 'inherit' });
-    console.log('serverless-http installed successfully');
-  } catch (error) {
-    console.error('ERROR: Failed to install serverless-http:', error.message);
-    process.exit(1);
-  }
-}
+// Note: No additional dependencies needed - Next.js standalone includes everything
 
 // Create index.mjs as fallback (re-exports handler)
 console.log('Creating index.mjs fallback...');
