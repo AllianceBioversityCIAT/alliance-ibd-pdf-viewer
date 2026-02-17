@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SileoToaster from "./toaster";
 
 export const metadata: Metadata = {
   title: "CGIAR PDF Generator",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <SileoToaster />
+      </body>
     </html>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { sileo } from "sileo";
 
 const LS_SECRET = "cgiar_admin_secret";
 
@@ -13,27 +14,21 @@ export default function ListPage() {
   const [secret, setSecret] = useState("");
   const [items, setItems] = useState<TableItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  // Load secret from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem(LS_SECRET) ?? "";
     setSecret(saved);
     setMounted(true);
   }, []);
 
-  // Persist secret changes
   useEffect(() => {
     if (!mounted) return;
-    if (secret) {
-      localStorage.setItem(LS_SECRET, secret);
-    }
+    if (secret) localStorage.setItem(LS_SECRET, secret);
   }, [secret, mounted]);
 
-  // Auto-load if secret was cached
   useEffect(() => {
     if (mounted && secret && !loaded) {
       handleFetch();
@@ -46,14 +41,14 @@ export default function ListPage() {
     setLoaded(false);
     setItems([]);
     localStorage.removeItem(LS_SECRET);
+    sileo.info({ title: "Session cleared" });
   }
 
   async function handleFetch() {
     if (!secret) return;
     setLoading(true);
-    setError(null);
 
-    try {
+    const promise = (async () => {
       const res = await fetch("/api/list", {
         headers: { "x-admin-secret": secret },
       });
@@ -61,22 +56,47 @@ export default function ListPage() {
       const body = await res.json();
 
       if (!res.ok) {
-        setError(body.error ?? "Request failed");
-        return;
+        throw new Error(body.error ?? "Request failed");
       }
 
       setItems(body.items);
       setLoaded(true);
-    } catch (e) {
-      setError((e as Error).message);
+      return body.items.length as number;
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: "Fetching records..." },
+      success: (count) => ({
+        title: `${count} record${count !== 1 ? "s" : ""} found`,
+      }),
+      error: (err) => ({
+        title: "Could not load records",
+        description: (err as Error).message,
+      }),
+    });
+
+    try {
+      await promise;
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleDelete(id: string) {
+  function requestDelete(id: string) {
+    sileo.action({
+      title: "Remove this record permanently?",
+      description: id,
+      button: {
+        title: "Delete",
+        onClick: () => executeDelete(id),
+      },
+    });
+  }
+
+  async function executeDelete(id: string) {
     setDeleting(id);
-    try {
+
+    const promise = (async () => {
       const res = await fetch("/api/delete", {
         method: "POST",
         headers: {
@@ -88,13 +108,23 @@ export default function ListPage() {
 
       if (!res.ok) {
         const body = await res.json();
-        setError(body.error ?? "Delete failed");
-        return;
+        throw new Error(body.error ?? "Delete failed");
       }
 
       setItems((prev) => prev.filter((item) => item.id !== id));
-    } catch (e) {
-      setError((e as Error).message);
+    })();
+
+    sileo.promise(promise, {
+      loading: { title: "Removing record..." },
+      success: { title: "Record removed" },
+      error: (err) => ({
+        title: "Could not delete record",
+        description: (err as Error).message,
+      }),
+    });
+
+    try {
+      await promise;
     } finally {
       setDeleting(null);
     }
@@ -120,130 +150,126 @@ export default function ListPage() {
   const hasSession = !!secret;
 
   return (
-    <div className="min-h-screen bg-[#02211A] font-sans p-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-white font-sans">
+      <div className="max-w-3xl mx-auto px-6 py-16">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#11D4B3]/10 border border-[#11D4B3]/20 flex items-center justify-center">
-                <span className="text-[#11D4B3] text-sm">DB</span>
-              </div>
-              <div>
-                <h1 className="text-white text-xl font-bold">Records</h1>
-                <p className="text-[#E2E0DF]/40 text-xs">CGIAR PDF Generator Service</p>
-              </div>
+            <div>
+              <h1 className="text-neutral-900 text-xl font-semibold tracking-tight">
+                Records
+              </h1>
+              <p className="text-neutral-400 text-sm mt-0.5">
+                CGIAR PDF Generator
+              </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <a
                 href="/admin"
-                className="text-[#11D4B3]/50 hover:text-[#11D4B3] text-xs transition-colors"
+                className="text-neutral-400 hover:text-neutral-900 text-sm transition-colors"
               >
-                Upload JSON
+                Upload
+              </a>
+              <a
+                href="/docs"
+                className="text-neutral-400 hover:text-neutral-900 text-sm transition-colors"
+              >
+                Docs
               </a>
               {hasSession && (
                 <button
                   onClick={handleLogout}
-                  className="text-[#E2E0DF]/30 hover:text-red-400 text-xs transition-colors"
+                  className="text-neutral-400 hover:text-red-500 text-sm transition-colors"
                 >
-                  Logout
+                  Sign out
                 </button>
               )}
             </div>
           </div>
-          <div className="h-px bg-gradient-to-r from-[#11D4B3]/30 to-transparent mt-4" />
+          <div className="h-px bg-neutral-100 mt-6" />
         </div>
 
         {/* Auth bar */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex gap-3 mb-8">
           <input
             type="password"
             value={secret}
             onChange={(e) => setSecret(e.target.value)}
             placeholder="Admin Secret"
             onKeyDown={(e) => e.key === "Enter" && handleFetch()}
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-[#E2E0DF] text-sm focus:outline-none focus:border-[#11D4B3] placeholder-white/20 transition-colors"
+            className="flex-1 bg-white border border-neutral-200 rounded-lg px-3 py-2.5 text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent placeholder-neutral-300 transition-shadow"
           />
           <button
             onClick={handleFetch}
             disabled={!secret || loading}
-            className="bg-[#11D4B3] text-[#02211A] font-bold text-sm px-6 py-2.5 rounded-lg hover:bg-[#0bc4a4] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer active:scale-[0.98]"
+            className="bg-neutral-900 text-white font-medium text-sm px-6 py-2.5 rounded-lg hover:bg-neutral-800 disabled:opacity-20 disabled:cursor-not-allowed transition-colors cursor-pointer active:scale-[0.98]"
           >
             {loading ? "Loading..." : "Load"}
           </button>
         </div>
 
-        {/* Error */}
-        {error && (
-          <div className="bg-red-900/20 border border-red-400/20 rounded-lg px-4 py-3 mb-4">
-            <p className="text-red-400 text-sm">{error}</p>
-          </div>
-        )}
-
         {/* Results */}
         {loaded && (
           <>
-            {/* Count badge */}
-            <div className="flex items-center gap-2 mb-4">
-              <span className="bg-[#11D4B3]/10 text-[#11D4B3] text-xs font-bold px-2.5 py-1 rounded-full">
+            {/* Count + Refresh */}
+            <div className="flex items-center gap-3 mb-5">
+              <span className="bg-neutral-100 text-neutral-600 text-xs font-medium px-2.5 py-1 rounded-full">
                 {items.length}
               </span>
-              <span className="text-[#E2E0DF]/40 text-sm">
-                record{items.length !== 1 && "s"} in table
+              <span className="text-neutral-400 text-sm">
+                record{items.length !== 1 && "s"}
               </span>
               <button
                 onClick={handleFetch}
                 disabled={loading}
-                className="text-[#E2E0DF]/30 hover:text-[#11D4B3] text-xs ml-auto transition-colors disabled:opacity-30"
+                className="text-neutral-400 hover:text-neutral-900 text-sm ml-auto transition-colors disabled:opacity-30"
               >
                 Refresh
               </button>
             </div>
 
             {items.length === 0 && (
-              <div className="text-center py-16">
-                <div className="text-[#E2E0DF]/20 text-5xl mb-3">0</div>
-                <p className="text-[#E2E0DF]/30 text-sm">Table is empty</p>
+              <div className="text-center py-20">
+                <p className="text-neutral-300 text-lg font-medium">No records</p>
+                <p className="text-neutral-400 text-sm mt-1">The table is empty</p>
               </div>
             )}
 
-            <div className="space-y-2">
+            <div className="space-y-px">
               {items.map((item) => (
                 <details
                   key={item.id}
-                  className="group bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.06] rounded-xl transition-colors"
+                  className="group border border-neutral-100 first:rounded-t-xl last:rounded-b-xl transition-colors hover:bg-neutral-50"
                 >
                   <summary className="flex items-center justify-between px-4 py-3 cursor-pointer list-none">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-2 h-2 rounded-full bg-[#11D4B3] shrink-0" />
-                      <code className="text-[#11D4B3] text-sm font-mono truncate">
+                      <div className="w-2 h-2 rounded-full bg-neutral-900 shrink-0" />
+                      <code className="text-neutral-900 text-sm font-mono truncate">
                         {item.id}
                       </code>
-                      <span className="text-[#E2E0DF]/25 text-xs truncate hidden sm:inline">
+                      <span className="text-neutral-300 text-xs truncate hidden sm:inline font-mono">
                         {truncateJson(item.json)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0 ml-3">
-                      <span className="text-[#E2E0DF]/20 text-xs group-open:rotate-90 transition-transform">
+                      <span className="text-neutral-300 text-xs group-open:rotate-90 transition-transform">
                         &#9654;
                       </span>
                       <button
                         onClick={(e) => {
                           e.preventDefault();
-                          if (confirm(`Delete record ${item.id}?`)) {
-                            handleDelete(item.id);
-                          }
+                          requestDelete(item.id);
                         }}
                         disabled={deleting === item.id}
-                        className="text-red-400/40 hover:text-red-400 hover:bg-red-400/10 text-xs px-2.5 py-1 rounded-lg transition-all disabled:opacity-30"
+                        className="text-neutral-300 hover:text-red-500 hover:bg-red-50 text-xs px-2.5 py-1 rounded-md transition-all disabled:opacity-30"
                       >
                         {deleting === item.id ? "..." : "Delete"}
                       </button>
                     </div>
                   </summary>
                   <div className="px-4 pb-4">
-                    <div className="bg-black/20 rounded-lg p-3 border border-white/[0.04]">
-                      <pre className="text-[#E2E0DF]/60 text-xs font-mono overflow-x-auto max-h-60 overflow-y-auto">
+                    <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-100">
+                      <pre className="text-neutral-600 text-xs font-mono overflow-x-auto max-h-60 overflow-y-auto">
                         {formatJson(item.json)}
                       </pre>
                     </div>
