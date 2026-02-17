@@ -1,3 +1,5 @@
+import TemplateBadges from "./template-badges";
+
 export default function DocsPage() {
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -316,14 +318,7 @@ x-admin-secret: <ADMIN_SECRET>`}</pre>
                 <p className="text-neutral-400 text-[10px] uppercase tracking-wider font-medium mb-2">
                   Available Templates
                 </p>
-                <div className="flex gap-2">
-                  <span className="text-xs font-mono bg-neutral-100 text-neutral-700 px-2 py-1 rounded">
-                    example
-                  </span>
-                  <span className="text-xs font-mono bg-neutral-100 text-neutral-700 px-2 py-1 rounded">
-                    summary
-                  </span>
-                </div>
+                <TemplateBadges />
               </div>
             </div>
 

@@ -45,11 +45,16 @@ export default function AdminPage() {
   const [form, setForm] = useState<FormState>(defaultForm);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [templates, setTemplates] = useState<string[]>([]);
 
   useEffect(() => {
     setSecret(loadSecret());
     setForm(loadForm());
     setMounted(true);
+    fetch("/api/templates")
+      .then((r) => r.json())
+      .then((d) => setTemplates(d.templates))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -233,8 +238,9 @@ export default function AdminPage() {
                 onChange={(e) => updateForm({ template: e.target.value })}
                 className="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2.5 text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-shadow"
               >
-                <option value="example">example</option>
-                <option value="summary">summary</option>
+                {templates.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
               </select>
             </div>
             <div>

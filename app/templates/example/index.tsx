@@ -1,4 +1,4 @@
-import type { TemplateProps } from "../index";
+import type { TemplateProps } from "..";
 
 interface LinkedEvidence {
   details: string | null;

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { templates } from "@/app/templates";
+import type { ComponentType } from "react";
+import type { TemplateProps } from "@/app/templates";
 import { getItem, deleteItem } from "@/lib/dynamo";
 
 interface Props {
@@ -16,8 +17,13 @@ export default async function TemplatePage({ params, searchParams }: Props) {
   const { template } = await params;
   const { uuid, paperWidth, paperHeight, test } = await searchParams;
 
-  const TemplateComponent = templates[template];
-  if (!TemplateComponent) notFound();
+  let TemplateComponent: ComponentType<TemplateProps>;
+  try {
+    const mod = await import(`@/app/templates/${template}`);
+    TemplateComponent = mod.default;
+  } catch {
+    notFound();
+  }
 
   if (!uuid) notFound();
 
