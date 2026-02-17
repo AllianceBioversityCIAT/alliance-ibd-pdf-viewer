@@ -1,108 +1,113 @@
 /**
- * AWS Lambda Handler for Next.js Static Site
+ * AWS Lambda Handler for Next.js Standalone Server
  * 
- * Serves static files from the Next.js static export (out/ directory).
+ * Adapts Next.js standalone server to Lambda.
  * Supports both Lambda Function URL and API Gateway events.
  */
 
-import { readFileSync, existsSync } from 'fs';
-import { join, extname, normalize } from 'path';
+import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Path to static files (Next.js export output)
-const STATIC_DIR = join(__dirname, 'out');
+// Path to Next.js standalone server
+const SERVER_PATH = join(__dirname, '.next', 'standalone', 'server.js');
 
-// MIME type mapping
-const MIME_TYPES = {
-  '.html': 'text/html',
-  '.css': 'text/css',
-  '.js': 'application/javascript',
-  '.json': 'application/json',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
-  '.woff': 'font/woff',
-  '.woff2': 'font/woff2',
-  '.ttf': 'font/ttf',
-  '.eot': 'application/vnd.ms-fontobject',
-  '.webp': 'image/webp',
-  '.xml': 'application/xml',
-  '.txt': 'text/plain',
-};
+let requestHandler = null;
 
 /**
- * Get MIME type for file extension
+ * Initialize Next.js request handler (lazy loading)
  */
-function getMimeType(filePath) {
-  const ext = extname(filePath).toLowerCase();
-  return MIME_TYPES[ext] || 'application/octet-stream';
-}
+async function getRequestHandler() {
+  if (requestHandler) {
+    return requestHandler;
+  }
 
-/**
- * Serve static file
- */
-function serveFile(filePath) {
   try {
-    const fullPath = join(STATIC_DIR, filePath);
-    const normalizedPath = normalize(fullPath);
+    // Import Next.js server
+    const serverModule = await import(SERVER_PATH);
     
-    // Security: Ensure path is within STATIC_DIR
-    if (!normalizedPath.startsWith(STATIC_DIR)) {
-      return null;
-    }
+    // Next.js standalone exports a request handler
+    // It might be default export or named export
+    requestHandler = serverModule.default || serverModule.requestHandler || serverModule;
     
-    if (!existsSync(normalizedPath)) {
-      return null;
-    }
-    
-    const content = readFileSync(normalizedPath);
-    const mimeType = getMimeType(filePath);
-    
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': mimeType,
-        'Cache-Control': filePath === 'index.html' || filePath.endsWith('.html')
-          ? 'no-cache, no-store, must-revalidate'
-          : 'public, max-age=31536000, immutable',
-      },
-      body: content.toString('base64'),
-      isBase64Encoded: true,
-    };
+    return requestHandler;
   } catch (error) {
-    console.error('Error serving file:', error);
-    return null;
+    console.error('Failed to load Next.js server:', error);
+    throw error;
   }
 }
 
 /**
- * Convert Lambda event to request path
+ * Convert Lambda event to Next.js request/response
  */
-function getRequestPath(event) {
-  // Lambda Function URL
-  if (event.requestContext && event.rawPath) {
-    return event.rawPath === '/' ? 'index.html' : event.rawPath.replace(/^\//, '');
-  }
+function createRequestResponse(event) {
+  const url = event.rawPath || event.path || '/';
+  const queryString = event.rawQueryString || '';
+  const fullUrl = queryString ? `${url}?${queryString}` : url;
+  const method = event.requestContext?.http?.method || event.httpMethod || 'GET';
   
-  // API Gateway V2
-  if (event.requestContext && event.requestContext.http) {
-    const path = event.rawPath || event.path || '/';
-    return path === '/' ? 'index.html' : path.replace(/^\//, '');
-  }
-  
-  // API Gateway V1
-  if (event.path) {
-    return event.path === '/' ? 'index.html' : event.path.replace(/^\//, '');
-  }
-  
-  return 'index.html';
+  const headers = new Headers();
+  Object.entries(event.headers || {}).forEach(([key, value]) => {
+    if (value) {
+      headers.set(key, value);
+    }
+  });
+
+  const body = event.body 
+    ? (event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body)
+    : undefined;
+
+  const request = new Request(`https://${event.requestContext?.domainName || 'localhost'}${fullUrl}`, {
+    method,
+    headers,
+    body: body ? (typeof body === 'string' ? body : JSON.stringify(body)) : undefined,
+  });
+
+  let responseBody = '';
+  let responseHeaders = {};
+  let statusCode = 200;
+  let isBase64Encoded = false;
+
+  const response = {
+    status: (code) => {
+      statusCode = code;
+      return response;
+    },
+    setHeader: (name, value) => {
+      responseHeaders[name] = value;
+      return response;
+    },
+    getHeader: (name) => responseHeaders[name],
+    write: (chunk) => {
+      responseBody += chunk.toString();
+      return response;
+    },
+    end: (chunk) => {
+      if (chunk) {
+        responseBody += chunk.toString();
+      }
+      return response;
+    },
+    json: (data) => {
+      responseHeaders['Content-Type'] = 'application/json';
+      responseBody = JSON.stringify(data);
+      return response;
+    },
+    send: (data) => {
+      responseBody = typeof data === 'string' ? data : JSON.stringify(data);
+      return response;
+    },
+  };
+
+  return { request, response, getResult: () => ({
+    statusCode,
+    headers: responseHeaders,
+    body: responseBody,
+    isBase64Encoded,
+  })};
 }
 
 /**
@@ -110,39 +115,23 @@ function getRequestPath(event) {
  */
 export const handler = async (event, context) => {
   try {
-    const requestPath = getRequestPath(event);
-    
-    // Try to serve the requested file
-    let response = serveFile(requestPath);
-    
-    // If file not found and it's not already index.html, try index.html (SPA routing)
-    if (!response && requestPath !== 'index.html' && !requestPath.includes('.')) {
-      response = serveFile('index.html');
-    }
-    
-    // If still not found, serve index.html as fallback
-    if (!response) {
-      response = serveFile('index.html');
-    }
-    
-    // If index.html doesn't exist, return 404
-    if (!response) {
-      return {
-        statusCode: 404,
-        headers: { 'Content-Type': 'text/plain' },
-        body: 'Not Found',
-        isBase64Encoded: false,
-      };
-    }
-    
-    return response;
+    // Initialize request handler if needed
+    const handlerFn = await getRequestHandler();
+
+    // Create request/response objects
+    const { request, response, getResult } = createRequestResponse(event);
+
+    // Call Next.js request handler
+    await handlerFn(request, response);
+
+    // Get the result
+    return getResult();
   } catch (error) {
     console.error('Lambda handler error:', {
       message: error.message,
       stack: error.stack,
-      requestPath: getRequestPath(event),
     });
-    
+
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'text/plain' },

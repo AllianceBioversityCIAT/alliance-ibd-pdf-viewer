@@ -1,10 +1,12 @@
 /**
- * Package Lambda deployment ZIP
+ * Package Lambda deployment ZIP for Next.js Standalone
  * 
  * Creates lambda-package/ directory with:
  * - handler.mjs (Lambda handler)
- * - out/ (Next.js static export)
- * - package.json (minimal, if needed)
+ * - .next/standalone (Next.js standalone server)
+ * - .next/static (Next.js static assets)
+ * - public (public assets)
+ * - package.json
  */
 
 import { mkdirSync, cpSync, existsSync, rmSync, writeFileSync } from 'fs';
@@ -16,10 +18,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT_DIR = join(__dirname, '..');
 const PACKAGE_DIR = join(ROOT_DIR, 'lambda-package');
-const OUT_DIR = join(ROOT_DIR, 'out');
+const NEXT_STANDALONE = join(ROOT_DIR, '.next', 'standalone');
+const NEXT_STATIC = join(ROOT_DIR, '.next', 'static');
+const PUBLIC_DIR = join(ROOT_DIR, 'public');
 const HANDLER_SRC = join(ROOT_DIR, 'lambda', 'handler.mjs');
 
-console.log('Packaging Lambda deployment...');
+console.log('Packaging Lambda deployment for Next.js standalone...');
 
 // Clean and create package directory
 if (existsSync(PACKAGE_DIR)) {
@@ -29,19 +33,36 @@ if (existsSync(PACKAGE_DIR)) {
 mkdirSync(PACKAGE_DIR, { recursive: true });
 
 // Verify build output exists
-if (!existsSync(OUT_DIR)) {
-  console.error('ERROR: out/ directory not found. Run "npm run build" first.');
+if (!existsSync(NEXT_STANDALONE)) {
+  console.error('ERROR: .next/standalone directory not found. Run "npm run build" first.');
+  console.error('Make sure next.config.ts has output: "standalone"');
   process.exit(1);
 }
 
-if (!existsSync(join(OUT_DIR, 'index.html'))) {
-  console.error('ERROR: index.html not found in out/. Build may have failed.');
+if (!existsSync(join(NEXT_STANDALONE, 'server.js'))) {
+  console.error('ERROR: server.js not found in .next/standalone. Build may have failed.');
   process.exit(1);
 }
 
 // Copy handler
 console.log('Copying Lambda handler...');
 cpSync(HANDLER_SRC, join(PACKAGE_DIR, 'handler.mjs'));
+
+// Copy Next.js standalone server
+console.log('Copying Next.js standalone server...');
+cpSync(NEXT_STANDALONE, join(PACKAGE_DIR, '.next', 'standalone'), { recursive: true });
+
+// Copy Next.js static assets
+if (existsSync(NEXT_STATIC)) {
+  console.log('Copying Next.js static assets...');
+  cpSync(NEXT_STATIC, join(PACKAGE_DIR, '.next', 'static'), { recursive: true });
+}
+
+// Copy public directory if it exists
+if (existsSync(PUBLIC_DIR)) {
+  console.log('Copying public assets...');
+  cpSync(PUBLIC_DIR, join(PACKAGE_DIR, 'public'), { recursive: true });
+}
 
 // Create index.mjs as fallback (re-exports handler)
 console.log('Creating index.mjs fallback...');
@@ -50,11 +71,7 @@ export { handler } from './handler.mjs';
 `;
 writeFileSync(join(PACKAGE_DIR, 'index.mjs'), indexContent);
 
-// Copy static files
-console.log('Copying static files from out/...');
-cpSync(OUT_DIR, join(PACKAGE_DIR, 'out'), { recursive: true });
-
-// Create minimal package.json for Lambda (if needed)
+// Create minimal package.json for Lambda
 const packageJson = {
   name: 'alliance-ibd-pdf-viewer-lambda',
   version: '1.0.0',
