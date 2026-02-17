@@ -43,6 +43,13 @@ if (!existsSync(join(OUT_DIR, 'index.html'))) {
 console.log('Copying Lambda handler...');
 cpSync(HANDLER_SRC, join(PACKAGE_DIR, 'handler.mjs'));
 
+// Create index.mjs as fallback (re-exports handler)
+console.log('Creating index.mjs fallback...');
+const indexContent = `// Re-export handler for Lambda compatibility
+export { handler } from './handler.mjs';
+`;
+writeFileSync(join(PACKAGE_DIR, 'index.mjs'), indexContent);
+
 // Copy static files
 console.log('Copying static files from out/...');
 cpSync(OUT_DIR, join(PACKAGE_DIR, 'out'), { recursive: true });
