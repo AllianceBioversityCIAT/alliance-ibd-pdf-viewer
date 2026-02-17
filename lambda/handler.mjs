@@ -297,7 +297,17 @@ function createMockResponse() {
   };
   res.write = function (chunk, encoding, callback) {
     if (chunk) {
-      const chunkStr = Buffer.isBuffer(chunk) ? chunk.toString(encoding || 'utf8') : chunk.toString();
+      let chunkStr;
+      if (Buffer.isBuffer(chunk)) {
+        chunkStr = chunk.toString(encoding || 'utf8');
+      } else if (typeof chunk === 'string') {
+        chunkStr = chunk;
+      } else if (Array.isArray(chunk)) {
+        // Handle array of numbers (bytes) - convert to string
+        chunkStr = String.fromCharCode(...chunk);
+      } else {
+        chunkStr = String(chunk);
+      }
       body += chunkStr;
       res._body = body; // Update stored body reference
     }
@@ -328,7 +338,17 @@ function createMockResponse() {
   };
   res.end = function (chunk, encoding, callback) {
     if (chunk) {
-      const chunkStr = Buffer.isBuffer(chunk) ? chunk.toString(encoding || 'utf8') : chunk.toString();
+      let chunkStr;
+      if (Buffer.isBuffer(chunk)) {
+        chunkStr = chunk.toString(encoding || 'utf8');
+      } else if (typeof chunk === 'string') {
+        chunkStr = chunk;
+      } else if (Array.isArray(chunk)) {
+        // Handle array of numbers (bytes) - convert to string
+        chunkStr = String.fromCharCode(...chunk);
+      } else {
+        chunkStr = String(chunk);
+      }
       body += chunkStr;
       res._body = body; // Update stored body reference
     }
@@ -446,11 +466,25 @@ function createServerRequestHandler(server) {
         // Get the response data
         const statusCode = res.statusCode || 200;
         const responseHeaders = res._headers || {};
-        const responseBody = res._body || '';
+        let responseBody = res._body || '';
+
+        // Ensure responseBody is a string
+        if (typeof responseBody !== 'string') {
+          if (Buffer.isBuffer(responseBody)) {
+            responseBody = responseBody.toString('utf8');
+          } else if (Array.isArray(responseBody)) {
+            // Convert array of numbers to string
+            responseBody = String.fromCharCode(...responseBody);
+          } else {
+            responseBody = String(responseBody);
+          }
+        }
 
         console.log('Response status:', statusCode);
         console.log('Response headers:', Object.keys(responseHeaders));
         console.log('Response body length:', responseBody.length);
+        console.log('Response body type:', typeof responseBody);
+        console.log('Response body preview (first 100 chars):', responseBody.substring(0, 100));
 
         resolve(new Response(responseBody, {
           status: statusCode,
