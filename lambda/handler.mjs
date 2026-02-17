@@ -320,6 +320,12 @@ function createMockResponse() {
     this.headersSent = true;
     return this;
   };
+  res.flushHeaders = function () {
+    // flushHeaders sends the headers immediately
+    this._headerSent = true;
+    this.headersSent = true;
+    return this;
+  };
   res.end = function (chunk, encoding, callback) {
     if (chunk) {
       const chunkStr = Buffer.isBuffer(chunk) ? chunk.toString(encoding || 'utf8') : chunk.toString();
