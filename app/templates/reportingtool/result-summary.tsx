@@ -42,6 +42,30 @@ interface GeoLocation {
   countries: string[];
 }
 
+interface Evidence {
+  label: string;
+  link: string;
+  description?: string;
+}
+
+interface InnovationCollaborator {
+  name: string;
+  email?: string;
+}
+
+interface InnovationDevelopment {
+  developer_name: string;
+  developer_email?: string;
+  developer_institution?: string;
+  current_readiness_level?: string;
+  current_readiness_label?: string;
+  readiness_justification?: string;
+  collaborators?: InnovationCollaborator[];
+  innovation_nature?: string;
+  innovation_type?: string;
+  reference_materials?: string[];
+}
+
 interface ResultSummaryData {
   result_type: string;
   title: string;
@@ -61,6 +85,8 @@ interface ResultSummaryData {
   partners?: Partner[];
   bundled_innovations?: BundledInnovation[];
   geo_location?: GeoLocation;
+  evidences?: Evidence[];
+  innovation_development?: InnovationDevelopment;
 }
 
 function ImpactAreaCard({ area }: { area: ImpactArea }) {
@@ -290,6 +316,138 @@ function GeoLocationBox({ geo }: { geo: GeoLocation }) {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function EvidenceCard({ evidence }: { evidence: Evidence }) {
+  return (
+    <div className="bg-[#e2e0df]" style={{ padding: "15px 19px" }}>
+      <div className="flex flex-col gap-[10px]">
+        <p
+          className="text-[#02211a] text-[9.5px] leading-[1.15]"
+          style={{ fontFamily: "'Noto Serif', serif" }}
+        >
+          {evidence.label}
+        </p>
+        <p className="text-[9px] leading-[1.5]">
+          <span className="font-bold text-[#1d1d1d]">Link:</span>{" "}
+          <a href={evidence.link} className="text-[#065f4a] underline break-all">
+            {evidence.link}
+          </a>
+        </p>
+        {evidence.description && (
+          <p className="text-[9px] leading-[1.5]">
+            <span className="font-bold text-[#1d1d1d]">Description:</span>{" "}
+            <span className="text-[#393939]">{evidence.description}</span>
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function InnovationDevelopmentSection({ innovation }: { innovation: InnovationDevelopment }) {
+  return (
+    <div className="flex gap-[20px]">
+      <div className="flex flex-col gap-[8px] text-[10px] flex-1 min-w-0">
+        {/* Developer */}
+        <p style={{ lineHeight: 1.5 }}>
+          <span className="font-bold text-[#1d1d1d]">Innovation Developer:</span>{" "}
+          <span className="text-[#393939]">
+            {innovation.developer_name}
+            {innovation.developer_email && (
+              <>
+                {" "}
+                <span className="text-[#065f4a]">(</span>
+                <a href={`mailto:${innovation.developer_email}`} className="text-[#065f4a] underline">
+                  {innovation.developer_email}
+                </a>
+                <span className="text-[#065f4a]">)</span>
+              </>
+            )}
+            {innovation.developer_institution && ` ${innovation.developer_institution}`}
+          </span>
+        </p>
+
+        {/* Readiness level */}
+        {innovation.current_readiness_level && (
+          <p style={{ lineHeight: 1.5 }}>
+            <span className="font-bold text-[#1d1d1d]">Current readiness of this innovation:</span>{" "}
+            <span className="text-[#393939]">
+              <span className="font-medium">{innovation.current_readiness_level}</span>
+              {innovation.current_readiness_label && ` - ${innovation.current_readiness_label}`}
+            </span>
+          </p>
+        )}
+
+        {/* Readiness justification */}
+        {innovation.readiness_justification && (
+          <p style={{ lineHeight: 1.5 }}>
+            <span className="font-bold text-[#1d1d1d]">Innovation readiness justification:</span>{" "}
+            <span className="text-[#393939]">{innovation.readiness_justification}</span>
+          </p>
+        )}
+
+        {/* Collaborators */}
+        {innovation.collaborators && innovation.collaborators.length > 0 && (
+          <div className="flex flex-col gap-[5px]">
+            <p className="font-bold text-[#1d1d1d] leading-[1.15]">Innovation collaborators:</p>
+            <ul className="list-disc ml-[15px] text-[#393939]">
+              {innovation.collaborators.map((c, i) => (
+                <li key={i} className="leading-[1.5]">
+                  {c.name}{c.email && `, ${c.email}`}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Innovation nature */}
+        {innovation.innovation_nature && (
+          <p style={{ lineHeight: 1.5 }}>
+            <span className="font-bold text-[#1d1d1d]">Innovation nature:</span>{" "}
+            <span className="text-[#393939]">{innovation.innovation_nature}</span>
+          </p>
+        )}
+
+        {/* Innovation type */}
+        {innovation.innovation_type && (
+          <p style={{ lineHeight: 1.5 }}>
+            <span className="font-bold text-[#1d1d1d]">Innovation type:</span>{" "}
+            <span className="text-[#393939]">{innovation.innovation_type}</span>
+          </p>
+        )}
+
+        {/* Reference materials */}
+        {innovation.reference_materials && innovation.reference_materials.length > 0 && (
+          <div className="flex flex-col gap-[5px]">
+            <p className="font-bold text-[#1d1d1d] leading-[1.15]">Reference materials:</p>
+            <ul className="list-disc ml-[15px]">
+              {innovation.reference_materials.map((url, i) => (
+                <li key={i} className="leading-[1.5]">
+                  <a href={url} className="text-[#065f4a] underline break-all">{url}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      {/* Readiness scale infographic */}
+      <div className="flex flex-col items-center shrink-0" style={{ width: 182 }}>
+        <img
+          src="/assets/prms/readiness-scale.png"
+          alt="Innovation Readiness Scale"
+          className="w-full"
+        />
+        <p className="text-[#818181] text-[8px] leading-[1.367] text-center mt-[4px]">
+          Learn more in{" "}
+          <a href="https://www.scalingreadiness.org" className="text-[#065f4a] underline">
+            www.scalingreadiness.org
+          </a>
+        </p>
       </div>
     </div>
   );
@@ -530,6 +688,26 @@ export default function ResultSummary({ data }: TemplateProps) {
           <div className="flex flex-col gap-[10px]">
             <SectionTitle>Geographic location</SectionTitle>
             <GeoLocationBox geo={d.geo_location} />
+          </div>
+        )}
+
+        {/* Evidence section */}
+        {d?.evidences && d.evidences.length > 0 && (
+          <div className="flex flex-col gap-[10px]">
+            <SectionTitle>Evidence</SectionTitle>
+            <div className="flex flex-col gap-[10px]">
+              {d.evidences.map((ev, i) => (
+                <EvidenceCard key={i} evidence={ev} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Innovation Development details section */}
+        {d?.innovation_development && (
+          <div className="flex flex-col gap-[10px]">
+            <SectionTitle>Innovation Development details</SectionTitle>
+            <InnovationDevelopmentSection innovation={d.innovation_development} />
           </div>
         )}
       </div>

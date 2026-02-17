@@ -78,5 +78,34 @@
     "geo_focus": "Global",
     "regions": ["Eastern Africa", "Southern Africa", "Western Africa"],
     "countries": ["Ethiopia", "South Africa"]
+  },
+  "evidences": [
+    {
+      "label": "Evidence #1",
+      "link": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages C%26A%20Brand%20%26%20Message%20Hub.aspx?csf=1&web=1&e=7UaD6x"
+    },
+    {
+      "label": "Evidence #2",
+      "link": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages C%26A%20Info%20%26%20Message%20Hub.aspx?csf=1&web=1&e=7UaD9",
+      "description": "Agriculture is a transformative shift that redefines how we grow food, combining scientific knowledge, cutting-edge technology, and a long-term vision centered on sustainability."
+    }
+  ],
+  "innovation_development": {
+    "developer_name": "Amit Srivastava",
+    "developer_email": "A.srivastava@cgiar.org",
+    "developer_institution": "International Rice Research Institute (IRRI)",
+    "current_readiness_level": "Level 7",
+    "current_readiness_label": "Prototype",
+    "readiness_justification": "Scaling report included to show level 7, as we are conducting uncontrolled testing right now. Launch events and several testing workshops with users were held in 2023.",
+    "collaborators": [
+      { "name": "Virender Kumar", "email": "virender.kumar@irri.org" },
+      { "name": "Prakashan Chellattan Veettil", "email": "pcveettil@irri.org" },
+      { "name": "Balwinder Singh", "email": "pcveettil@irri.org" }
+    ],
+    "innovation_nature": "Incremental innovation (Innovations that already exist and undergo constant, steady progress, and improvement.)",
+    "innovation_type": "Capacity development innovation (Innovations that strengthen capacity, including farmer, extension or investor decision-support services; accelerator/ incubator programs; manuals, training programs and curricula; online courses.)",
+    "reference_materials": [
+      "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages C%26A%20Info%"
+    ]
   }
 }
