@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { readdirSync, existsSync } from "fs";
-import { join } from "path";
+import { readdirSync, statSync, existsSync } from "fs";
+import { join, relative } from "path";
 import type { ComponentType } from "react";
 import type { TemplateProps } from "@/app/templates";
 import { getItem, deleteItem } from "@/lib/dynamo";
@@ -15,12 +15,26 @@ interface Props {
   }>;
 }
 
+function findInDir(dir: string, fileName: string): string | null {
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      const found = findInDir(full, fileName);
+      if (found) return found;
+    } else if (entry === fileName) {
+      return full;
+    }
+  }
+  return null;
+}
+
 function findTemplate(name: string): string | null {
   const base = join(process.cwd(), "app", "templates");
   for (const project of readdirSync(base)) {
-    if (existsSync(join(base, project, `${name}.tsx`))) {
-      return `${project}/${name}`;
-    }
+    const projectDir = join(base, project);
+    if (!existsSync(projectDir) || !statSync(projectDir).isDirectory()) continue;
+    const found = findInDir(projectDir, `${name}.tsx`);
+    if (found) return relative(base, found).replace(/\.tsx$/, "");
   }
   return null;
 }
