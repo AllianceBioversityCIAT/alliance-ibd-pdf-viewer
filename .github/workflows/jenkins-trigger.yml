@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - next-ssr-version-lambda-setup
+      - main
   workflow_dispatch: # Allows manual execution
 
 jobs:
