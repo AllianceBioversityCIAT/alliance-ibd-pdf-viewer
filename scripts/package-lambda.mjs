@@ -99,6 +99,9 @@ if (existsSync(NEXT_STATIC)) {
 if (existsSync(PUBLIC_DIR)) {
   console.log('Copying public assets...');
   cpSync(PUBLIC_DIR, join(PACKAGE_DIR, 'public'), { recursive: true });
+  console.log('✓ Public assets copied');
+} else {
+  console.log('No public directory found (this is OK if not using public assets)');
 }
 
 // Note: No additional dependencies needed - Next.js standalone includes everything

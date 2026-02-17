@@ -5,11 +5,12 @@
  * Supports both Lambda Function URL and API Gateway events.
  */
 
-import { join } from 'path';
+import { join, extname } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import http from 'http';
 import { EventEmitter } from 'events';
+import { readFileSync, existsSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -706,10 +707,105 @@ async function convertResponseToLambda(response) {
 }
 
 /**
+ * Serve static files directly (fallback if Next.js doesn't handle them)
+ * Uses absolute paths from __dirname since we change working directory
+ */
+function serveStaticFile(filePath) {
+  try {
+    if (!existsSync(filePath)) {
+      return null;
+    }
+
+    const content = readFileSync(filePath);
+    const ext = extname(filePath).toLowerCase();
+
+    // Content-Type mapping
+    const contentTypes = {
+      '.css': 'text/css',
+      '.js': 'application/javascript',
+      '.json': 'application/json',
+      '.html': 'text/html',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.svg': 'image/svg+xml',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.woff': 'font/woff',
+      '.woff2': 'font/woff2',
+      '.ttf': 'font/ttf',
+      '.eot': 'application/vnd.ms-fontobject',
+      '.ico': 'image/x-icon',
+      '.xml': 'application/xml',
+      '.txt': 'text/plain',
+    };
+
+    const contentType = contentTypes[ext] || 'application/octet-stream';
+    // Binary files need base64 encoding
+    const isBinary = ext.match(/\.(png|jpg|jpeg|gif|svg|webp|woff|woff2|ttf|eot|ico)$/);
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+      body: isBinary ? content.toString('base64') : content.toString('utf8'),
+      isBase64Encoded: !!isBinary,
+    };
+  } catch (error) {
+    console.error('Error serving static file:', filePath, error.message);
+    return null;
+  }
+}
+
+/**
  * Main Lambda handler
  */
 export const handler = async (event, context) => {
   try {
+    const url = event.rawPath || event.path || '/';
+
+    // Handle static file requests directly (before Next.js)
+    // This ensures /_next/static/* and /public/* are always served
+    // Use absolute paths from __dirname since we change working directory
+
+    // Serve /_next/static/* files (CSS, JS, chunks, etc.)
+    if (url.startsWith('/_next/static/')) {
+      // Remove /_next/static prefix
+      const staticPath = url.replace('/_next/static/', '');
+
+      // Try primary location: .next/standalone/.next/static (where Next.js expects them)
+      const filePath1 = join(__dirname, '.next', 'standalone', '.next', 'static', staticPath);
+      let response = serveStaticFile(filePath1);
+
+      // Fallback to backup location: .next/static
+      if (!response) {
+        const filePath2 = join(__dirname, '.next', 'static', staticPath);
+        response = serveStaticFile(filePath2);
+      }
+
+      if (response) {
+        console.log('✓ Served static file:', url, 'Content-Type:', response.headers['Content-Type']);
+        return response;
+      } else {
+        console.warn('⚠ Static file not found:', url);
+      }
+    }
+
+    // Serve /public/* files (favicon, images, etc.)
+    if (url.startsWith('/public/')) {
+      const publicPath = url.replace('/public/', '');
+      const filePath = join(__dirname, 'public', publicPath);
+
+      const response = serveStaticFile(filePath);
+      if (response) {
+        console.log('✓ Served public file:', url);
+        return response;
+      }
+    }
+
+    // For all other requests (including /summary), use Next.js handler
     const handlerFn = await getRequestHandler();
 
     if (!handlerFn || typeof handlerFn !== 'function') {
