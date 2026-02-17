@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import { readdirSync, existsSync } from "fs";
+import { join } from "path";
 import type { ComponentType } from "react";
 import type { TemplateProps } from "@/app/templates";
 import { getItem, deleteItem } from "@/lib/dynamo";
@@ -13,13 +15,26 @@ interface Props {
   }>;
 }
 
+function findTemplate(name: string): string | null {
+  const base = join(process.cwd(), "app", "templates");
+  for (const project of readdirSync(base)) {
+    if (existsSync(join(base, project, `${name}.tsx`))) {
+      return `${project}/${name}`;
+    }
+  }
+  return null;
+}
+
 export default async function TemplatePage({ params, searchParams }: Props) {
   const { template } = await params;
   const { uuid, paperWidth, paperHeight, test } = await searchParams;
 
+  const templatePath = findTemplate(template);
+  if (!templatePath) notFound();
+
   let TemplateComponent: ComponentType<TemplateProps>;
   try {
-    const mod = await import(`@/app/templates/${template}`);
+    const mod = await import(`@/app/templates/${templatePath}`);
     TemplateComponent = mod.default;
   } catch {
     notFound();
