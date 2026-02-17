@@ -73,7 +73,7 @@ export async function putItem(uuid: string, data: unknown): Promise<void> {
   await client.send(
     new PutCommand({
       TableName: table(),
-      Item: { uuid, json: JSON.stringify(data) },
+      Item: { id: uuid, json: JSON.stringify(data) },
     }),
   );
 }
@@ -82,7 +82,7 @@ export async function getItem(uuid: string): Promise<unknown | null> {
   const result = await client.send(
     new GetCommand({
       TableName: table(),
-      Key: { uuid },
+      Key: { id: uuid },
     }),
   );
 
@@ -98,7 +98,7 @@ export async function deleteItem(uuid: string): Promise<void> {
   await client.send(
     new DeleteCommand({
       TableName: table(),
-      Key: { uuid },
+      Key: { id: uuid },
     }),
   );
 }
