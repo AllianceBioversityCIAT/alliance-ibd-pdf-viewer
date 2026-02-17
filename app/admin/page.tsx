@@ -45,7 +45,7 @@ export default function AdminPage() {
   const [form, setForm] = useState<FormState>(defaultForm);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [templates, setTemplates] = useState<string[]>([]);
+  const [templates, setTemplates] = useState<{ name: string; hasDemo: boolean }[]>([]);
 
   useEffect(() => {
     setSecret(loadSecret());
@@ -239,7 +239,7 @@ export default function AdminPage() {
                 className="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2.5 text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-shadow"
               >
                 {templates.map((t) => (
-                  <option key={t} value={t}>{t}</option>
+                  <option key={t.name} value={t.name}>{t.name}</option>
                 ))}
               </select>
             </div>
@@ -251,10 +251,14 @@ export default function AdminPage() {
                 )}
               </label>
               <input
-                type="password"
+                type="text"
                 value={secret}
                 onChange={(e) => setSecret(e.target.value)}
                 placeholder="Enter secret"
+                autoComplete="off"
+                data-1p-ignore
+                data-lpignore="true"
+                style={{ WebkitTextSecurity: "disc" } as React.CSSProperties}
                 className="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2.5 text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent placeholder-neutral-300 transition-shadow"
               />
             </div>
@@ -337,6 +341,20 @@ export default function AdminPage() {
             >
               {loading ? "Uploading..." : "Upload & Open"}
             </button>
+            {templates.find((t) => t.name === form.template)?.hasDemo && (
+              <button
+                onClick={() => {
+                  const params = new URLSearchParams({
+                    demo: "true",
+                    paperWidth: form.paperWidth,
+                  });
+                  window.open(`/${form.template}?${params.toString()}`, "_blank");
+                }}
+                className="bg-white hover:bg-neutral-50 border border-neutral-200 text-neutral-500 hover:text-neutral-900 text-sm px-4 py-2.5 rounded-lg transition-colors cursor-pointer"
+              >
+                Demo
+              </button>
+            )}
             <button
               onClick={handleClearForm}
               className="bg-white hover:bg-neutral-50 border border-neutral-200 text-neutral-500 hover:text-neutral-900 text-sm px-4 py-2.5 rounded-lg transition-colors cursor-pointer"
