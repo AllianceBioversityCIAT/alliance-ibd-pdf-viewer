@@ -94,7 +94,8 @@ export default function AdminPage() {
               data-sileo-button="true"
               onClick={(e) => { e.stopPropagation(); sileo.dismiss(id); executeUpload(); }}
               onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(id); executeUpload(); } }}
-              className="flex-1 text-center bg-white text-neutral-900 text-sm font-medium py-2 rounded-lg cursor-pointer hover:bg-neutral-200 transition-colors"
+              style={{ background: "#fff", color: "#171717" }}
+              className="flex-1 text-center text-sm font-medium py-2 rounded-lg cursor-pointer transition-colors"
             >
               Upload
             </span>
@@ -104,7 +105,8 @@ export default function AdminPage() {
               data-sileo-button="true"
               onClick={(e) => { e.stopPropagation(); sileo.dismiss(id); }}
               onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(id); } }}
-              className="flex-1 text-center bg-neutral-800 text-neutral-300 text-sm font-medium py-2 rounded-lg cursor-pointer hover:bg-neutral-700 hover:text-white transition-colors"
+              style={{ background: "#262626", color: "#a3a3a3" }}
+              className="flex-1 text-center text-sm font-medium py-2 rounded-lg cursor-pointer transition-colors"
             >
               Cancel
             </span>

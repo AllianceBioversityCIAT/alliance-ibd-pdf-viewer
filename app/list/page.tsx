@@ -95,7 +95,8 @@ export default function ListPage() {
               data-sileo-button="true"
               onClick={(e) => { e.stopPropagation(); sileo.dismiss(toastId); executeDelete(recordId); }}
               onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(toastId); executeDelete(recordId); } }}
-              className="flex-1 text-center bg-red-500 text-white text-sm font-medium py-2 rounded-lg cursor-pointer hover:bg-red-600 transition-colors"
+              style={{ background: "#ef4444", color: "#fff" }}
+              className="flex-1 text-center text-sm font-medium py-2 rounded-lg cursor-pointer transition-colors"
             >
               Delete
             </span>
@@ -105,7 +106,8 @@ export default function ListPage() {
               data-sileo-button="true"
               onClick={(e) => { e.stopPropagation(); sileo.dismiss(toastId); }}
               onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(toastId); } }}
-              className="flex-1 text-center bg-neutral-800 text-neutral-300 text-sm font-medium py-2 rounded-lg cursor-pointer hover:bg-neutral-700 hover:text-white transition-colors"
+              style={{ background: "#262626", color: "#a3a3a3" }}
+              className="flex-1 text-center text-sm font-medium py-2 rounded-lg cursor-pointer transition-colors"
             >
               Cancel
             </span>
