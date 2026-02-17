@@ -1,13 +1,14 @@
 /**
  * AWS Lambda Handler for Next.js Standalone Server
  * 
- * Accesses Next.js request handler from standalone server.
+ * Intercepts Next.js server creation to access the request handler.
  * Supports both Lambda Function URL and API Gateway events.
  */
 
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import http from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,6 +17,7 @@ const __dirname = dirname(__filename);
 const SERVER_PATH = join(__dirname, '.next', 'standalone', 'server.js');
 
 let requestHandler = null;
+let interceptedServer = null;
 
 /**
  * Initialize Next.js request handler (lazy loading)
@@ -26,186 +28,114 @@ async function getRequestHandler() {
   }
 
   try {
-    // Import Next.js server module
+    // Intercept http.createServer before Next.js loads
+    // This allows us to capture the server instance that Next.js creates
+    const originalCreateServer = http.createServer;
+
+    http.createServer = function (...args) {
+      const server = originalCreateServer.apply(this, args);
+      interceptedServer = server;
+      console.log('Intercepted HTTP server creation');
+      return server;
+    };
+
+    // Import Next.js server module (this will trigger server creation)
     const serverModule = await import(SERVER_PATH);
     const defaultExport = serverModule.default;
 
-    if (!defaultExport) {
-      throw new Error('Server module default export is undefined');
-    }
+    // Restore original createServer
+    http.createServer = originalCreateServer;
 
-    // Log detailed information about the default export
     console.log('Default export type:', typeof defaultExport);
     console.log('Default export keys:', Object.keys(defaultExport));
 
-    // Log all properties and their types
-    const keys = Object.keys(defaultExport);
-    const propertyInfo = keys.map(key => {
-      const value = defaultExport[key];
-      return {
-        key,
-        type: typeof value,
-        isFunction: typeof value === 'function',
-        isObject: typeof value === 'object' && value !== null,
-        objectKeys: (typeof value === 'object' && value !== null) ? Object.keys(value).slice(0, 10) : null
-      };
-    });
-    console.log('Property details:', JSON.stringify(propertyInfo, null, 2));
-
-    // Next.js standalone server.js exports the server instance
-    // For Next.js 16 App Router, we need to access the request handler
-    // The server instance typically has the handler we can use
-
-    // Try direct access to request handler methods
-    if (defaultExport.requestHandler && typeof defaultExport.requestHandler === 'function') {
-      console.log('Found requestHandler method');
-      requestHandler = defaultExport.requestHandler;
+    // Check if we intercepted the server
+    if (interceptedServer) {
+      console.log('Using intercepted HTTP server');
+      // The intercepted server is the Next.js HTTP server
+      // We can use it to handle requests
+      requestHandler = createServerRequestHandler(interceptedServer);
       return requestHandler;
     }
 
-    if (defaultExport.handle && typeof defaultExport.handle === 'function') {
-      console.log('Found handle method');
-      requestHandler = defaultExport.handle;
+    // Try to access the server through the default export
+    if (defaultExport) {
+      // Check for non-enumerable properties
+      const allPropertyNames = Object.getOwnPropertyNames(defaultExport);
+      console.log('All property names:', allPropertyNames);
+
+      for (const prop of allPropertyNames) {
+        try {
+          const value = defaultExport[prop];
+          if (value && typeof value === 'object') {
+            // Check if it's an HTTP server
+            if (typeof value.on === 'function' || typeof value.emit === 'function') {
+              console.log(`Found HTTP server in property: ${prop}`);
+              requestHandler = createServerRequestHandler(value);
+              return requestHandler;
+            }
+            // Check if it has request handler methods
+            if (value.requestHandler && typeof value.requestHandler === 'function') {
+              console.log(`Found requestHandler in property: ${prop}`);
+              requestHandler = value.requestHandler;
+              return requestHandler;
+            }
+            if (value.handle && typeof value.handle === 'function') {
+              console.log(`Found handle in property: ${prop}`);
+              requestHandler = value.handle;
+              return requestHandler;
+            }
+            if (value.fetch && typeof value.fetch === 'function') {
+              console.log(`Found fetch in property: ${prop}`);
+              requestHandler = value.fetch;
+              return requestHandler;
+            }
+          }
+        } catch (e) {
+          // Continue
+        }
+      }
+    }
+
+    // Try to access through module exports
+    const moduleExports = Object.keys(serverModule);
+    console.log('Module exports:', moduleExports);
+
+    for (const exportName of moduleExports) {
+      if (exportName === 'default') continue;
+      const exportValue = serverModule[exportName];
+      if (exportValue && typeof exportValue === 'object') {
+        if (exportValue.requestHandler && typeof exportValue.requestHandler === 'function') {
+          console.log(`Found requestHandler in export: ${exportName}`);
+          requestHandler = exportValue.requestHandler;
+          return requestHandler;
+        }
+        if (typeof exportValue.on === 'function') {
+          console.log(`Found HTTP server in export: ${exportName}`);
+          requestHandler = createServerRequestHandler(exportValue);
+          return requestHandler;
+        }
+      }
+    }
+
+    // If we still don't have a handler, try to access the server
+    // through the global state or by waiting for it to initialize
+    // Next.js might store the server in a global variable
+
+    // Check global state
+    if (global.nextServer) {
+      console.log('Found server in global.nextServer');
+      requestHandler = createServerRequestHandler(global.nextServer);
       return requestHandler;
     }
 
-    if (defaultExport.fetch && typeof defaultExport.fetch === 'function') {
-      console.log('Found fetch method');
-      requestHandler = defaultExport.fetch;
-      return requestHandler;
-    }
-
-    // Check if there's a server property
-    if (defaultExport.server) {
-      console.log('Found server property');
-      const server = defaultExport.server;
-      console.log('Server type:', typeof server);
-      console.log('Server keys:', Object.keys(server));
-
-      if (server.requestHandler && typeof server.requestHandler === 'function') {
-        console.log('Found server.requestHandler');
-        requestHandler = server.requestHandler;
-        return requestHandler;
-      }
-      if (server.handle && typeof server.handle === 'function') {
-        console.log('Found server.handle');
-        requestHandler = server.handle;
-        return requestHandler;
-      }
-      if (server.fetch && typeof server.fetch === 'function') {
-        console.log('Found server.fetch');
-        requestHandler = server.fetch;
-        return requestHandler;
-      }
-      // Use server's request event handler
-      if (typeof server.on === 'function' || typeof server.emit === 'function') {
-        console.log('Using server request event handler');
-        requestHandler = createServerRequestHandler(server);
-        return requestHandler;
-      }
-    }
-
-    // Check for app property (Next.js might export { app, server, port, hostname })
-    if (defaultExport.app) {
-      console.log('Found app property');
-      const app = defaultExport.app;
-      console.log('App type:', typeof app);
-      console.log('App keys:', Object.keys(app));
-
-      if (app.requestHandler && typeof app.requestHandler === 'function') {
-        console.log('Found app.requestHandler');
-        requestHandler = app.requestHandler;
-        return requestHandler;
-      }
-      if (app.handle && typeof app.handle === 'function') {
-        console.log('Found app.handle');
-        requestHandler = app.handle;
-        return requestHandler;
-      }
-      if (app.fetch && typeof app.fetch === 'function') {
-        console.log('Found app.fetch');
-        requestHandler = app.fetch;
-        return requestHandler;
-      }
-    }
-
-    // Check for internal Next.js properties
-    // Next.js might store the handler in private properties
-    const internalProps = ['_requestHandler', '__requestHandler', 'handler', '_handler', 'request'];
-    for (const prop of internalProps) {
-      if (defaultExport[prop] && typeof defaultExport[prop] === 'function') {
-        console.log(`Found internal property: ${prop}`);
-        requestHandler = defaultExport[prop];
-        return requestHandler;
-      }
-    }
-
-    // If defaultExport is an HTTP server instance
-    if (typeof defaultExport.on === 'function' || typeof defaultExport.emit === 'function') {
-      console.log('Default export is an HTTP server, using request event handler');
-      requestHandler = createServerRequestHandler(defaultExport);
-      return requestHandler;
-    }
-
-    // Last resort: try to access the server through the module's exports
-    console.log('Checking module exports:', Object.keys(serverModule));
-    if (serverModule.requestHandler && typeof serverModule.requestHandler === 'function') {
-      console.log('Found requestHandler in module exports');
-      requestHandler = serverModule.requestHandler;
-      return requestHandler;
-    }
-
-    // If we still haven't found it, try to create a wrapper that uses the entire object
-    // This is a fallback for when Next.js exports something we don't recognize
-    console.log('Attempting to use default export as request handler wrapper');
-    requestHandler = createFallbackHandler(defaultExport);
-    return requestHandler;
+    throw new Error('Could not find Next.js request handler. Server may not have initialized correctly.');
 
   } catch (error) {
     console.error('Failed to load Next.js request handler:', error);
     console.error('Error stack:', error.stack);
     throw error;
   }
-}
-
-/**
- * Create a fallback handler when we can't find the request handler
- * This attempts to use the object in various ways
- */
-function createFallbackHandler(serverObj) {
-  return async (request) => {
-    // Try to call the object as a function
-    if (typeof serverObj === 'function') {
-      return await serverObj(request);
-    }
-
-    // Try to find any function that might handle requests
-    const possibleHandlers = [
-      serverObj.requestHandler,
-      serverObj.handle,
-      serverObj.fetch,
-      serverObj.process,
-      serverObj.handler,
-      serverObj._requestHandler,
-      serverObj.__requestHandler,
-    ].filter(h => h && typeof h === 'function');
-
-    if (possibleHandlers.length > 0) {
-      return await possibleHandlers[0](request);
-    }
-
-    // If it's an object with a server property, try that
-    if (serverObj.server) {
-      if (typeof serverObj.server === 'function') {
-        return await serverObj.server(request);
-      }
-      if (serverObj.server.requestHandler && typeof serverObj.server.requestHandler === 'function') {
-        return await serverObj.server.requestHandler(request);
-      }
-    }
-
-    throw new Error('Could not find any way to handle requests with the server object');
-  };
 }
 
 /**
