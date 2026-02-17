@@ -91,15 +91,28 @@ export default function MyTemplate({ data }: TemplateProps) {
 - Match the Figma design pixel-for-pixel: exact font sizes, colors, gaps, paddings
 - All font sizes use `text-[Xpx]` syntax (e.g., `text-[10px]`, `text-[8px]`)
 
-### Step 5: Download static assets
+### Step 5: Audit and download static assets
 
-Download any static images/icons from the Figma MCP asset URLs to `public/assets/{project}/`:
+**Before downloading anything**, launch an Explore subagent to scan all existing assets:
+
+```
+Task(subagent_type="Explore", prompt="List ALL files in public/assets/ recursively. For each image, report its filename, dimensions if possible, and which template references it. I need to know what assets already exist so I don't download duplicates.")
+```
+
+**Asset reuse rules:**
+
+- If the Figma design uses an asset that already exists in `public/assets/` (same logo, icon, pattern, etc.), **reuse it** — do NOT download a duplicate with a different name.
+- Compare visually: the CGIAR logo, shield badge, sidebar pattern, and impact area icons likely already exist. Check before downloading.
+- Only download assets that are genuinely new (new icons, new illustrations, new patterns not seen before).
+- Use descriptive filenames: `cgiar-logo.png`, `icon-nutrition.png`, not `image174.png` or `asset-1.png`.
+
+**When downloading new assets:**
 
 ```bash
 curl -sL "https://www.figma.com/api/mcp/asset/{id}" -o public/assets/{project}/{name}.png
 ```
 
-These URLs expire after 7 days — always download them immediately.
+Figma asset URLs expire after 7 days — download immediately. Store in `public/assets/{project}/`.
 
 ### Step 6: Create demo data
 
@@ -123,6 +136,7 @@ Before finishing, confirm:
 - [ ] No duplicate components — anything that exists elsewhere was imported, not copied
 - [ ] Repeating patterns within the template are extracted as local components
 - [ ] All dynamic content comes from the `data` prop, not hardcoded
+- [ ] No duplicate assets — verified existing `public/assets/` before downloading
 - [ ] Static assets are stored in `public/assets/` and referenced correctly
 - [ ] No pagination, no fixed-height layouts, no absolute positioning on content
 - [ ] Demo JSON created with realistic test data
