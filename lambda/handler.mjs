@@ -1,14 +1,13 @@
 /**
  * AWS Lambda Handler for Next.js Standalone Server
  * 
- * Uses Next.js server by intercepting the HTTP server before it starts.
+ * Accesses Next.js request handler from standalone server.
  * Supports both Lambda Function URL and API Gateway events.
  */
 
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { createServer } from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,187 +28,148 @@ async function getRequestHandler() {
   try {
     // Import Next.js server module
     const serverModule = await import(SERVER_PATH);
-
-    console.log('Server module imported. Keys:', Object.keys(serverModule));
-    console.log('Default type:', typeof serverModule.default);
-
     const defaultExport = serverModule.default;
 
     if (!defaultExport) {
       throw new Error('Server module default export is undefined');
     }
 
-    // Log all properties to understand structure
-    const keys = Object.keys(defaultExport);
-    console.log('Default export keys:', keys);
-    console.log('Default export property types:', keys.map(key => ({
-      key,
-      type: typeof defaultExport[key],
-      isFunction: typeof defaultExport[key] === 'function',
-      value: typeof defaultExport[key] === 'function' ? '[Function]' :
-        typeof defaultExport[key] === 'object' ? Object.keys(defaultExport[key] || {}).slice(0, 5) :
-          String(defaultExport[key]).substring(0, 50)
-    })));
+    // Next.js standalone server.js exports the server instance
+    // For Next.js 16 App Router, we need to access the request handler
+    // The server instance typically has the handler we can use
 
-    // Next.js standalone exports an object that contains server configuration
-    // The actual request handler is inside the server instance
-    // We need to intercept the server before it starts listening
-
-    // Approach 1: Check for requestHandler directly
+    // Try direct access to request handler methods
     if (defaultExport.requestHandler && typeof defaultExport.requestHandler === 'function') {
-      console.log('Using defaultExport.requestHandler');
       requestHandler = defaultExport.requestHandler;
       return requestHandler;
     }
 
-    // Approach 2: Check for handle method
     if (defaultExport.handle && typeof defaultExport.handle === 'function') {
-      console.log('Using defaultExport.handle');
       requestHandler = defaultExport.handle;
       return requestHandler;
     }
 
-    // Approach 3: Check for fetch method
     if (defaultExport.fetch && typeof defaultExport.fetch === 'function') {
-      console.log('Using defaultExport.fetch');
       requestHandler = defaultExport.fetch;
       return requestHandler;
     }
 
-    // Approach 4: The object might contain a server property
+    // Check if there's a server property
     if (defaultExport.server) {
-      console.log('Found server property, checking for handler');
       const server = defaultExport.server;
-      if (server.requestHandler) {
-        console.log('Using server.requestHandler');
+      if (server.requestHandler && typeof server.requestHandler === 'function') {
         requestHandler = server.requestHandler;
         return requestHandler;
       }
-      if (server.handle) {
-        console.log('Using server.handle');
+      if (server.handle && typeof server.handle === 'function') {
         requestHandler = server.handle;
         return requestHandler;
       }
-      if (server.fetch) {
-        console.log('Using server.fetch');
+      if (server.fetch && typeof server.fetch === 'function') {
         requestHandler = server.fetch;
+        return requestHandler;
+      }
+      // Use server's request event handler
+      if (typeof server.on === 'function' || typeof server.emit === 'function') {
+        requestHandler = createServerRequestHandler(server);
         return requestHandler;
       }
     }
 
-    // Approach 5: Try to access internal Next.js properties
-    // Next.js might store the handler in private properties
-    const possibleHandlers = [
-      defaultExport._requestHandler,
-      defaultExport.__requestHandler,
-      defaultExport.handler,
-      defaultExport.app?.requestHandler,
-      defaultExport.app?.handle,
-      defaultExport.app?.fetch,
-    ].filter(h => h && typeof h === 'function');
-
-    if (possibleHandlers.length > 0) {
-      console.log('Found handler in internal properties');
-      requestHandler = possibleHandlers[0];
+    // If defaultExport is an HTTP server instance
+    if (typeof defaultExport.on === 'function' || typeof defaultExport.emit === 'function') {
+      requestHandler = createServerRequestHandler(defaultExport);
       return requestHandler;
     }
 
-    // Approach 6: Create a wrapper that intercepts HTTP requests
-    // Next.js standalone creates an HTTP server, we need to intercept it
-    console.log('Creating HTTP server wrapper to intercept Next.js server');
-    requestHandler = createHttpServerWrapper(defaultExport);
-    return requestHandler;
-
+    throw new Error(`Could not find request handler. Default export type: ${typeof defaultExport}`);
   } catch (error) {
     console.error('Failed to load Next.js request handler:', error);
-    console.error('Error stack:', error.stack);
     throw error;
   }
 }
 
 /**
- * Create an HTTP server wrapper that intercepts requests
- * This works by creating a local HTTP server and forwarding requests to Next.js
+ * Create a request handler from an HTTP server instance
+ * Uses the server's request event to handle requests
  */
-function createHttpServerWrapper(serverConfig) {
-  let httpServer = null;
-  let nextRequestHandler = null;
-
+function createServerRequestHandler(server) {
   return async (request) => {
-    // Lazy initialization: create HTTP server on first request
-    if (!httpServer) {
-      // Create a local HTTP server that Next.js can handle
-      httpServer = createServer();
+    // Convert Web Request to Node.js request format
+    const url = new URL(request.url);
+    const req = {
+      url: url.pathname + url.search,
+      method: request.method,
+      headers: Object.fromEntries(request.headers),
+      getHeader: function (name) { return this.headers[name.toLowerCase()]; },
+      body: request.body,
+    };
 
-      // Try to get the request handler from the server
-      // Next.js standalone might export a function that creates the server
-      if (typeof serverConfig === 'function') {
-        // If it's a function, it might be a factory
-        const serverInstance = serverConfig();
-        if (serverInstance && typeof serverInstance.handle === 'function') {
-          nextRequestHandler = serverInstance.handle.bind(serverInstance);
+    let statusCode = 200;
+    const headers = {};
+    let body = '';
+    let responseComplete = false;
+
+    const res = {
+      statusCode: 200,
+      status: function (code) {
+        this.statusCode = code;
+        statusCode = code;
+        return this;
+      },
+      setHeader: function (name, value) {
+        headers[name] = value;
+        return this;
+      },
+      getHeader: function (name) {
+        return headers[name];
+      },
+      write: function (chunk) {
+        body += chunk ? chunk.toString() : '';
+        return this;
+      },
+      end: function (chunk) {
+        if (chunk) {
+          body += chunk.toString();
         }
-      } else if (serverConfig.server && typeof serverConfig.server.handle === 'function') {
-        nextRequestHandler = serverConfig.server.handle.bind(serverConfig.server);
-      } else {
-        // Create a mock server that Next.js can attach to
-        // This is a workaround for Next.js standalone mode
-        throw new Error(`Cannot create handler from server config. Type: ${typeof serverConfig}, keys: ${Object.keys(serverConfig).join(', ')}`);
-      }
+        responseComplete = true;
+        return this;
+      },
+      json: function (data) {
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(data);
+        responseComplete = true;
+        return this;
+      },
+      send: function (data) {
+        body = typeof data === 'string' ? data : JSON.stringify(data);
+        responseComplete = true;
+        return this;
+      },
+    };
 
-      // Set up the server to handle requests
-      httpServer.on('request', async (req, res) => {
-        try {
-          // Convert Node.js request to Web Request
-          const webRequest = nodeToWebRequest(req);
-          const response = await nextRequestHandler(webRequest);
-          await webToNodeResponse(response, res);
-        } catch (error) {
-          console.error('Error handling request:', error);
-          res.statusCode = 500;
-          res.end('Internal Server Error');
+    // Handle the request using the server's request event
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Request timeout'));
+      }, 29000);
+
+      // Emit request event on server
+      server.emit('request', req, res);
+
+      // Wait for response to complete
+      const checkInterval = setInterval(() => {
+        if (responseComplete) {
+          clearInterval(checkInterval);
+          clearTimeout(timeout);
+          resolve(new Response(body, {
+            status: statusCode,
+            headers: headers,
+          }));
         }
-      });
-    }
-
-    // For Lambda, we need to handle the request directly
-    // Since we can't start an HTTP server in Lambda, we need a different approach
-    // This won't work - we need to find the actual request handler
-
-    throw new Error('HTTP server wrapper not suitable for Lambda. Need direct request handler access.');
+      }, 10);
+    });
   };
-}
-
-/**
- * Convert Node.js request to Web Request
- */
-function nodeToWebRequest(req) {
-  const url = `https://${req.headers.host || 'localhost'}${req.url}`;
-  return new Request(url, {
-    method: req.method,
-    headers: req.headers,
-    body: req,
-  });
-}
-
-/**
- * Convert Web Response to Node.js response
- */
-async function webToNodeResponse(webResponse, nodeRes) {
-  nodeRes.statusCode = webResponse.status;
-  webResponse.headers.forEach((value, key) => {
-    nodeRes.setHeader(key, value);
-  });
-
-  if (webResponse.body) {
-    const reader = webResponse.body.getReader();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      nodeRes.write(value);
-    }
-  }
-  nodeRes.end();
 }
 
 /**
@@ -283,20 +243,14 @@ async function convertResponseToLambda(response) {
  */
 export const handler = async (event, context) => {
   try {
-    // Initialize request handler if needed
     const handlerFn = await getRequestHandler();
 
     if (!handlerFn || typeof handlerFn !== 'function') {
       throw new Error('Request handler is not a function');
     }
 
-    // Create Next.js Request from Lambda event
     const request = createNextRequest(event);
-
-    // Call Next.js request handler
     const response = await handlerFn(request);
-
-    // Convert Next.js Response to Lambda format
     return await convertResponseToLambda(response);
   } catch (error) {
     console.error('Lambda handler error:', {
