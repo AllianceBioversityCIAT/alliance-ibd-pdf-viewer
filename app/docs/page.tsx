@@ -291,14 +291,14 @@ x-admin-secret: <ADMIN_SECRET>`}</pre>
                           paperWidth
                         </td>
                         <td className="text-neutral-400 pr-4">optional</td>
-                        <td>Container width in px (default: 794)</td>
+                        <td>Container width in px (default: 600)</td>
                       </tr>
                       <tr>
                         <td className="text-neutral-900 pr-4 py-0.5 font-medium">
                           paperHeight
                         </td>
                         <td className="text-neutral-400 pr-4">optional</td>
-                        <td>Container height in px (default: 1123)</td>
+                        <td>Container height in px (default: 1000)</td>
                       </tr>
                       <tr>
                         <td className="text-neutral-900 pr-4 py-0.5 font-medium">

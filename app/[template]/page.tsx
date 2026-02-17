@@ -53,8 +53,8 @@ export default async function TemplatePage({ params, searchParams }: Props) {
     }
   }
 
-  const width = Math.max(100, Math.min(5000, Number(paperWidth) || 794));
-  const height = Math.max(100, Math.min(5000, Number(paperHeight) || 1123));
+  const width = Math.max(100, Math.min(5000, Number(paperWidth) || 600));
+  const height = Math.max(100, Math.min(5000, Number(paperHeight) || 1000));
 
   return (
     <div style={{ width: `${width}px`, height: `${height}px`, overflow: "hidden" }}>

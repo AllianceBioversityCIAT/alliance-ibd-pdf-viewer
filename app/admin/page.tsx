@@ -19,8 +19,8 @@ interface FormState {
 const defaultForm: FormState = {
   json: "",
   template: "example",
-  paperWidth: "794",
-  paperHeight: "1123",
+  paperWidth: "600",
+  paperHeight: "1000",
   testMode: false,
 };
 
