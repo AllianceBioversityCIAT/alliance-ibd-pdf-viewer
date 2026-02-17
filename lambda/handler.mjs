@@ -318,10 +318,13 @@ function createMockResponse() {
     }
     this.finished = true;
     responseComplete = true;
+    this.headersSent = true;
+    this._headerSent = true;
+    // Emit finish event before calling callback
+    this.emit('finish');
     if (typeof callback === 'function') {
       callback();
     }
-    this.emit('finish');
     return this;
   };
   res.json = function (data) {
@@ -329,6 +332,8 @@ function createMockResponse() {
     body = JSON.stringify(data);
     this.finished = true;
     responseComplete = true;
+    this.headersSent = true;
+    this._headerSent = true;
     this.emit('finish');
     return this;
   };
@@ -336,6 +341,8 @@ function createMockResponse() {
     body = typeof data === 'string' ? data : JSON.stringify(data);
     this.finished = true;
     responseComplete = true;
+    this.headersSent = true;
+    this._headerSent = true;
     this.emit('finish');
     return this;
   };
@@ -405,22 +412,50 @@ function createServerRequestHandler(server) {
     // Handle the request using the server's request event
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
+        console.error('Request timeout - response not completed');
+        console.error('Response finished:', res.finished);
+        console.error('Response complete:', res._responseComplete);
+        console.error('Response status:', res.statusCode);
+        console.error('Response headers:', res._headers);
         reject(new Error('Request timeout'));
       }, 29000);
 
-      // Emit request event on server
-      server.emit('request', req, res);
+      // Listen for 'finish' event on response
+      res.once('finish', () => {
+        clearTimeout(timeout);
+        console.log('Response finished event received');
 
-      // Wait for response to complete
+        // Get the response data
+        const statusCode = res.statusCode || 200;
+        const responseHeaders = res._headers || {};
+        const responseBody = res._body || '';
+
+        console.log('Response status:', statusCode);
+        console.log('Response headers:', Object.keys(responseHeaders));
+        console.log('Response body length:', responseBody.length);
+
+        resolve(new Response(responseBody, {
+          status: statusCode,
+          headers: responseHeaders,
+        }));
+      });
+
+      // Also check periodically in case 'finish' event doesn't fire
       const checkInterval = setInterval(() => {
         if (res._responseComplete || res.finished) {
           clearInterval(checkInterval);
           clearTimeout(timeout);
 
+          console.log('Response completed via check interval');
+
           // Get the response data
           const statusCode = res.statusCode || 200;
           const responseHeaders = res._headers || {};
           const responseBody = res._body || '';
+
+          console.log('Response status:', statusCode);
+          console.log('Response headers:', Object.keys(responseHeaders));
+          console.log('Response body length:', responseBody.length);
 
           resolve(new Response(responseBody, {
             status: statusCode,
@@ -428,6 +463,16 @@ function createServerRequestHandler(server) {
           }));
         }
       }, 10);
+
+      // Emit request event on server
+      console.log('Emitting request event to server for:', urlPath);
+      try {
+        server.emit('request', req, res);
+      } catch (error) {
+        console.error('Error emitting request event:', error);
+        clearTimeout(timeout);
+        reject(error);
+      }
     });
   };
 }
