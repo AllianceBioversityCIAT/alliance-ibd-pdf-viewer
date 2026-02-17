@@ -480,14 +480,40 @@ function createServerRequestHandler(server) {
     const headers = Object.fromEntries(request.headers);
 
     // Get body if present
+    // IMPORTANT: request.body is a ReadableStream in Web API Request objects
+    // We must read it using arrayBuffer() or text(), NOT Buffer.from() directly
     let body = null;
     if (request.body) {
-      if (typeof request.body === 'string') {
-        body = request.body;
-      } else if (Buffer.isBuffer(request.body)) {
-        body = request.body;
-      } else {
-        body = Buffer.from(request.body);
+      try {
+        // Check if it's already a string or Buffer (shouldn't happen with Web Request, but safe)
+        if (typeof request.body === 'string') {
+          body = request.body;
+        } else if (Buffer.isBuffer(request.body)) {
+          body = request.body;
+        } else if (request.body instanceof ReadableStream) {
+          // Read ReadableStream properly
+          const contentType = headers['content-type'] || headers['Content-Type'] || '';
+          if (contentType.includes('application/json') || contentType.includes('text/')) {
+            // For JSON/text, read as text
+            body = await request.text();
+          } else {
+            // For binary, read as arrayBuffer then convert to Buffer
+            const arrayBuffer = await request.arrayBuffer();
+            body = Buffer.from(arrayBuffer);
+          }
+        } else {
+          // Fallback: try to read as text
+          console.warn('Unexpected body type:', typeof request.body, request.body?.constructor?.name);
+          body = await request.text();
+        }
+      } catch (error) {
+        console.error('Error reading request body:', {
+          error: error.message,
+          bodyType: typeof request.body,
+          bodyConstructor: request.body?.constructor?.name,
+        });
+        // Return 400 for invalid body
+        throw new Error('Invalid request body: ' + error.message);
       }
     }
 
@@ -657,14 +683,30 @@ function createNextRequest(event) {
     }
   });
 
-  const body = event.body
-    ? (event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body)
-    : undefined;
+  // Handle body from Lambda event
+  // Lambda Function URL provides body as string (may be base64 encoded)
+  let body = undefined;
+  if (event.body) {
+    if (event.isBase64Encoded) {
+      // Decode base64 to Buffer, then to string for JSON
+      body = Buffer.from(event.body, 'base64').toString('utf8');
+    } else if (typeof event.body === 'string') {
+      // Already a string, use as-is
+      body = event.body;
+    } else {
+      // Shouldn't happen, but handle gracefully
+      console.warn('Unexpected event.body type:', typeof event.body);
+      body = String(event.body);
+    }
+  }
 
+  // Create Web Request object
+  // Note: When body is provided as string, Request constructor will create a ReadableStream
+  // This is expected and will be handled correctly in createServerRequestHandler
   return new Request(`https://${host}${fullUrl}`, {
     method,
     headers,
-    body: body,
+    body: body, // This will become a ReadableStream in the Request object
   });
 }
 
@@ -816,16 +858,26 @@ export const handler = async (event, context) => {
     const response = await handlerFn(request);
     return await convertResponseToLambda(response);
   } catch (error) {
-    console.error('Lambda handler error:', {
+    // Log error safely (without exposing secrets)
+    const errorInfo = {
       message: error.message,
-      stack: error.stack,
       errorType: error.constructor.name,
-    });
+      // Only log stack in development
+      ...(process.env.NODE_ENV !== 'production' && { stack: error.stack }),
+    };
+    console.error('Lambda handler error:', errorInfo);
+
+    // Return appropriate status code based on error type
+    const statusCode = error.message.includes('Invalid request body') ||
+      error.message.includes('Invalid JSON') ? 400 : 500;
 
     return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Internal Server Error: ' + error.message,
+      statusCode,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        error: statusCode === 400 ? 'Bad Request' : 'Internal Server Error',
+        message: statusCode === 400 ? error.message : 'An error occurred processing your request',
+      }),
       isBase64Encoded: false,
     };
   }
