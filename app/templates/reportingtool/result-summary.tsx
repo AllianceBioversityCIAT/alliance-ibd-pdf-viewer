@@ -126,15 +126,16 @@ export default function ResultSummary({ data }: TemplateProps) {
   const d = data as ResultSummaryData | null;
 
   return (
-    <div className="bg-white" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
+    <div className="bg-white relative" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;700&family=Noto+Serif:wght@400;500&display=swap');`}</style>
 
+      {/* Right sidebar decorative strip — full page height */}
+      <div className="absolute top-0 right-0 h-full overflow-hidden" style={{ width: 13, zIndex: 10 }}>
+        <img src="/assets/prms/sidebar-pattern.png" alt="" className="h-full object-cover" style={{ width: 844 }} />
+      </div>
+
       {/* Header */}
-      <div className="bg-[#02211a] relative overflow-hidden" style={{ padding: "42px 43px 30px" }}>
-        {/* Right sidebar decorative strip */}
-        <div className="absolute top-0 right-0 h-full overflow-hidden" style={{ width: 13 }}>
-          <img src="/assets/prms/sidebar-pattern.png" alt="" className="h-full object-cover" style={{ width: 844 }} />
-        </div>
+      <div className="bg-[#02211a]" style={{ padding: "42px 43px 30px" }}>
 
         {/* Logo */}
         <img
