@@ -5,14 +5,6 @@ import type { ComponentType } from "react";
 import type { TemplateProps } from "@/app/templates";
 import { getItem, deleteItem } from "@/lib/dynamo";
 
-// Generate static params for all known templates (required for static export)
-// Note: This is for build-time generation, but the route still works dynamically at runtime
-export async function generateStaticParams() {
-  return Object.keys(templates).map((template) => ({
-    template,
-  }));
-}
-
 interface Props {
   params: Promise<{ template: string }>;
   searchParams: Promise<{
