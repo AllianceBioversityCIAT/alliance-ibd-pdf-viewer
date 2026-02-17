@@ -107,5 +107,38 @@
     "reference_materials": [
       "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages C%26A%20Info%"
     ]
-  }
+  },
+  "investments": [
+    {
+      "entity": "CGIAR Science Program/ Accelerator",
+      "name": "Not provided",
+      "usd_investment": "Not provided"
+    },
+    {
+      "entity": "CGIAR W3 or bilateral projects",
+      "name": "International Maize and Wheat Improvement Center / Centro Internacional de Mejoramiento de Maíz y Trigo",
+      "usd_investment": "$5,000"
+    },
+    {
+      "entity": "Partners",
+      "name": "DOA - Department of Agriculture West Bengal (India)",
+      "usd_investment": "$8,000"
+    }
+  ],
+  "innovation_actors": [
+    {
+      "type": "Farmers/(agro) pastoralist/herders/fishers",
+      "actors": "Men (Non-youth)"
+    },
+    {
+      "type": "Researchers",
+      "actors": "Sex and age disaggregation does not apply"
+    }
+  ],
+  "innovation_organizations": [
+    {
+      "type": "Research organizations and universities",
+      "subtype": "Research organizations and universities International (Universities)"
+    }
+  ]
 }

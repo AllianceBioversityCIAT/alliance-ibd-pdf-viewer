@@ -66,6 +66,22 @@ interface InnovationDevelopment {
   reference_materials?: string[];
 }
 
+interface Investment {
+  entity: string;
+  name: string;
+  usd_investment: string;
+}
+
+interface InnovationActor {
+  type: string;
+  actors: string;
+}
+
+interface InnovationOrganization {
+  type: string;
+  subtype: string;
+}
+
 interface ResultSummaryData {
   result_type: string;
   title: string;
@@ -87,6 +103,9 @@ interface ResultSummaryData {
   geo_location?: GeoLocation;
   evidences?: Evidence[];
   innovation_development?: InnovationDevelopment;
+  investments?: Investment[];
+  innovation_actors?: InnovationActor[];
+  innovation_organizations?: InnovationOrganization[];
 }
 
 function ImpactAreaCard({ area }: { area: ImpactArea }) {
@@ -708,6 +727,46 @@ export default function ResultSummary({ data }: TemplateProps) {
           <div className="flex flex-col gap-[10px]">
             <SectionTitle>Innovation Development details</SectionTitle>
             <InnovationDevelopmentSection innovation={d.innovation_development} />
+          </div>
+        )}
+
+        {/* CGIAR and Partners estimated USD investment */}
+        {d?.investments && d.investments.length > 0 && (
+          <div className="flex flex-col gap-[10px]">
+            <SubSectionTitle>CGIAR and Partners estimated USD investment</SubSectionTitle>
+            <DataTable
+              columns={["Entity", "Name", "USD investment"]}
+              rows={d.investments.map((inv) => [inv.entity, inv.name, inv.usd_investment])}
+            />
+          </div>
+        )}
+
+        {/* Anticipated Innovation users */}
+        {(d?.innovation_actors?.length || d?.innovation_organizations?.length) && (
+          <div className="flex flex-col gap-[15px]">
+            <SubSectionTitle>Anticipated Innovation users</SubSectionTitle>
+
+            {/* Actors table */}
+            {d?.innovation_actors && d.innovation_actors.length > 0 && (
+              <div className="flex flex-col gap-[5px]">
+                <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">Actors</p>
+                <DataTable
+                  columns={["#", "Type", "Actors"]}
+                  rows={d.innovation_actors.map((a, i) => [String(i + 1), a.type, a.actors])}
+                />
+              </div>
+            )}
+
+            {/* Organizations table */}
+            {d?.innovation_organizations && d.innovation_organizations.length > 0 && (
+              <div className="flex flex-col gap-[5px]">
+                <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">Organizations</p>
+                <DataTable
+                  columns={["#", "Type", "Subtype"]}
+                  rows={d.innovation_organizations.map((o, i) => [String(i + 1), o.type, o.subtype])}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
