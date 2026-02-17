@@ -502,39 +502,66 @@ function createServerRequestHandler(server) {
         const responseHeaders = res._headers || {};
         let responseBody = res._body || '';
 
-        // Ensure responseBody is a string
+        // Check content-type to determine if response is binary
+        const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type'] || '';
+        const isBinary = contentType.startsWith('image/') ||
+          contentType.startsWith('application/octet-stream') ||
+          contentType.startsWith('font/') ||
+          contentType.startsWith('application/javascript') ||
+          contentType.startsWith('text/javascript') ||
+          contentType.includes('charset=binary');
+
+        // Ensure responseBody is properly formatted
+        let finalBody = responseBody;
         if (typeof responseBody !== 'string') {
           if (Buffer.isBuffer(responseBody)) {
-            responseBody = responseBody.toString('utf8');
+            finalBody = isBinary ? responseBody.toString('binary') : responseBody.toString('utf8');
           } else if (Array.isArray(responseBody)) {
-            // Convert array of numbers to string
             if (responseBody.length > 0 && typeof responseBody[0] === 'number') {
-              responseBody = Buffer.from(responseBody).toString('utf8');
+              finalBody = Buffer.from(responseBody).toString(isBinary ? 'binary' : 'utf8');
             } else {
-              responseBody = responseBody.join('');
+              finalBody = responseBody.join('');
             }
           } else {
-            responseBody = String(responseBody);
+            finalBody = String(responseBody);
           }
         } else {
           // Even if it's a string, check if it's a comma-separated list of numbers
-          // This can happen if the array was converted to string incorrectly
           if (/^\d+(,\d+)*$/.test(responseBody.trim())) {
             const numbers = responseBody.split(',').map(n => parseInt(n.trim(), 10));
-            responseBody = Buffer.from(numbers).toString('utf8');
+            finalBody = Buffer.from(numbers).toString(isBinary ? 'binary' : 'utf8');
           }
         }
 
         console.log('Response status:', statusCode);
         console.log('Response headers:', Object.keys(responseHeaders));
-        console.log('Response body length:', responseBody.length);
-        console.log('Response body type:', typeof responseBody);
-        console.log('Response body preview (first 100 chars):', responseBody.substring(0, 100));
+        console.log('Response body length:', finalBody.length);
+        console.log('Response body type:', typeof finalBody);
+        console.log('Content-Type:', contentType);
+        console.log('Is binary:', isBinary);
 
-        resolve(new Response(responseBody, {
-          status: statusCode,
-          headers: responseHeaders,
-        }));
+        // Only log preview for text content, not binary
+        if (!isBinary) {
+          console.log('Response body preview (first 100 chars):', finalBody.substring(0, 100));
+        } else {
+          console.log('Response body is binary, will be base64 encoded');
+        }
+
+        // Create Response object
+        // For binary content, we need to convert the binary string to a Buffer
+        if (isBinary && typeof finalBody === 'string') {
+          // Convert binary string to Buffer, then to ArrayBuffer for Response
+          const buffer = Buffer.from(finalBody, 'binary');
+          resolve(new Response(buffer, {
+            status: statusCode,
+            headers: responseHeaders,
+          }));
+        } else {
+          resolve(new Response(finalBody, {
+            status: statusCode,
+            headers: responseHeaders,
+          }));
+        }
       });
 
       // Also check periodically in case 'finish' event doesn't fire

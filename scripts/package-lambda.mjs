@@ -53,9 +53,24 @@ console.log('Copying Next.js standalone server...');
 cpSync(NEXT_STANDALONE, join(PACKAGE_DIR, '.next', 'standalone'), { recursive: true });
 
 // Copy Next.js static assets
+// In standalone mode, static files need to be in .next/static relative to the server
+// Next.js standalone expects static files at .next/static relative to the server root
 if (existsSync(NEXT_STATIC)) {
   console.log('Copying Next.js static assets...');
+  // Copy to root .next/static (for Lambda handler access)
   cpSync(NEXT_STATIC, join(PACKAGE_DIR, '.next', 'static'), { recursive: true });
+  // Also copy to standalone/.next/static (for Next.js server access)
+  const standaloneStaticDir = join(PACKAGE_DIR, '.next', 'standalone', '.next', 'static');
+  cpSync(NEXT_STATIC, standaloneStaticDir, { recursive: true });
+  console.log('Static assets copied to both .next/static and .next/standalone/.next/static');
+} else {
+  console.warn('WARNING: .next/static directory not found. Static assets may not be available.');
+  // Check if static files are already in standalone directory
+  const standaloneStatic = join(NEXT_STANDALONE, '.next', 'static');
+  if (existsSync(standaloneStatic)) {
+    console.log('Found static assets in standalone directory, copying to root...');
+    cpSync(standaloneStatic, join(PACKAGE_DIR, '.next', 'static'), { recursive: true });
+  }
 }
 
 // Copy public directory if it exists
@@ -89,13 +104,13 @@ writeFileSync(
 try {
   const size = execSync(`du -sh ${PACKAGE_DIR}`, { encoding: 'utf-8' }).split('\t')[0];
   console.log(`Package size: ${size}`);
-  
+
   // Check if we should use ECR instead
   const sizeBytes = parseInt(execSync(`du -sb ${PACKAGE_DIR}`, { encoding: 'utf-8' }).split('\t')[0]);
   const sizeMB = sizeBytes / (1024 * 1024);
-  
+
   console.log(`Package size: ${sizeMB.toFixed(2)} MB`);
-  
+
   if (sizeMB > 250) {
     console.warn('WARNING: Package size exceeds 250MB. Consider using ECR deployment.');
   } else if (sizeMB > 50) {
