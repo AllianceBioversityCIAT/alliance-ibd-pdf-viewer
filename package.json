@@ -5,8 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:lambda": "npm run build && npm run package:lambda",
+    "package:lambda": "node scripts/package-lambda.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:lambda": "node lambda/local-server.mjs"
   },
   "dependencies": {
     "next": "16.1.6",
