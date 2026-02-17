@@ -15,7 +15,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Path to Next.js standalone server
+// In Lambda, __dirname points to /var/task (the Lambda package root)
 const SERVER_PATH = join(__dirname, '.next', 'standalone', 'server.js');
+
+// Set NODE_ENV to production for Next.js
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'production';
+}
+
+// Set working directory to standalone directory so Next.js can find static files
+// Next.js standalone expects to run from its own directory
+const STANDALONE_DIR = join(__dirname, '.next', 'standalone');
+process.chdir(STANDALONE_DIR);
 
 let requestHandler = null;
 let interceptedServer = null;
@@ -41,7 +52,9 @@ async function getRequestHandler() {
     };
 
     // Import Next.js server module (this will trigger server creation)
-    const serverModule = await import(SERVER_PATH);
+    // Use absolute path to ensure we can import even after chdir
+    const absoluteServerPath = join(__dirname, '.next', 'standalone', 'server.js');
+    const serverModule = await import(absoluteServerPath);
     const defaultExport = serverModule.default;
 
     // Restore original createServer

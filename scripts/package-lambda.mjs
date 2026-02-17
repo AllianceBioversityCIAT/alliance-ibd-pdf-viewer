@@ -53,23 +53,45 @@ console.log('Copying Next.js standalone server...');
 cpSync(NEXT_STANDALONE, join(PACKAGE_DIR, '.next', 'standalone'), { recursive: true });
 
 // Copy Next.js static assets
-// In standalone mode, static files need to be in .next/static relative to the server
-// Next.js standalone expects static files at .next/static relative to the server root
+// CRITICAL: In standalone mode, Next.js expects static files at .next/static relative to the server directory
+// The server runs from .next/standalone/, so it looks for .next/standalone/.next/static
 if (existsSync(NEXT_STATIC)) {
   console.log('Copying Next.js static assets...');
-  // Copy to root .next/static (for Lambda handler access)
-  cpSync(NEXT_STATIC, join(PACKAGE_DIR, '.next', 'static'), { recursive: true });
-  // Also copy to standalone/.next/static (for Next.js server access)
+
+  // PRIMARY: Copy to standalone/.next/static (where Next.js server expects them)
   const standaloneStaticDir = join(PACKAGE_DIR, '.next', 'standalone', '.next', 'static');
+  mkdirSync(standaloneStaticDir, { recursive: true });
   cpSync(NEXT_STATIC, standaloneStaticDir, { recursive: true });
-  console.log('Static assets copied to both .next/static and .next/standalone/.next/static');
+  console.log('✓ Static assets copied to .next/standalone/.next/static (primary location)');
+
+  // SECONDARY: Also copy to root .next/static (for backup/reference)
+  const rootStaticDir = join(PACKAGE_DIR, '.next', 'static');
+  mkdirSync(rootStaticDir, { recursive: true });
+  cpSync(NEXT_STATIC, rootStaticDir, { recursive: true });
+  console.log('✓ Static assets also copied to .next/static (backup location)');
+
+  // Verify CSS files are present
+  const cssDir = join(standaloneStaticDir, 'css');
+  if (existsSync(cssDir)) {
+    const cssFiles = execSync(`find "${cssDir}" -name "*.css" 2>/dev/null | head -5`, { encoding: 'utf-8' }).trim();
+    if (cssFiles) {
+      console.log('✓ CSS files found:', cssFiles.split('\n').length, 'files');
+    } else {
+      console.warn('⚠ WARNING: No CSS files found in static directory');
+    }
+  }
 } else {
   console.warn('WARNING: .next/static directory not found. Static assets may not be available.');
-  // Check if static files are already in standalone directory
+  // Check if static files are already in standalone directory (sometimes Next.js includes them)
   const standaloneStatic = join(NEXT_STANDALONE, '.next', 'static');
   if (existsSync(standaloneStatic)) {
-    console.log('Found static assets in standalone directory, copying to root...');
-    cpSync(standaloneStatic, join(PACKAGE_DIR, '.next', 'static'), { recursive: true });
+    console.log('Found static assets in standalone build, copying...');
+    const targetDir = join(PACKAGE_DIR, '.next', 'standalone', '.next', 'static');
+    mkdirSync(targetDir, { recursive: true });
+    cpSync(standaloneStatic, targetDir, { recursive: true });
+    console.log('✓ Static assets copied from standalone build');
+  } else {
+    console.error('ERROR: No static assets found. Build may be incomplete.');
   }
 }
 
