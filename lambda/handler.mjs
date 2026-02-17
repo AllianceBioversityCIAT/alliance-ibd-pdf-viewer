@@ -303,10 +303,27 @@ function createMockResponse() {
       } else if (typeof chunk === 'string') {
         chunkStr = chunk;
       } else if (Array.isArray(chunk)) {
-        // Handle array of numbers (bytes) - convert to string
-        chunkStr = String.fromCharCode(...chunk);
+        // Handle array of numbers (bytes) - convert to Buffer then string
+        // Check if it's an array of numbers (bytes)
+        if (chunk.length > 0 && typeof chunk[0] === 'number') {
+          chunkStr = Buffer.from(chunk).toString(encoding || 'utf8');
+        } else {
+          // Array of strings or other types
+          chunkStr = chunk.join('');
+        }
+      } else if (chunk instanceof Uint8Array) {
+        chunkStr = Buffer.from(chunk).toString(encoding || 'utf8');
       } else {
-        chunkStr = String(chunk);
+        // For other types, try to convert to string
+        // But check if it's a string representation of an array
+        const str = String(chunk);
+        // If it looks like "60,33,68,79..." (comma-separated numbers), convert it
+        if (/^\d+(,\d+)*$/.test(str.trim())) {
+          const numbers = str.split(',').map(n => parseInt(n.trim(), 10));
+          chunkStr = String.fromCharCode(...numbers);
+        } else {
+          chunkStr = str;
+        }
       }
       body += chunkStr;
       res._body = body; // Update stored body reference
@@ -344,10 +361,27 @@ function createMockResponse() {
       } else if (typeof chunk === 'string') {
         chunkStr = chunk;
       } else if (Array.isArray(chunk)) {
-        // Handle array of numbers (bytes) - convert to string
-        chunkStr = String.fromCharCode(...chunk);
+        // Handle array of numbers (bytes) - convert to Buffer then string
+        // Check if it's an array of numbers (bytes)
+        if (chunk.length > 0 && typeof chunk[0] === 'number') {
+          chunkStr = Buffer.from(chunk).toString(encoding || 'utf8');
+        } else {
+          // Array of strings or other types
+          chunkStr = chunk.join('');
+        }
+      } else if (chunk instanceof Uint8Array) {
+        chunkStr = Buffer.from(chunk).toString(encoding || 'utf8');
       } else {
-        chunkStr = String(chunk);
+        // For other types, try to convert to string
+        // But check if it's a string representation of an array
+        const str = String(chunk);
+        // If it looks like "60,33,68,79..." (comma-separated numbers), convert it
+        if (/^\d+(,\d+)*$/.test(str.trim())) {
+          const numbers = str.split(',').map(n => parseInt(n.trim(), 10));
+          chunkStr = String.fromCharCode(...numbers);
+        } else {
+          chunkStr = str;
+        }
       }
       body += chunkStr;
       res._body = body; // Update stored body reference
@@ -474,9 +508,20 @@ function createServerRequestHandler(server) {
             responseBody = responseBody.toString('utf8');
           } else if (Array.isArray(responseBody)) {
             // Convert array of numbers to string
-            responseBody = String.fromCharCode(...responseBody);
+            if (responseBody.length > 0 && typeof responseBody[0] === 'number') {
+              responseBody = Buffer.from(responseBody).toString('utf8');
+            } else {
+              responseBody = responseBody.join('');
+            }
           } else {
             responseBody = String(responseBody);
+          }
+        } else {
+          // Even if it's a string, check if it's a comma-separated list of numbers
+          // This can happen if the array was converted to string incorrectly
+          if (/^\d+(,\d+)*$/.test(responseBody.trim())) {
+            const numbers = responseBody.split(',').map(n => parseInt(n.trim(), 10));
+            responseBody = Buffer.from(numbers).toString('utf8');
           }
         }
 
@@ -503,11 +548,36 @@ function createServerRequestHandler(server) {
           // Get the response data
           const statusCode = res.statusCode || 200;
           const responseHeaders = res._headers || {};
-          const responseBody = res._body || '';
+          let responseBody = res._body || '';
+
+          // Ensure responseBody is a string
+          if (typeof responseBody !== 'string') {
+            if (Buffer.isBuffer(responseBody)) {
+              responseBody = responseBody.toString('utf8');
+            } else if (Array.isArray(responseBody)) {
+              // Convert array of numbers to string
+              if (responseBody.length > 0 && typeof responseBody[0] === 'number') {
+                responseBody = Buffer.from(responseBody).toString('utf8');
+              } else {
+                responseBody = responseBody.join('');
+              }
+            } else {
+              responseBody = String(responseBody);
+            }
+          } else {
+            // Even if it's a string, check if it's a comma-separated list of numbers
+            // This can happen if the array was converted to string incorrectly
+            if (/^\d+(,\d+)*$/.test(responseBody.trim())) {
+              const numbers = responseBody.split(',').map(n => parseInt(n.trim(), 10));
+              responseBody = Buffer.from(numbers).toString('utf8');
+            }
+          }
 
           console.log('Response status:', statusCode);
           console.log('Response headers:', Object.keys(responseHeaders));
           console.log('Response body length:', responseBody.length);
+          console.log('Response body type:', typeof responseBody);
+          console.log('Response body preview (first 100 chars):', responseBody.substring(0, 100));
 
           resolve(new Response(responseBody, {
             status: statusCode,
