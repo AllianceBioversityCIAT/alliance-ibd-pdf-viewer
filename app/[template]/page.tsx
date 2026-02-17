@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { readdirSync, statSync, existsSync } from "fs";
+import { readdirSync, statSync, existsSync, readFileSync } from "fs";
 import { join, relative } from "path";
 import type { ComponentType } from "react";
 import type { TemplateProps } from "@/app/templates";
@@ -12,6 +12,7 @@ interface Props {
     paperWidth?: string;
     paperHeight?: string;
     test?: string;
+    demo?: string;
   }>;
 }
 
@@ -39,9 +40,16 @@ function findTemplate(name: string): string | null {
   return null;
 }
 
+function loadDemoData(templatePath: string): unknown | null {
+  const base = join(process.cwd(), "app", "templates");
+  const demoFile = join(base, `${templatePath}.demo.json`);
+  if (!existsSync(demoFile)) return null;
+  return JSON.parse(readFileSync(demoFile, "utf-8"));
+}
+
 export default async function TemplatePage({ params, searchParams }: Props) {
   const { template } = await params;
-  const { uuid, paperWidth, paperHeight, test } = await searchParams;
+  const { uuid, paperWidth, paperHeight, test, demo } = await searchParams;
 
   const templatePath = findTemplate(template);
   if (!templatePath) notFound();
@@ -54,16 +62,22 @@ export default async function TemplatePage({ params, searchParams }: Props) {
     notFound();
   }
 
-  if (!uuid) notFound();
+  let data: unknown;
 
-  const data = await getItem(uuid);
-  if (data === null) notFound();
+  if (demo === "true") {
+    data = loadDemoData(templatePath);
+    if (data === null) notFound();
+  } else {
+    if (!uuid) notFound();
+    data = await getItem(uuid);
+    if (data === null) notFound();
 
-  if (test !== "true") {
-    try {
-      await deleteItem(uuid);
-    } catch {
-      // Record may have already been deleted by a concurrent request
+    if (test !== "true") {
+      try {
+        await deleteItem(uuid);
+      } catch {
+        // Record may have already been deleted by a concurrent request
+      }
     }
   }
 

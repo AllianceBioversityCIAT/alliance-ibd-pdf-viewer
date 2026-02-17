@@ -1,4 +1,4 @@
-import type { TemplateProps } from "..";
+import type { TemplateProps } from "../..";
 
 interface SummaryData {
   title: string;
