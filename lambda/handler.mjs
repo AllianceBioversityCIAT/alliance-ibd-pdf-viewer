@@ -1,10 +1,11 @@
 /**
  * AWS Lambda Handler for Next.js Standalone Server
  * 
- * Directly uses Next.js request handler without starting HTTP server.
+ * Uses serverless-http to adapt Next.js HTTP server to Lambda.
  * Supports both Lambda Function URL and API Gateway events.
  */
 
+import serverless from 'serverless-http';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -15,105 +16,96 @@ const __dirname = dirname(__filename);
 // Path to Next.js standalone server
 const SERVER_PATH = join(__dirname, '.next', 'standalone', 'server.js');
 
-let requestHandler = null;
+let app = null;
+let handler = null;
 
 /**
- * Initialize Next.js request handler (lazy loading)
+ * Initialize Next.js app (lazy loading)
  */
-async function getRequestHandler() {
-  if (requestHandler) {
-    return requestHandler;
+async function getApp() {
+  if (app) {
+    return app;
   }
 
   try {
     // Import Next.js server module
-    // Note: This may trigger server startup, but we'll intercept the handler
     const serverModule = await import(SERVER_PATH);
     
     console.log('Server module imported. Keys:', Object.keys(serverModule));
+    console.log('Default type:', typeof serverModule.default);
     
-    // Next.js standalone typically exports the request handler
-    // Look for common Next.js handler exports
-    if (serverModule.requestHandler) {
-      requestHandler = serverModule.requestHandler;
-    } else if (serverModule.default && typeof serverModule.default === 'function') {
-      // Default export might be the handler
-      requestHandler = serverModule.default;
-    } else if (serverModule.handler) {
-      requestHandler = serverModule.handler;
+    // Next.js standalone server.js exports a default
+    // In Next.js 16, the default export might be the server instance or a factory
+    const defaultExport = serverModule.default;
+    
+    // Check what the default export is
+    if (!defaultExport) {
+      throw new Error('Server module default export is undefined');
+    }
+    
+    console.log('Default export type:', typeof defaultExport);
+    console.log('Default export constructor:', defaultExport?.constructor?.name);
+    
+    // Next.js standalone server typically exports the HTTP server instance
+    // We need to extract the Express/HTTP app from it
+    if (typeof defaultExport === 'function') {
+      // If it's a function, it might be:
+      // 1. A factory that creates the server
+      // 2. A request handler itself
+      // 3. The server constructor
+      
+      // Try calling it (might be a factory)
+      try {
+        const result = defaultExport();
+        if (result && (typeof result.listen === 'function' || typeof result.handle === 'function')) {
+          app = result;
+        } else {
+          // If calling returns something else, use the function itself
+          app = defaultExport;
+        }
+      } catch (e) {
+        // If calling fails, use the function directly
+        // It might be a request handler or middleware
+        app = defaultExport;
+      }
+    } else if (defaultExport && typeof defaultExport.listen === 'function') {
+      // It's already an HTTP server
+      // Extract the underlying app if possible
+      // For Express, the app is usually the server itself
+      app = defaultExport;
+    } else if (defaultExport && typeof defaultExport.handle === 'function') {
+      // It might be a Connect-style app
+      app = defaultExport;
     } else {
-      // Try to access the internal Next.js request handler
-      // Next.js stores it in different places depending on version
-      throw new Error('Could not find request handler in server module. Available keys: ' + Object.keys(serverModule).join(', '));
+      // Try to use it as-is
+      app = defaultExport;
     }
     
-    if (typeof requestHandler !== 'function') {
-      throw new Error(`Request handler is not a function. Type: ${typeof requestHandler}`);
+    // Verify app is usable with serverless-http
+    // serverless-http works with Express apps, Connect apps, or any app with (req, res) signature
+    if (!app) {
+      throw new Error('Could not extract app from server module');
     }
     
-    return requestHandler;
+    console.log('App type:', typeof app);
+    console.log('App has listen:', typeof app.listen === 'function');
+    console.log('App has handle:', typeof app.handle === 'function');
+    
+    // Wrap with serverless-http
+    // serverless-http can work with Express apps, Connect middleware, or any (req, res) handler
+    handler = serverless(app, {
+      binary: ['image/*', 'application/pdf', 'application/octet-stream'],
+    });
+
+    return app;
   } catch (error) {
-    console.error('Failed to load Next.js request handler:', error);
+    console.error('Failed to load Next.js server:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+    });
     throw error;
   }
-}
-
-/**
- * Convert Lambda event to Next.js Request object
- */
-function createNextRequest(event) {
-  const url = event.rawPath || event.path || '/';
-  const queryString = event.rawQueryString || '';
-  const fullUrl = queryString ? `${url}?${queryString}` : url;
-  const method = event.requestContext?.http?.method || event.httpMethod || 'GET';
-  const host = event.requestContext?.domainName || 'localhost';
-  
-  const headers = new Headers();
-  Object.entries(event.headers || {}).forEach(([key, value]) => {
-    if (value) {
-      headers.set(key, value);
-    }
-  });
-
-  const body = event.body 
-    ? (event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body)
-    : undefined;
-
-  return new Request(`https://${host}${fullUrl}`, {
-    method,
-    headers,
-    body: body,
-  });
-}
-
-/**
- * Convert Next.js Response to Lambda response format
- */
-async function convertResponse(response) {
-  const headers = {};
-  response.headers.forEach((value, key) => {
-    headers[key] = value;
-  });
-
-  let body;
-  let isBase64Encoded = false;
-
-  // Check if response is binary
-  const contentType = response.headers.get('content-type') || '';
-  if (contentType.startsWith('image/') || contentType.startsWith('application/pdf') || contentType.startsWith('application/octet-stream')) {
-    const arrayBuffer = await response.arrayBuffer();
-    body = Buffer.from(arrayBuffer).toString('base64');
-    isBase64Encoded = true;
-  } else {
-    body = await response.text();
-  }
-
-  return {
-    statusCode: response.status,
-    headers,
-    body,
-    isBase64Encoded,
-  };
 }
 
 /**
@@ -121,21 +113,17 @@ async function convertResponse(response) {
  */
 export const handler = async (event, context) => {
   try {
-    // Initialize request handler if needed
-    const handlerFn = await getRequestHandler();
-
-    if (!handlerFn || typeof handlerFn !== 'function') {
-      throw new Error('Request handler is not a function');
+    // Initialize app if needed
+    if (!handler) {
+      await getApp();
     }
 
-    // Create Next.js Request from Lambda event
-    const request = createNextRequest(event);
+    if (!handler || typeof handler !== 'function') {
+      throw new Error('Handler is not a function. App initialization may have failed.');
+    }
 
-    // Call Next.js request handler
-    const response = await handlerFn(request);
-
-    // Convert Next.js Response to Lambda format
-    return await convertResponse(response);
+    // Use serverless-http to handle the request
+    return await handler(event, context);
   } catch (error) {
     console.error('Lambda handler error:', {
       message: error.message,
