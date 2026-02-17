@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+const LS_SECRET = "cgiar_admin_secret";
 
 interface TableItem {
   id: string;
@@ -14,6 +16,37 @@ export default function ListPage() {
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Load secret from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem(LS_SECRET) ?? "";
+    setSecret(saved);
+    setMounted(true);
+  }, []);
+
+  // Persist secret changes
+  useEffect(() => {
+    if (!mounted) return;
+    if (secret) {
+      localStorage.setItem(LS_SECRET, secret);
+    }
+  }, [secret, mounted]);
+
+  // Auto-load if secret was cached
+  useEffect(() => {
+    if (mounted && secret && !loaded) {
+      handleFetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
+  function handleLogout() {
+    setSecret("");
+    setLoaded(false);
+    setItems([]);
+    localStorage.removeItem(LS_SECRET);
+  }
 
   async function handleFetch() {
     if (!secret) return;
@@ -84,6 +117,8 @@ export default function ListPage() {
     }
   }
 
+  const hasSession = !!secret;
+
   return (
     <div className="min-h-screen bg-[#02211A] font-sans p-6">
       <div className="max-w-4xl mx-auto">
@@ -99,12 +134,22 @@ export default function ListPage() {
                 <p className="text-[#E2E0DF]/40 text-xs">CGIAR PDF Generator Service</p>
               </div>
             </div>
-            <a
-              href="/admin"
-              className="text-[#11D4B3]/50 hover:text-[#11D4B3] text-xs transition-colors"
-            >
-              Upload JSON
-            </a>
+            <div className="flex items-center gap-3">
+              <a
+                href="/admin"
+                className="text-[#11D4B3]/50 hover:text-[#11D4B3] text-xs transition-colors"
+              >
+                Upload JSON
+              </a>
+              {hasSession && (
+                <button
+                  onClick={handleLogout}
+                  className="text-[#E2E0DF]/30 hover:text-red-400 text-xs transition-colors"
+                >
+                  Logout
+                </button>
+              )}
+            </div>
           </div>
           <div className="h-px bg-gradient-to-r from-[#11D4B3]/30 to-transparent mt-4" />
         </div>
@@ -146,6 +191,13 @@ export default function ListPage() {
               <span className="text-[#E2E0DF]/40 text-sm">
                 record{items.length !== 1 && "s"} in table
               </span>
+              <button
+                onClick={handleFetch}
+                disabled={loading}
+                className="text-[#E2E0DF]/30 hover:text-[#11D4B3] text-xs ml-auto transition-colors disabled:opacity-30"
+              >
+                Refresh
+              </button>
             </div>
 
             {items.length === 0 && (
