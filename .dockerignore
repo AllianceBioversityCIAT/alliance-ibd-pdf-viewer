@@ -1,0 +1,22 @@
+node_modules
+.git
+.env
+.env.local
+*.log
+.DS_Store
+lambda-package
+dist
+build
+react-old
+scripts
+tsconfig.json
+tsconfig.app.json
+eslint.config.mjs
+postcss.config.mjs
+README.md
+Jenkinsfile
+*.md
+# Exclude .next but include standalone and static
+.next
+!.next/standalone
+!.next/static

@@ -1,0 +1,151 @@
+/**
+ * Package Lambda deployment ZIP for Next.js Standalone
+ * 
+ * Creates lambda-package/ directory with:
+ * - handler.mjs (Lambda handler)
+ * - .next/standalone (Next.js standalone server)
+ * - .next/static (Next.js static assets)
+ * - public (public assets)
+ * - package.json
+ */
+
+import { mkdirSync, cpSync, existsSync, rmSync, writeFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const ROOT_DIR = join(__dirname, '..');
+const PACKAGE_DIR = join(ROOT_DIR, 'lambda-package');
+const NEXT_STANDALONE = join(ROOT_DIR, '.next', 'standalone');
+const NEXT_STATIC = join(ROOT_DIR, '.next', 'static');
+const PUBLIC_DIR = join(ROOT_DIR, 'public');
+const HANDLER_SRC = join(ROOT_DIR, 'lambda', 'handler.mjs');
+
+console.log('Packaging Lambda deployment for Next.js standalone...');
+
+// Clean and create package directory
+if (existsSync(PACKAGE_DIR)) {
+  console.log('Cleaning existing lambda-package/...');
+  rmSync(PACKAGE_DIR, { recursive: true, force: true });
+}
+mkdirSync(PACKAGE_DIR, { recursive: true });
+
+// Verify build output exists
+if (!existsSync(NEXT_STANDALONE)) {
+  console.error('ERROR: .next/standalone directory not found. Run "npm run build" first.');
+  console.error('Make sure next.config.ts has output: "standalone"');
+  process.exit(1);
+}
+
+if (!existsSync(join(NEXT_STANDALONE, 'server.js'))) {
+  console.error('ERROR: server.js not found in .next/standalone. Build may have failed.');
+  process.exit(1);
+}
+
+// Copy handler
+console.log('Copying Lambda handler...');
+cpSync(HANDLER_SRC, join(PACKAGE_DIR, 'handler.mjs'));
+
+// Copy Next.js standalone server
+console.log('Copying Next.js standalone server...');
+cpSync(NEXT_STANDALONE, join(PACKAGE_DIR, '.next', 'standalone'), { recursive: true });
+
+// Copy Next.js static assets
+// CRITICAL: In standalone mode, Next.js expects static files at .next/static relative to the server directory
+// The server runs from .next/standalone/, so it looks for .next/standalone/.next/static
+if (existsSync(NEXT_STATIC)) {
+  console.log('Copying Next.js static assets...');
+
+  // PRIMARY: Copy to standalone/.next/static (where Next.js server expects them)
+  const standaloneStaticDir = join(PACKAGE_DIR, '.next', 'standalone', '.next', 'static');
+  mkdirSync(standaloneStaticDir, { recursive: true });
+  cpSync(NEXT_STATIC, standaloneStaticDir, { recursive: true });
+  console.log('✓ Static assets copied to .next/standalone/.next/static (primary location)');
+
+  // SECONDARY: Also copy to root .next/static (for backup/reference)
+  const rootStaticDir = join(PACKAGE_DIR, '.next', 'static');
+  mkdirSync(rootStaticDir, { recursive: true });
+  cpSync(NEXT_STATIC, rootStaticDir, { recursive: true });
+  console.log('✓ Static assets also copied to .next/static (backup location)');
+
+  // Verify CSS files are present
+  const cssDir = join(standaloneStaticDir, 'css');
+  if (existsSync(cssDir)) {
+    const cssFiles = execSync(`find "${cssDir}" -name "*.css" 2>/dev/null | head -5`, { encoding: 'utf-8' }).trim();
+    if (cssFiles) {
+      console.log('✓ CSS files found:', cssFiles.split('\n').length, 'files');
+    } else {
+      console.warn('⚠ WARNING: No CSS files found in static directory');
+    }
+  }
+} else {
+  console.warn('WARNING: .next/static directory not found. Static assets may not be available.');
+  // Check if static files are already in standalone directory (sometimes Next.js includes them)
+  const standaloneStatic = join(NEXT_STANDALONE, '.next', 'static');
+  if (existsSync(standaloneStatic)) {
+    console.log('Found static assets in standalone build, copying...');
+    const targetDir = join(PACKAGE_DIR, '.next', 'standalone', '.next', 'static');
+    mkdirSync(targetDir, { recursive: true });
+    cpSync(standaloneStatic, targetDir, { recursive: true });
+    console.log('✓ Static assets copied from standalone build');
+  } else {
+    console.error('ERROR: No static assets found. Build may be incomplete.');
+  }
+}
+
+// Copy public directory if it exists
+if (existsSync(PUBLIC_DIR)) {
+  console.log('Copying public assets...');
+  cpSync(PUBLIC_DIR, join(PACKAGE_DIR, 'public'), { recursive: true });
+  console.log('✓ Public assets copied');
+} else {
+  console.log('No public directory found (this is OK if not using public assets)');
+}
+
+// Note: No additional dependencies needed - Next.js standalone includes everything
+
+// Create index.mjs as fallback (re-exports handler)
+console.log('Creating index.mjs fallback...');
+const indexContent = `// Re-export handler for Lambda compatibility
+export { handler } from './handler.mjs';
+`;
+writeFileSync(join(PACKAGE_DIR, 'index.mjs'), indexContent);
+
+// Create minimal package.json for Lambda
+const packageJson = {
+  name: 'alliance-ibd-pdf-viewer-lambda',
+  version: '1.0.0',
+  type: 'module',
+  main: 'handler.mjs',
+};
+writeFileSync(
+  join(PACKAGE_DIR, 'package.json'),
+  JSON.stringify(packageJson, null, 2)
+);
+
+// Calculate package size
+try {
+  const size = execSync(`du -sh ${PACKAGE_DIR}`, { encoding: 'utf-8' }).split('\t')[0];
+  console.log(`Package size: ${size}`);
+
+  // Check if we should use ECR instead
+  const sizeBytes = parseInt(execSync(`du -sb ${PACKAGE_DIR}`, { encoding: 'utf-8' }).split('\t')[0]);
+  const sizeMB = sizeBytes / (1024 * 1024);
+
+  console.log(`Package size: ${sizeMB.toFixed(2)} MB`);
+
+  if (sizeMB > 250) {
+    console.warn('WARNING: Package size exceeds 250MB. Consider using ECR deployment.');
+  } else if (sizeMB > 50) {
+    console.warn('WARNING: Package size exceeds 50MB. ZIP deployment may be slow. Consider ECR.');
+  } else {
+    console.log('Package size is within ZIP deployment limits.');
+  }
+} catch (error) {
+  console.warn('Could not calculate package size:', error.message);
+}
+
+console.log('Lambda package created successfully in lambda-package/');
+console.log('Ready for deployment!');
