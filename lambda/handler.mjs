@@ -267,6 +267,18 @@ function createMockResponse() {
     headers[name] = value;
     return this;
   };
+  res.appendHeader = function (name, value) {
+    // appendHeader appends to existing header or creates new one
+    if (headers[name]) {
+      // If header exists, append with comma separator
+      headers[name] = Array.isArray(headers[name])
+        ? [...headers[name], value].join(', ')
+        : `${headers[name]}, ${value}`;
+    } else {
+      headers[name] = value;
+    }
+    return this;
+  };
   res.getHeader = function (name) {
     return headers[name];
   };
