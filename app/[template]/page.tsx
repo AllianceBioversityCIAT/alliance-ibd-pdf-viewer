@@ -10,7 +10,6 @@ interface Props {
   searchParams: Promise<{
     uuid?: string;
     paperWidth?: string;
-    paperHeight?: string;
     test?: string;
     demo?: string;
   }>;
@@ -49,7 +48,7 @@ function loadDemoData(templatePath: string): unknown | null {
 
 export default async function TemplatePage({ params, searchParams }: Props) {
   const { template } = await params;
-  const { uuid, paperWidth, paperHeight, test, demo } = await searchParams;
+  const { uuid, paperWidth, test, demo } = await searchParams;
 
   const templatePath = findTemplate(template);
   if (!templatePath) notFound();
@@ -82,10 +81,9 @@ export default async function TemplatePage({ params, searchParams }: Props) {
   }
 
   const width = Math.max(100, Math.min(5000, Number(paperWidth) || 600));
-  const height = Math.max(100, Math.min(5000, Number(paperHeight) || 1000));
 
   return (
-    <div style={{ width: `${width}px`, height: `${height}px`, overflow: "hidden" }}>
+    <div style={{ width: `${width}px` }}>
       <TemplateComponent data={data} />
     </div>
   );

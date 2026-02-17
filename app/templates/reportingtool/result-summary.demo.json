@@ -29,5 +29,54 @@
       "from_value": "Level 5",
       "to_value": "Level 7"
     }
-  ]
+  ],
+  "theory_of_change": {
+    "program_name": "Science program 02 - Sustainable Farming",
+    "area_of_work": "Area of work 01 - Climate Adaptation and Mitigation",
+    "toc_url": "https://toc.cgiar.org/diagram/sp02",
+    "high_level_output": "Climate hazards to prioritized geographies and systems",
+    "indicator": "Number of quantified climate change-related hazards that affect agronomic"
+  },
+  "contributing_program": "Science Program (SP) 01 - Breeding for tomorrow",
+  "contributing_centers": [
+    "International Potato Center / Centro Internacional de la Papa (CIP)",
+    "Africa Rice Center / Centro Africano del Arroz (AfricaRice)"
+  ],
+  "contributing_projects": [
+    "IWMI - Implementation of conservation agriculture in Africa and Asia",
+    "ICARDA - Farmers trained on protection against wheat disease apply CGIAR innovation in their work"
+  ],
+  "partners": [
+    {
+      "name": "JEEVIKA - Jeevika",
+      "country_hq": "India (IN)",
+      "institution_type": "NGO Local (General)"
+    },
+    {
+      "name": "DOA - Department of Agriculture West Bengal (India)",
+      "country_hq": "India (IN)",
+      "institution_type": "Government (Subnational)"
+    }
+  ],
+  "bundled_innovations": [
+    {
+      "portfolio": "P25",
+      "phase": "2025",
+      "code": "5892",
+      "indicator": "Policy Change",
+      "title": "Youth engagement in agricultural transformation"
+    },
+    {
+      "portfolio": "P25",
+      "phase": "2025",
+      "code": "5892",
+      "indicator": "Policy Change",
+      "title": "Empowering farmers through sustainable agricultural practices"
+    }
+  ],
+  "geo_location": {
+    "geo_focus": "Global",
+    "regions": ["Eastern Africa", "Southern Africa", "Western Africa"],
+    "countries": ["Ethiopia", "South Africa"]
+  }
 }

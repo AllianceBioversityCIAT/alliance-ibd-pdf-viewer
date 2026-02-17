@@ -14,6 +14,34 @@ interface QAAdjustment {
   to_value: string;
 }
 
+interface TheoryOfChange {
+  program_name: string;
+  area_of_work: string;
+  toc_url?: string;
+  high_level_output?: string;
+  indicator?: string;
+}
+
+interface Partner {
+  name: string;
+  country_hq: string;
+  institution_type: string;
+}
+
+interface BundledInnovation {
+  portfolio: string;
+  phase: string;
+  code: string;
+  indicator: string;
+  title: string;
+}
+
+interface GeoLocation {
+  geo_focus: string;
+  regions: string[];
+  countries: string[];
+}
+
 interface ResultSummaryData {
   result_type: string;
   title: string;
@@ -26,6 +54,13 @@ interface ResultSummaryData {
   lead_contact_email: string;
   impact_areas: ImpactArea[];
   qa_adjustments: QAAdjustment[];
+  theory_of_change?: TheoryOfChange;
+  contributing_program?: string;
+  contributing_centers?: string[];
+  contributing_projects?: string[];
+  partners?: Partner[];
+  bundled_innovations?: BundledInnovation[];
+  geo_location?: GeoLocation;
 }
 
 function ImpactAreaCard({ area }: { area: ImpactArea }) {
@@ -104,6 +139,153 @@ function QABox({ adjustments }: { adjustments: QAAdjustment[] }) {
                   <img src="/assets/prms/arrow-right.svg" alt="→" className="w-[11px] h-[8px]" />
                   <span className="text-[#033529] font-medium">{adj.to_value}</span>
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: string }) {
+  return (
+    <p className="text-[#065f4a] text-[14px] font-bold leading-[1.15]">{children}</p>
+  );
+}
+
+function SubSectionTitle({ children }: { children: string }) {
+  return (
+    <p className="text-[#555554] text-[12px] leading-[1.15]">{children}</p>
+  );
+}
+
+function DataTable({ columns, rows }: { columns: string[]; rows: string[][] }) {
+  return (
+    <table className="w-full text-[7.5px] border-collapse" style={{ fontFamily: "'Inter', 'Noto Sans', sans-serif" }}>
+      <thead>
+        <tr>
+          {columns.map((col, i) => (
+            <th
+              key={i}
+              className="bg-[#eff6ff] text-[#1d4ed8] font-bold text-left border-b border-[#e5e7eb]"
+              style={{ padding: "7.5px" }}
+            >
+              {col}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i} className="bg-white">
+            {row.map((cell, j) => (
+              <td
+                key={j}
+                className="text-[#4b5563] border-b border-[#e5e7eb]"
+                style={{ padding: "7.5px", borderLeft: j === 0 ? "0.5px solid #e8ebed" : undefined }}
+              >
+                {cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function TheoryOfChangeCard({ toc }: { toc: TheoryOfChange }) {
+  return (
+    <div className="bg-[#e2e0df]" style={{ padding: "15px 19px" }}>
+      <div className="flex items-center justify-between mb-[16px]">
+        <div className="flex flex-col gap-[3px]">
+          <p className="text-[#02211a] text-[11px] font-bold leading-[1.15]">
+            {toc.program_name}
+          </p>
+          <p
+            className="text-[#02211a] text-[9.5px] leading-[1.15]"
+            style={{ fontFamily: "'Noto Serif', serif" }}
+          >
+            {toc.area_of_work}
+          </p>
+        </div>
+        {toc.toc_url && (
+          <a href={toc.toc_url} className="flex items-center gap-[2px] shrink-0">
+            <img src="/assets/prms/icon-link.svg" alt="" className="w-[13px] h-[13px]" />
+            <span className="text-[#065f4a] text-[9px] font-bold">Access TOC diagram</span>
+          </a>
+        )}
+      </div>
+      <div className="flex flex-col gap-[5px] text-[9px]">
+        {toc.high_level_output && (
+          <p className="leading-[1.15]">
+            <span className="font-bold text-[#1d1d1d]">High Level Output:</span>{" "}
+            <span className="text-[#393939]">{toc.high_level_output}</span>
+          </p>
+        )}
+        {toc.indicator && (
+          <p style={{ lineHeight: 1.5 }}>
+            <span className="font-bold text-[#1d1d1d]">Indicator:</span>{" "}
+            <span className="text-[#393939]">{toc.indicator}</span>
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function GeoLocationBox({ geo }: { geo: GeoLocation }) {
+  return (
+    <div className="bg-[#e2e0df] flex overflow-hidden">
+      <div
+        className="bg-[#033529] flex flex-col items-center justify-center shrink-0"
+        style={{ width: 106, padding: "8px 17px" }}
+      >
+        <div
+          className="bg-white mb-[5px]"
+          style={{
+            width: 60,
+            height: 52,
+            WebkitMaskImage: "url(/assets/prms/globe-mask.png)",
+            WebkitMaskSize: "contain",
+            WebkitMaskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
+            maskImage: "url(/assets/prms/globe-mask.png)",
+            maskSize: "contain",
+            maskRepeat: "no-repeat",
+            maskPosition: "center",
+          }}
+        />
+        <p className="text-white text-[11px] font-bold text-center leading-[1.15]">
+          {geo.geo_focus}
+        </p>
+      </div>
+      <div className="flex flex-col gap-[18px] py-[15px] px-[22px] flex-1 min-w-0 text-[10px]">
+        {geo.regions.length > 0 && (
+          <div className="flex flex-col gap-[5px]">
+            <p className="font-bold text-[#1d1d1d] leading-[1.15]">
+              Regions specified for this result:
+            </p>
+            <div className="flex flex-wrap gap-[6px]">
+              {geo.regions.map((r, i) => (
+                <span key={i} className="text-[#393939] leading-[1.5]">
+                  <span className="mr-[4px]">&bull;</span>{r}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        {geo.countries.length > 0 && (
+          <div className="flex flex-col gap-[5px]">
+            <p className="font-bold text-[#1d1d1d] leading-[1.15]">
+              Countries specified for this result:
+            </p>
+            <div className="flex flex-wrap gap-[6px]">
+              {geo.countries.map((c, i) => (
+                <span key={i} className="text-[#393939] leading-[1.5]">
+                  <span className="mr-[4px]">&bull;</span>{c}
+                </span>
               ))}
             </div>
           </div>
@@ -205,9 +387,7 @@ export default function ResultSummary({ data }: TemplateProps) {
 
         {/* Result details section */}
         <div className="flex flex-col gap-[10px]">
-          <p className="text-[#065f4a] text-[14px] font-bold leading-[1.15]">
-            Result details
-          </p>
+          <SectionTitle>Result details</SectionTitle>
 
           <div className="flex flex-col gap-[8px]">
             {d?.short_title && <LabelValue label="Short title" value={d.short_title} />}
@@ -271,6 +451,87 @@ export default function ResultSummary({ data }: TemplateProps) {
             )}
           </div>
         </div>
+
+        {/* Contributors and Partners section */}
+        {(d?.theory_of_change || d?.contributing_program || d?.partners?.length || d?.bundled_innovations?.length) && (
+          <div className="flex flex-col gap-[10px]">
+            <SectionTitle>Contributors and Partners</SectionTitle>
+
+            {/* Theory of Change */}
+            {d?.theory_of_change && (
+              <div className="flex flex-col gap-[10px]">
+                <SubSectionTitle>Theory of Change</SubSectionTitle>
+                <TheoryOfChangeCard toc={d.theory_of_change} />
+              </div>
+            )}
+
+            {/* Contributors */}
+            {(d?.contributing_program || d?.contributing_centers?.length || d?.contributing_projects?.length) && (
+              <div className="flex flex-col gap-[10px]">
+                <SubSectionTitle>Contributors</SubSectionTitle>
+                <div className="flex flex-col gap-[8px] text-[10px]">
+                  {d?.contributing_program && (
+                    <LabelValue label="Contributing Program" value={d.contributing_program} />
+                  )}
+                  {d?.contributing_centers && d.contributing_centers.length > 0 && (
+                    <div>
+                      <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15] mb-[4px]">
+                        Contributing CGIAR Centers:
+                      </p>
+                      <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
+                        {d.contributing_centers.map((c, i) => (
+                          <li key={i} className="leading-[1.5]">{c}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {d?.contributing_projects && d.contributing_projects.length > 0 && (
+                    <div>
+                      <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15] mb-[4px]">
+                        Contributing W3 and/or bilateral projects:
+                      </p>
+                      <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
+                        {d.contributing_projects.map((p, i) => (
+                          <li key={i} className="leading-[1.5]">{p}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Partners table */}
+            {d?.partners && d.partners.length > 0 && (
+              <div className="flex flex-col gap-[10px]">
+                <SubSectionTitle>Partners</SubSectionTitle>
+                <DataTable
+                  columns={["Name", "Country HQ", "Institution type"]}
+                  rows={d.partners.map((p) => [p.name, p.country_hq, p.institution_type])}
+                />
+              </div>
+            )}
+
+            {/* Bundled innovations table */}
+            {d?.bundled_innovations && d.bundled_innovations.length > 0 && (
+              <div className="flex flex-col gap-[10px]">
+                <SubSectionTitle>Bundled innovations</SubSectionTitle>
+                <DataTable
+                  columns={["Portfolio", "Phase", "Code", "Indicator", "Title"]}
+                  rows={d.bundled_innovations.map((b) => [b.portfolio, b.phase, b.code, b.indicator, b.title])}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Geographic location section */}
+        {d?.geo_location && (
+          <div className="flex flex-col gap-[10px]">
+            <SectionTitle>Geographic location</SectionTitle>
+            <GeoLocationBox geo={d.geo_location} />
+          </div>
+        )}
       </div>
     </div>
   );
