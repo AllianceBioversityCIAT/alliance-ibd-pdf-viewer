@@ -2,17 +2,31 @@ import { timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { generateUUID, putItem } from "@/lib/dynamo";
 
-function isAuthorized(secret: string | null): boolean {
-  const expected = process.env.API_SECRET;
-  if (!secret || !expected) return false;
+function matches(secret: string, expected: string): boolean {
   const a = Buffer.from(secret);
   const b = Buffer.from(expected);
   if (a.length !== b.length) return false;
   return timingSafeEqual(a, b);
 }
 
+function isAuthorized(req: NextRequest): boolean {
+  // Accept either API_SECRET (for external consumers) or ADMIN_SECRET (for admin UI)
+  const apiSecret = req.headers.get("x-api-secret");
+  const adminSecret = req.headers.get("x-admin-secret");
+
+  if (apiSecret && process.env.API_SECRET) {
+    if (matches(apiSecret, process.env.API_SECRET)) return true;
+  }
+
+  if (adminSecret && process.env.ADMIN_SECRET) {
+    if (matches(adminSecret, process.env.ADMIN_SECRET)) return true;
+  }
+
+  return false;
+}
+
 export async function POST(req: NextRequest) {
-  if (!isAuthorized(req.headers.get("x-api-secret"))) {
+  if (!isAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

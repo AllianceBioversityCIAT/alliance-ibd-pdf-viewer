@@ -4,6 +4,7 @@ import {
   PutCommand,
   GetCommand,
   DeleteCommand,
+  ScanCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 // ---------------------------------------------------------------------------
@@ -92,6 +93,35 @@ export async function getItem(uuid: string): Promise<unknown | null> {
   if (typeof json !== "string") return null;
 
   return JSON.parse(json);
+}
+
+export interface TableItem {
+  id: string;
+  json: string;
+}
+
+export async function scanAll(): Promise<TableItem[]> {
+  const items: TableItem[] = [];
+  let lastKey: Record<string, unknown> | undefined;
+
+  do {
+    const result = await client.send(
+      new ScanCommand({
+        TableName: table(),
+        ExclusiveStartKey: lastKey,
+      }),
+    );
+
+    if (result.Items) {
+      for (const item of result.Items) {
+        items.push({ id: item.id as string, json: item.json as string });
+      }
+    }
+
+    lastKey = result.LastEvaluatedKey;
+  } while (lastKey);
+
+  return items;
 }
 
 export async function deleteItem(uuid: string): Promise<void> {
