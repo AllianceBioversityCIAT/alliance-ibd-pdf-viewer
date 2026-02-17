@@ -16,17 +16,35 @@ declare global {
 }
 
 function createClient(): DynamoDBDocumentClient {
+  // Get region from environment
+  // In Lambda, AWS_REGION is automatically set by the runtime
+  // Also check AWS_REGION env var (which you've configured in Lambda)
+  const region = 
+    process.env.AWS_REGION || 
+    process.env.AWS_DEFAULT_REGION || 
+    'us-east-1'; // Fallback
+
   const config: ConstructorParameters<typeof DynamoDBClient>[0] = {
-    region: process.env.AWS_REGION,
+    region: region,
   };
 
-  // Use explicit credentials if provided, otherwise fall back to IAM role
-  if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+  // In Lambda, NEVER use explicit credentials - always use the IAM role
+  // Only use explicit credentials for LOCAL development (when not in Lambda)
+  const isLambda = !!(
+    process.env.AWS_LAMBDA_FUNCTION_NAME || 
+    process.env.LAMBDA_TASK_ROOT ||
+    process.env._HANDLER
+  );
+
+  if (!isLambda && process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY) {
+    // Only use explicit credentials for local development
     config.credentials = {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     };
   }
+  // In Lambda, the SDK will automatically use the IAM role credentials
+  // Do NOT set credentials explicitly in Lambda - let the SDK use the role
 
   const raw = new DynamoDBClient(config);
 
