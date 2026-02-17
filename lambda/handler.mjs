@@ -242,6 +242,9 @@ function createMockResponse() {
   let body = '';
   let responseComplete = false;
 
+  // Store body reference so it can be accessed later
+  res._body = body;
+
   // Set properties
   res.statusCode = 200;
   res.statusMessage = 'OK';
@@ -292,9 +295,14 @@ function createMockResponse() {
   res.hasHeader = function (name) {
     return name in headers;
   };
-  res.write = function (chunk) {
+  res.write = function (chunk, encoding, callback) {
     if (chunk) {
-      body += chunk.toString();
+      const chunkStr = Buffer.isBuffer(chunk) ? chunk.toString(encoding || 'utf8') : chunk.toString();
+      body += chunkStr;
+      res._body = body; // Update stored body reference
+    }
+    if (typeof callback === 'function') {
+      callback();
     }
     return true;
   };
@@ -314,7 +322,9 @@ function createMockResponse() {
   };
   res.end = function (chunk, encoding, callback) {
     if (chunk) {
-      body += chunk.toString();
+      const chunkStr = Buffer.isBuffer(chunk) ? chunk.toString(encoding || 'utf8') : chunk.toString();
+      body += chunkStr;
+      res._body = body; // Update stored body reference
     }
     this.finished = true;
     responseComplete = true;
@@ -330,6 +340,7 @@ function createMockResponse() {
   res.json = function (data) {
     headers['Content-Type'] = 'application/json';
     body = JSON.stringify(data);
+    res._body = body; // Update stored body reference
     this.finished = true;
     responseComplete = true;
     this.headersSent = true;
@@ -339,6 +350,7 @@ function createMockResponse() {
   };
   res.send = function (data) {
     body = typeof data === 'string' ? data : JSON.stringify(data);
+    res._body = body; // Update stored body reference
     this.finished = true;
     responseComplete = true;
     this.headersSent = true;
