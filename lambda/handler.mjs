@@ -198,51 +198,42 @@ function createMockRequest(url, method, headers, body) {
       bodyBuffer = Buffer.from(bodyString, 'utf8');
       console.log('[createMockRequest] Body converted to string, length:', bodyString.length);
     }
-    // CRITICAL: Next.js in standalone mode may access req.body directly
-    // Make body available as a getter that ALWAYS returns the string when accessed
-    // This ensures Next.js can read the body even if it doesn't use the stream
-    // Also need to ensure the stream can emit the body when Next.js reads via stream
+    // CRITICAL FIX: Next.js API routes (App Router) convert IncomingMessage to Request
+    // When Next.js accesses req.body, it expects a ReadableStream that it can read via req.json()
+    // The problem: If we return a ReadableStream, Next.js may try to parse it directly as JSON
+    // The solution: Return a ReadableStream that can be read correctly, ensuring it's not locked
+    // Next.js will read the stream via req.json(), which internally calls request.body.getReader()
     Object.defineProperty(req, 'body', {
       get: function () {
         console.log('[MockRequest] req.body accessed via getter');
-        console.log('[MockRequest] bodyString type:', typeof bodyString, 'length:', bodyString?.length || 0);
-        console.log('[MockRequest] bodyBuffer exists:', !!bodyBuffer, 'type:', bodyBuffer?.constructor?.name);
 
-        // CRITICAL: Next.js may convert IncomingMessage to Request, which expects a ReadableStream
-        // But we have the body as string. We need to return a ReadableStream that can be read
-        // However, if Next.js accesses req.body directly (not via stream), it might expect a string
-        // The solution: Return a ReadableStream that reads from our stored string
-        // This way, Next.js can read it via req.json() without issues
-
+        // If bodyString exists, create a fresh ReadableStream that can be read
         if (bodyString) {
           console.log('[MockRequest] Creating ReadableStream from bodyString, length:', bodyString.length);
 
-          // Create a new ReadableStream from the string
-          // This allows Next.js to read it via req.json() without "locked" errors
-          // IMPORTANT: Create a fresh stream each time the getter is called
+          // Create a new ReadableStream that can be read by Next.js
+          // IMPORTANT: This stream must be readable and not locked
           const encoder = new TextEncoder();
-          const stream = new ReadableStream({
+          return new ReadableStream({
             start(controller) {
+              // Enqueue the body data immediately
               controller.enqueue(encoder.encode(bodyString));
               controller.close();
             }
           });
-          return stream;
         } else if (bodyBuffer) {
-          // If bodyString is null but bodyBuffer exists, convert it
+          // If bodyBuffer exists, convert to string and create stream
           const converted = bodyBuffer.toString('utf8');
           bodyString = converted; // Cache it
           console.log('[MockRequest] Converted bodyBuffer to string, creating ReadableStream, length:', converted.length);
 
-          // Create a new ReadableStream from the converted string
           const encoder = new TextEncoder();
-          const stream = new ReadableStream({
+          return new ReadableStream({
             start(controller) {
               controller.enqueue(encoder.encode(converted));
               controller.close();
             }
           });
-          return stream;
         } else {
           console.log('[MockRequest] No body available, returning null');
           return null;
@@ -250,6 +241,7 @@ function createMockRequest(url, method, headers, body) {
       },
       set: function (value) {
         console.log('[MockRequest] req.body set to:', typeof value, 'constructor:', value?.constructor?.name);
+        // Allow Next.js body parser to set the parsed body
         if (typeof value === 'string') {
           bodyString = value;
           bodyBuffer = Buffer.from(value, 'utf8');
