@@ -882,9 +882,19 @@ export const handler = async (event, context) => {
 
       const response = serveStaticFile(filePath);
       if (response) {
-        console.log('✓ Served public file:', url);
+        console.log('✓ Served public file with /public prefix:', url);
         return response;
       }
+    }
+
+    // Fallback: serve anything that physically exists under /public at the root.
+    // This covers correct Next.js semantics where /public/foo.png is requested as /foo.png.
+    const normalizedPath = url.replace(/^\/+/, ''); // strip leading slash
+    const rootPublicPath = join(__dirname, 'public', normalizedPath);
+    const rootPublicResponse = serveStaticFile(rootPublicPath);
+    if (rootPublicResponse) {
+      console.log('✓ Served public file from root path:', url);
+      return rootPublicResponse;
     }
 
     // For all other requests (including /summary), use Next.js handler
