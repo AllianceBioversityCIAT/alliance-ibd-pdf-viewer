@@ -1,23 +1,22 @@
+import Image from "next/image";
 import type { PRMSResultData } from "../types";
 import { SectionTitle, SubSectionTitle } from "./common-sections";
 import { DataTable } from "./tables";
 
 export function InnovationDevelopmentSections({
   data,
-}: {
+}: Readonly<{
   data: PRMSResultData;
-}) {
+}>) {
   const hasDevelopers =
     data.innovation_developers && data.innovation_developers.length > 0;
   const hasCollaborators =
     data.innovation_collaborators && data.innovation_collaborators.length > 0;
   const hasInvestments =
     data.innovation_investments && data.innovation_investments.length > 0;
-  const hasActors =
-    data.innovation_actors && data.innovation_actors.length > 0;
+  const hasActors = data.innovation_actors && data.innovation_actors.length > 0;
   const hasOrgs =
-    data.innovation_organizations &&
-    data.innovation_organizations.length > 0;
+    data.innovation_organizations && data.innovation_organizations.length > 0;
 
   const hasDetails =
     hasDevelopers ||
@@ -38,7 +37,7 @@ export function InnovationDevelopmentSections({
             <div className="flex flex-col gap-[8px] text-[10px] flex-1 min-w-0">
               {hasDevelopers &&
                 data.innovation_developers!.map((dev, i) => (
-                  <p key={i} style={{ lineHeight: 1.5 }}>
+                  <p key={`${dev.name}-${i}`} style={{ lineHeight: 1.5 }}>
                     <span className="font-bold text-[#1d1d1d]">
                       Innovation Developer:
                     </span>{" "}
@@ -69,8 +68,7 @@ export function InnovationDevelopmentSections({
                   </span>{" "}
                   <span className="text-[#393939]">
                     <span className="font-medium">{data.readiness_level}</span>
-                    {data.readiness_details &&
-                      ` - ${data.readiness_details}`}
+                    {data.readiness_details && ` - ${data.readiness_details}`}
                   </span>
                 </p>
               )}
@@ -93,7 +91,7 @@ export function InnovationDevelopmentSections({
                   </p>
                   <ul className="list-disc ml-[15px] text-[#393939]">
                     {data.innovation_collaborators!.map((c, i) => (
-                      <li key={i} className="leading-[1.5]">
+                      <li key={`${c.name}-${i}`} className="leading-normal">
                         {c.name}
                         {c.email && `, ${c.email}`}
                       </li>
@@ -118,26 +116,26 @@ export function InnovationDevelopmentSections({
                   <span className="font-bold text-[#1d1d1d]">
                     Innovation type:
                   </span>{" "}
-                  <span className="text-[#393939]">
-                    {data.innovation_type}
-                  </span>
+                  <span className="text-[#393939]">{data.innovation_type}</span>
                 </p>
               )}
 
-              {data.url_readiness && (
+              {data.materials_evidence && (
                 <div className="flex flex-col gap-[5px]">
                   <p className="font-bold text-[#1d1d1d] leading-[1.15]">
                     Reference materials:
                   </p>
                   <ul className="list-disc ml-[15px]">
-                    <li className="leading-[1.5]">
-                      <a
-                        href={data.url_readiness}
-                        className="text-[#065f4a] underline break-all"
-                      >
-                        {data.url_readiness}
-                      </a>
-                    </li>
+                    {data.materials_evidence.map((m, i) => (
+                      <li key={`${m.evidence}-${i}`} className="leading-normal">
+                        <a
+                          href={m.evidence}
+                          className="text-[#065f4a] underline break-all"
+                        >
+                          {m.evidence}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               )}
@@ -148,11 +146,17 @@ export function InnovationDevelopmentSections({
               className="flex flex-col items-center shrink-0"
               style={{ width: 182 }}
             >
-              <img
-                src="/assets/prms/readiness-scale.png"
+              <Image
+                src={
+                  data.url_readiness ||
+                  "https://prms-file-storage.s3.amazonaws.com/images/inno-scaling-readiness-not-provided.png"
+                }
                 alt="Innovation Readiness Scale"
                 className="w-full"
+                width={182}
+                height={400}
               />
+
               <p className="text-[#818181] text-[8px] leading-[1.367] text-center mt-[4px]">
                 Learn more in{" "}
                 <a

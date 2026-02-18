@@ -19,7 +19,7 @@ import { KPDetailsSection } from "./components/knowledge-product";
 import { PolicyChangePlaceholder } from "./components/policy-change";
 import { InnovationUsePlaceholder } from "./components/innovation-use";
 
-export default function ResultsP25({ data }: TemplateProps) {
+export default function ResultsP25({ data }: Readonly<TemplateProps>) {
   const d = data as PRMSResultData | null;
 
   const impactAreas = d ? extractImpactAreas(d) : [];
@@ -40,7 +40,7 @@ export default function ResultsP25({ data }: TemplateProps) {
       {/* Common sections */}
       {d && <ResultDetailsSection data={d} impactAreas={impactAreas} />}
       {d && <ContributorsSection data={d} tocEntries={tocEntries} />}
-      {geo && <GeographicSection geo={geo} />}
+      <GeographicSection geo={geo} />
       <EvidenceSection evidences={evidences} />
 
       {/* Variant-specific sections based on rt_id */}

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type {
   PRMSResultData,
   ImpactArea,
@@ -7,10 +8,11 @@ import type {
 } from "../types";
 import { ImpactAreaCard, OECDCriteria } from "./impact-areas";
 import { DataTable } from "./tables";
+import { Search } from "lucide-react";
 
 // ── Shared primitives ──
 
-export function SectionTitle({ children }: { children: string }) {
+export function SectionTitle({ children }: Readonly<{ children: string }>) {
   return (
     <p className="text-[#065f4a] text-[14px] font-bold leading-[1.15]">
       {children}
@@ -18,7 +20,7 @@ export function SectionTitle({ children }: { children: string }) {
   );
 }
 
-export function SubSectionTitle({ children }: { children: string }) {
+export function SubSectionTitle({ children }: Readonly<{ children: string }>) {
   return (
     <p className="text-[#555554] text-[12px] leading-[1.15]">{children}</p>
   );
@@ -28,11 +30,11 @@ export function LabelValue({
   label,
   value,
   multiline,
-}: {
+}: Readonly<{
   label: string;
   value: string;
   multiline?: boolean;
-}) {
+}>) {
   return (
     <p className="text-[10px]" style={{ lineHeight: multiline ? 1.5 : 1.15 }}>
       <span className="font-bold text-[#1d1d1d]">{label}:</span>{" "}
@@ -46,10 +48,10 @@ export function LabelValue({
 export function ResultDetailsSection({
   data,
   impactAreas,
-}: {
+}: Readonly<{
   data: PRMSResultData;
   impactAreas: ImpactArea[];
-}) {
+}>) {
   return (
     <div className="flex flex-col gap-[10px]">
       <SectionTitle>Result details</SectionTitle>
@@ -80,7 +82,9 @@ export function ResultDetailsSection({
         {data.lead_contact_person && (
           <LabelValue
             label="Lead contact person"
-            value={`${data.lead_contact_person}${data.result_lead ? ` (${data.result_lead})` : ""}`}
+            value={`${data.lead_contact_person}${
+              data.result_lead ? ` (${data.result_lead})` : ""
+            }`}
           />
         )}
 
@@ -90,9 +94,9 @@ export function ResultDetailsSection({
               Impact Areas targeted
             </p>
             <div className="flex flex-col gap-[10px]">
-              <div className="flex gap-[10px]">
-                {impactAreas.map((area, i) => (
-                  <ImpactAreaCard key={i} area={area} />
+              <div className="grid grid-cols-2 gap-2.5">
+                {impactAreas.map((area) => (
+                  <ImpactAreaCard key={area.name} area={area} />
                 ))}
               </div>
               <OECDCriteria />
@@ -106,31 +110,44 @@ export function ResultDetailsSection({
 
 // ── Theory of Change Card ──
 
-function TheoryOfChangeCard({ toc }: { toc: TheoryOfChange }) {
+function TheoryOfChangeCard({ toc }: Readonly<{ toc: TheoryOfChange }>) {
   return (
     <div className="bg-[#e2e0df]" style={{ padding: "15px 19px" }}>
       <div className="flex items-center justify-between mb-[16px]">
-        <div className="flex flex-col gap-[3px]">
-          <p className="text-[#02211a] text-[11px] font-bold leading-[1.15]">
-            {toc.program_name}
-          </p>
-          <p
-            className="text-[#02211a] text-[9.5px] leading-[1.15]"
-            style={{ fontFamily: "'Noto Serif', serif" }}
-          >
-            {toc.area_of_work}
-          </p>
+        <div className="flex items-center justify-center gap-1.5">
+          <div className="bg-white rounded-full w-6 h-6 flex items-center justify-center">
+            <Image
+              src="/assets/prms/icon-toc.png"
+              alt=""
+              width={18}
+              height={8}
+              className="w-[18px] h-[8px] object-cover"
+            />
+          </div>
+          <div className="flex flex-col gap-[3px]">
+            <p className="text-[#041b15] text-[11px] font-bold leading-[1.15]">
+              {toc.program_name}
+            </p>
+            <p
+              className="text-[#02211a] text-[9.5px] leading-[1.15]"
+              style={{ fontFamily: "'Noto Serif', serif" }}
+            >
+              {toc.area_of_work}
+            </p>
+          </div>
         </div>
         {toc.toc_url && (
           <a
             href={toc.toc_url}
             className="flex items-center gap-[2px] shrink-0"
           >
-            <img
+            <Image
               src="/assets/prms/icon-link.svg"
               alt=""
-              className="w-[13px] h-[13px]"
+              width={10}
+              height={7}
             />
+
             <span className="text-[#065f4a] text-[9px] font-bold">
               Access TOC diagram
             </span>
@@ -140,9 +157,7 @@ function TheoryOfChangeCard({ toc }: { toc: TheoryOfChange }) {
       <div className="flex flex-col gap-[5px] text-[9px]">
         {toc.high_level_output && (
           <p className="leading-[1.15]">
-            <span className="font-bold text-[#1d1d1d]">
-              High Level Output:
-            </span>{" "}
+            <span className="font-bold text-[#1d1d1d]">High Level Output:</span>{" "}
             <span className="text-[#393939]">{toc.high_level_output}</span>
           </p>
         )}
@@ -162,10 +177,10 @@ function TheoryOfChangeCard({ toc }: { toc: TheoryOfChange }) {
 export function ContributorsSection({
   data,
   tocEntries,
-}: {
+}: Readonly<{
   data: PRMSResultData;
   tocEntries: TheoryOfChange[];
-}) {
+}>) {
   const hasContributingInitiatives =
     data.contributing_initiatives && data.contributing_initiatives.length > 0;
   const hasCenters =
@@ -192,7 +207,10 @@ export function ContributorsSection({
       <SectionTitle>Contributors and Partners</SectionTitle>
 
       {tocEntries.map((toc, i) => (
-        <div key={i} className="flex flex-col gap-[10px]">
+        <div
+          key={`${toc.program_name}-${i}`}
+          className="flex flex-col gap-[10px]"
+        >
           <SubSectionTitle>Theory of Change</SubSectionTitle>
           <TheoryOfChangeCard toc={toc} />
         </div>
@@ -205,7 +223,7 @@ export function ContributorsSection({
             {hasContributingInitiatives &&
               data.contributing_initiatives!.map((init, i) => (
                 <LabelValue
-                  key={i}
+                  key={`${init.initiative_short_name}-${i}`}
                   label="Contributing Program"
                   value={init.initiative_short_name}
                 />
@@ -218,7 +236,10 @@ export function ContributorsSection({
                 </p>
                 <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
                   {data.contributing_centers.map((c, i) => (
-                    <li key={i} className="leading-[1.5]">
+                    <li
+                      key={`${c.center_name}-${i}`}
+                      className="leading-normal"
+                    >
                       {c.center_name}
                       {c.is_primary_center === 1 && (
                         <span className="text-[#065f4a] font-bold ml-[4px]">
@@ -238,7 +259,10 @@ export function ContributorsSection({
                 </p>
                 <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
                   {data.non_pooled_projects!.map((p, i) => (
-                    <li key={i} className="leading-[1.5]">
+                    <li
+                      key={`${p.project_title}-${i}`}
+                      className="leading-normal"
+                    >
                       {p.project_title}
                     </li>
                   ))}
@@ -284,69 +308,95 @@ export function ContributorsSection({
 
 // ── Geographic Location ──
 
-function GeoLocationBox({ geo }: { geo: GeoLocation }) {
+function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
   return (
     <div className="bg-[#e2e0df] flex overflow-hidden">
-      <div
-        className="bg-[#033529] flex flex-col items-center justify-center shrink-0"
-        style={{ width: 106, padding: "8px 17px" }}
-      >
-        <div
-          className="bg-white mb-[5px]"
-          style={{
-            width: 60,
-            height: 52,
-            WebkitMaskImage: "url(/assets/prms/globe-mask.png)",
-            WebkitMaskSize: "contain",
-            WebkitMaskRepeat: "no-repeat",
-            WebkitMaskPosition: "center",
-            maskImage: "url(/assets/prms/globe-mask.png)",
-            maskSize: "contain",
-            maskRepeat: "no-repeat",
-            maskPosition: "center",
-          }}
-        />
-        <p className="text-white text-[11px] font-bold text-center leading-[1.15]">
-          {geo.geo_focus}
-        </p>
-      </div>
-      <div className="flex flex-col gap-[18px] py-[15px] px-[22px] flex-1 min-w-0 text-[10px]">
-        {geo.regions.length > 0 && (
-          <div className="flex flex-col gap-[5px]">
-            <p className="font-bold text-[#1d1d1d] leading-[1.15]">
-              Regions specified for this result:
-            </p>
-            <div className="flex flex-wrap gap-[6px]">
-              {geo.regions.map((r, i) => (
-                <span key={i} className="text-[#393939] leading-[1.5]">
-                  <span className="mr-[4px]">&bull;</span>
-                  {r}
-                </span>
-              ))}
+      {geo?.geo_focus ? (
+        <>
+          <div
+            className="bg-[#033529] flex flex-col items-center justify-center shrink-0"
+            style={{ width: 106, padding: "8px 17px" }}
+          >
+            <div
+              className="bg-white mb-[5px]"
+              style={{
+                width: 70,
+                height: 70,
+                WebkitMaskImage: `url(/assets/prms/${geo.geo_focus.toLowerCase()}-mask.svg)`,
+                WebkitMaskSize: "contain",
+                WebkitMaskRepeat: "no-repeat",
+                WebkitMaskPosition: "center",
+                maskImage: `url(/assets/prms/${geo.geo_focus.toLowerCase()}-mask.svg)`,
+                maskSize: "contain",
+                maskRepeat: "no-repeat",
+                maskPosition: "center",
+                margin: "0",
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-[18px] py-[15px] px-[22px] flex-1 min-w-0 text-[10px]">
+            <div className="flex flex-col gap-[5px]">
+              <p className="font-bold text-[#1d1d1d] leading-[1.15]">
+                Regions specified for this result:
+              </p>
+              <div className="flex flex-wrap gap-[6px]">
+                {geo.regions.length > 0 ? (
+                  geo.regions.map((r, i) => (
+                    <span
+                      key={`${r}-${i}`}
+                      className="text-[#393939] leading-normal"
+                    >
+                      <span className="mr-[4px]">&bull;</span>
+                      {r}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-[#707070] text-[10px] leading-[1.15] italic font-normal">
+                    No regions specified
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-[5px]">
+              <p className="font-bold text-[#1d1d1d] leading-[1.15]">
+                Countries specified for this result:
+              </p>
+              <div className="flex flex-wrap gap-[6px]">
+                {geo.countries.length > 0 ? (
+                  geo.countries.map((c, i) => (
+                    <span
+                      key={`${c}-${i}`}
+                      className="text-[#393939] leading-normal"
+                    >
+                      <span className="mr-[4px]">&bull;</span>
+                      {c}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-[#707070] text-[10px] leading-[1.15] italic font-normal">
+                    No countries specified
+                  </p>
+                )}
+              </div>
             </div>
           </div>
-        )}
-        {geo.countries.length > 0 && (
-          <div className="flex flex-col gap-[5px]">
-            <p className="font-bold text-[#1d1d1d] leading-[1.15]">
-              Countries specified for this result:
-            </p>
-            <div className="flex flex-wrap gap-[6px]">
-              {geo.countries.map((c, i) => (
-                <span key={i} className="text-[#393939] leading-[1.5]">
-                  <span className="mr-[4px]">&bull;</span>
-                  {c}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <div className="flex items-center justify-center gap-[10px] py-4 mx-auto">
+          <Search size={16} className="text-[#033529] rotate-y-180" />
+          <p className="text-[#393939] text-[10px] leading-[1.15] font-semibold">
+            This is yet to be determined
+          </p>
+        </div>
+      )}
     </div>
   );
 }
 
-export function GeographicSection({ geo }: { geo: GeoLocation }) {
+export function GeographicSection({
+  geo,
+}: Readonly<{ geo: GeoLocation | null }>) {
   return (
     <div className="flex flex-col gap-[10px]">
       <SectionTitle>Geographic location</SectionTitle>
@@ -357,7 +407,7 @@ export function GeographicSection({ geo }: { geo: GeoLocation }) {
 
 // ── Evidence ──
 
-function EvidenceCard({ evidence }: { evidence: Evidence }) {
+function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
   return (
     <div className="bg-[#e2e0df]" style={{ padding: "15px 19px" }}>
       <div className="flex flex-col gap-[10px]">
@@ -367,7 +417,7 @@ function EvidenceCard({ evidence }: { evidence: Evidence }) {
         >
           {evidence.label}
         </p>
-        <p className="text-[9px] leading-[1.5]">
+        <p className="text-[9px] leading-normal">
           <span className="font-bold text-[#1d1d1d]">Link:</span>{" "}
           <a
             href={evidence.link}
@@ -377,36 +427,26 @@ function EvidenceCard({ evidence }: { evidence: Evidence }) {
           </a>
         </p>
         {evidence.description && (
-          <p className="text-[9px] leading-[1.5]">
+          <p className="text-[9px] leading-normal">
             <span className="font-bold text-[#1d1d1d]">Description:</span>{" "}
             <span className="text-[#393939]">{evidence.description}</span>
           </p>
-        )}
-        {evidence.tags && evidence.tags.length > 0 && (
-          <div className="flex flex-wrap gap-[4px]">
-            {evidence.tags.map((tag, i) => (
-              <span
-                key={i}
-                className="text-[8px] bg-[#11d4b3]/15 text-[#02211a] px-[6px] py-[2px] rounded"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
         )}
       </div>
     </div>
   );
 }
 
-export function EvidenceSection({ evidences }: { evidences: Evidence[] }) {
+export function EvidenceSection({
+  evidences,
+}: Readonly<{ evidences: Evidence[] }>) {
   if (evidences.length === 0) return null;
   return (
     <div className="flex flex-col gap-[10px]">
       <SectionTitle>Evidence</SectionTitle>
       <div className="flex flex-col gap-[10px]">
         {evidences.map((ev, i) => (
-          <EvidenceCard key={i} evidence={ev} />
+          <EvidenceCard key={`${ev.label}-${i}`} evidence={ev} />
         ))}
       </div>
     </div>

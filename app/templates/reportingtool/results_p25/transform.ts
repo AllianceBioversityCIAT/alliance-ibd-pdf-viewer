@@ -21,9 +21,9 @@ const IMPACT_AREA_MAP: Record<string, { name: string; icon_url?: string }> = {
 };
 
 function parseTag(tag: string): { score: number; label: string } | null {
-  const match = tag.match(/^\((\d+)\)\s*(.+)$/);
+  const match = /^\((\d+)\)\s*(.+)$/.exec(tag);
   if (!match) return null;
-  return { score: parseInt(match[1], 10), label: match[2] };
+  return { score: Number.parseInt(match[1], 10), label: match[2] };
 }
 
 export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
@@ -53,9 +53,7 @@ export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
   return areas;
 }
 
-export function extractGeoLocation(
-  data: PRMSResultData,
-): GeoLocation | null {
+export function extractGeoLocation(data: PRMSResultData): GeoLocation | null {
   if (!data.geo_focus) return null;
   const regions = data.regions ?? [];
   const countries = data.countries ?? [];
@@ -93,16 +91,6 @@ export function extractEvidences(data: PRMSResultData): Evidence[] {
         link: ev.evidence,
         description: ev.details ?? undefined,
         tags: tags.length > 0 ? tags : undefined,
-      });
-    });
-  }
-
-  if (data.materials_evidence) {
-    data.materials_evidence.forEach((ev, i) => {
-      evidences.push({
-        label: `Material Evidence #${i + 1}`,
-        link: ev.evidence,
-        description: ev.details ?? undefined,
       });
     });
   }

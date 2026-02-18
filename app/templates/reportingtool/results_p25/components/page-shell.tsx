@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 interface PageShellProps {
@@ -14,7 +15,7 @@ export function PageShell({
   generationDate,
   phaseName,
   children,
-}: PageShellProps) {
+}: Readonly<PageShellProps>) {
   return (
     <div
       className="bg-white relative"
@@ -27,21 +28,23 @@ export function PageShell({
         className="absolute top-0 right-0 h-full overflow-hidden"
         style={{ width: 13, zIndex: 10 }}
       >
-        <img
+        <Image
           src="/assets/prms/sidebar-pattern.png"
           alt=""
-          className="h-full object-cover"
-          style={{ width: 844 }}
+          width={13}
+          height={100}
+          className="h-full object-cover "
         />
       </div>
 
       {/* Header */}
-      <div className="bg-[#02211a]" style={{ padding: "42px 43px 30px" }}>
-        <img
+      <div className="bg-[#03211A]" style={{ padding: "42px 43px 30px" }}>
+        <Image
           src="/assets/prms/cgiar-logo.png"
           alt="CGIAR"
+          width={120}
+          height={44}
           className="object-contain mb-[15px]"
-          style={{ width: 120, height: 44 }}
         />
 
         <div
@@ -70,7 +73,7 @@ export function PageShell({
           <p>
             The present result summary presents a standalone result reported for
             the {phaseName} cycle through the CGIAR Performance and Results
-            Management System (PRMS) – the central platform for reporting and
+            Management System (PRMS) - the central platform for reporting and
             validating results under the{" "}
             <a
               href="https://storage.googleapis.com/cgiarorg/2025/06/CGIAR-Technical-Reporting-Arrangement-2025-30.pdf"
@@ -92,18 +95,14 @@ export function PageShell({
               href="https://www.cgiar.org/food-security-impact/results-dashboard"
               className="text-[#11d4b3] underline"
             >
-              CGIAR Results Dashboard
+              CGIAR Results Dashboard.
             </a>
-            .
           </p>
         </div>
       </div>
 
       {/* Body */}
-      <div
-        className="flex flex-col gap-[20px]"
-        style={{ padding: "20px 43px 40px", maxWidth: 552 }}
-      >
+      <div className="flex flex-col gap-[20px] pt-5 pb-10 px-11 max-w-[calc(100%-13px)]">
         {children}
       </div>
     </div>

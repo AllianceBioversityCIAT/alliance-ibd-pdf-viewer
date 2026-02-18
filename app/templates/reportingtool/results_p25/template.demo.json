@@ -37,15 +37,27 @@
     "toc_url": "https://toc.cgiar.org/diagram/sp02"
   },
   "contributing_centers": [
-    { "center_name": "International Potato Center / Centro Internacional de la Papa (CIP)", "is_primary_center": 1 },
-    { "center_name": "Africa Rice Center / Centro Africano del Arroz (AfricaRice)", "is_primary_center": 0 }
+    {
+      "center_name": "International Potato Center / Centro Internacional de la Papa (CIP)",
+      "is_primary_center": 1
+    },
+    {
+      "center_name": "Africa Rice Center / Centro Africano del Arroz (AfricaRice)",
+      "is_primary_center": 0
+    }
   ],
   "contributing_initiatives": [
-    { "initiative_short_name": "Science Program (SP) 01 - Breeding for tomorrow" }
+    {
+      "initiative_short_name": "Science Program (SP) 01 - Breeding for tomorrow"
+    }
   ],
   "non_pooled_projects": [
-    { "project_title": "IWMI - Implementation of conservation agriculture in Africa and Asia" },
-    { "project_title": "ICARDA - Farmers trained on protection against wheat disease apply CGIAR innovation in their work" }
+    {
+      "project_title": "IWMI - Implementation of conservation agriculture in Africa and Asia"
+    },
+    {
+      "project_title": "ICARDA - Farmers trained on protection against wheat disease apply CGIAR innovation in their work"
+    }
   ],
   "linked_evidences": [
     {
@@ -67,28 +79,61 @@
       "environmental_biodiversity_related": true
     }
   ],
-  "materials_evidence": null,
+  "materials_evidence": [
+    {
+      "label": "Materials Evidence",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Info%20Hub.aspx"
+    }
+  ],
   "partners_applicable": "Yes",
   "non_kp_partner_data": [
-    { "partner_name": "JEEVIKA - Jeevika", "country_hq_name": "India (IN)", "institution_type": "NGO Local (General)" },
-    { "partner_name": "DOA - Department of Agriculture West Bengal (India)", "country_hq_name": "India (IN)", "institution_type": "Government (Subnational)" }
+    {
+      "partner_name": "JEEVIKA - Jeevika",
+      "country_hq_name": "India (IN)",
+      "institution_type": "NGO Local (General)"
+    },
+    {
+      "partner_name": "DOA - Department of Agriculture West Bengal (India)",
+      "country_hq_name": "India (IN)",
+      "institution_type": "Government (Subnational)"
+    }
   ],
   "kp_partner_data": null,
   "qa_adjustments": [
-    { "label": "Innovation Readiness", "from_value": "Level 5", "to_value": "Level 7" }
+    {
+      "label": "Innovation Readiness",
+      "from_value": "Level 5",
+      "to_value": "Level 7"
+    }
   ],
   "bundled_innovations": [
-    { "portfolio": "P25", "phase": "2025", "code": "5892", "indicator": "Policy Change", "title": "Youth engagement in agricultural transformation" },
-    { "portfolio": "P25", "phase": "2025", "code": "5892", "indicator": "Policy Change", "title": "Empowering farmers through sustainable agricultural practices" }
+    {
+      "portfolio": "P25",
+      "phase": "2025",
+      "code": "5892",
+      "indicator": "Policy Change",
+      "title": "Youth engagement in agricultural transformation"
+    },
+    {
+      "portfolio": "P25",
+      "phase": "2025",
+      "code": "5892",
+      "indicator": "Policy Change",
+      "title": "Empowering farmers through sustainable agricultural practices"
+    }
   ],
   "readiness_level": "Level 7",
   "readiness_details": "Prototype",
   "readiness_justification": "Scaling report included to show level 7, as we are conducting uncontrolled testing right now. Launch events and several testing workshops with users were held in 2023.",
   "innovation_nature": "Incremental innovation (Innovations that already exist and undergo constant, steady progress, and improvement.)",
   "innovation_type": "Capacity development innovation (Innovations that strengthen capacity, including farmer, extension or investor decision-support services; accelerator/ incubator programs; manuals, training programs and curricula; online courses.)",
-  "url_readiness": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/ReadinessEvidence",
+  "url_readiness": null,
   "innovation_developers": [
-    { "name": "Amit Srivastava", "email": "A.srivastava@cgiar.org", "institution": "International Rice Research Institute (IRRI)" }
+    {
+      "name": "Amit Srivastava",
+      "email": "A.srivastava@cgiar.org",
+      "institution": "International Rice Research Institute (IRRI)"
+    }
   ],
   "innovation_collaborators": [
     { "name": "Virender Kumar", "email": "virender.kumar@irri.org" },
@@ -96,16 +141,37 @@
     { "name": "Balwinder Singh", "email": "pcveettil@irri.org" }
   ],
   "innovation_investments": [
-    { "entity": "CGIAR Science Program/ Accelerator", "name": "Not provided", "usd_investment": "Not provided" },
-    { "entity": "CGIAR W3 or bilateral projects", "name": "International Maize and Wheat Improvement Center / Centro Internacional de Mejoramiento de Maíz y Trigo", "usd_investment": "$5,000" },
-    { "entity": "Partners", "name": "DOA - Department of Agriculture West Bengal (India)", "usd_investment": "$8,000" }
+    {
+      "entity": "CGIAR Science Program/ Accelerator",
+      "name": "Not provided",
+      "usd_investment": "Not provided"
+    },
+    {
+      "entity": "CGIAR W3 or bilateral projects",
+      "name": "International Maize and Wheat Improvement Center / Centro Internacional de Mejoramiento de Maíz y Trigo",
+      "usd_investment": "$5,000"
+    },
+    {
+      "entity": "Partners",
+      "name": "DOA - Department of Agriculture West Bengal (India)",
+      "usd_investment": "$8,000"
+    }
   ],
   "innovation_actors": [
-    { "type": "Farmers/(agro) pastoralist/herders/fishers", "actors": "Men (Non-youth)" },
-    { "type": "Researchers", "actors": "Sex and age disaggregation does not apply" }
+    {
+      "type": "Farmers/(agro) pastoralist/herders/fishers",
+      "actors": "Men (Non-youth)"
+    },
+    {
+      "type": "Researchers",
+      "actors": "Sex and age disaggregation does not apply"
+    }
   ],
   "innovation_organizations": [
-    { "type": "Research organizations and universities", "subtype": "Research organizations and universities International (Universities)" }
+    {
+      "type": "Research organizations and universities",
+      "subtype": "Research organizations and universities International (Universities)"
+    }
   ],
   "linked_results": [],
   "previous_portfolio": [],

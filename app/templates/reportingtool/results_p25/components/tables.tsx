@@ -1,22 +1,21 @@
 export function DataTable({
   columns,
   rows,
-}: {
+}: Readonly<{
   columns: string[];
   rows: string[][];
-}) {
+}>) {
   return (
     <table
-      className="w-full text-[7.5px] border-collapse"
+      className="w-full text-[9px] border-collapse"
       style={{ fontFamily: "'Inter', 'Noto Sans', sans-serif" }}
     >
       <thead>
         <tr>
           {columns.map((col, i) => (
             <th
-              key={i}
-              className="bg-[#033529] text-white font-bold text-left border-b border-[#e5e7eb]"
-              style={{ padding: "7.5px" }}
+              key={`${col}-${i}`}
+              className="bg-[#033529] text-white text-left border-b border-[#e5e7eb] p-2"
             >
               {col}
             </th>
@@ -25,13 +24,12 @@ export function DataTable({
       </thead>
       <tbody>
         {rows.map((row, i) => (
-          <tr key={i} className="bg-white">
+          <tr key={`${row}-${i}`} className="bg-white">
             {row.map((cell, j) => (
               <td
-                key={j}
-                className="text-[#4b5563] border-b border-[#e5e7eb]"
+                key={`${row}-${i}-${cell}-${j}`}
+                className="text-[#4b5563] border-b border-[#e5e7eb] p-2"
                 style={{
-                  padding: "7.5px",
                   borderLeft: j === 0 ? "0.5px solid #e8ebed" : undefined,
                 }}
               >
@@ -47,17 +45,17 @@ export function DataTable({
 
 export function KeyValueTable({
   rows,
-}: {
+}: Readonly<{
   rows: { label: string; value: string }[];
-}) {
+}>) {
   return (
     <table
-      className="w-full text-[7.5px] border-collapse"
+      className="w-full text-[9px] border-collapse"
       style={{ fontFamily: "'Inter', 'Noto Sans', sans-serif" }}
     >
       <tbody>
         {rows.map((row, i) => (
-          <tr key={i}>
+          <tr key={`${row.label}-${row.value}-${i}`}>
             <td
               className="bg-[#033529] text-white font-normal border-b border-[#e8ebed]"
               style={{ padding: "7.5px", width: 208 }}
