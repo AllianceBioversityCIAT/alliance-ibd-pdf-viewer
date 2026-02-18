@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import http from 'http';
 import { EventEmitter } from 'events';
+import { Readable } from 'stream';
 import { readFileSync, existsSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -146,11 +147,38 @@ async function getRequestHandler() {
  * Create a complete mock IncomingMessage object
  * This needs to have all the properties and methods that Next.js expects
  */
-function createMockRequest(url, method, headers, body) {
-  // Create an EventEmitter-like object for the request
-  const req = Object.create(EventEmitter.prototype);
 
-  // Set properties
+function createMockRequest(url, method, headers, body) {
+  // Normalize body into a Buffer once so it can be streamed or stringified safely
+  let bodyBuffer = null;
+  if (body) {
+    if (typeof body === 'string') {
+      bodyBuffer = Buffer.from(body, 'utf8');
+      console.log('[createMockRequest] Body is string, length:', bodyBuffer.length);
+    } else if (Buffer.isBuffer(body)) {
+      bodyBuffer = body;
+      console.log('[createMockRequest] Body is Buffer, length:', bodyBuffer.length);
+    } else {
+      bodyBuffer = Buffer.from(typeof body === 'object' ? JSON.stringify(body) : String(body), 'utf8');
+      console.warn('[createMockRequest] Body was non-string/non-Buffer, stringified. Length:', bodyBuffer.length);
+    }
+  } else {
+    console.log('[createMockRequest] No body provided');
+  }
+
+  // Use a real Readable stream so Next.js body parsing (which relies on Node streams & async iterators)
+  // works reliably. The stream will push the body once and then end.
+  const req = new Readable({
+    read() {
+      if (bodyBuffer && !this._bodyPushed) {
+        this._bodyPushed = true;
+        this.push(bodyBuffer);
+      }
+      this.push(null);
+    }
+  });
+
+  // Core request properties expected by Next.js' Node server
   req.url = url;
   req.method = method;
   req.headers = headers;
@@ -166,7 +194,6 @@ function createMockRequest(url, method, headers, body) {
   req.complete = false;
   req.aborted = false;
   req.upgrade = false;
-  req.readable = true;
   req.socket = {
     remoteAddress: '127.0.0.1',
     remotePort: 0,
@@ -175,53 +202,11 @@ function createMockRequest(url, method, headers, body) {
   };
   req.connection = req.socket;
 
-  // Body handling
-  if (body) {
-    if (typeof body === 'string') {
-      req.body = body;
-    } else if (Buffer.isBuffer(body)) {
-      req.body = body;
-    }
-  }
+  // Expose body helper fields for any downstream logging/handlers
+  req._bodyBuffer = bodyBuffer;
+  req._bodyString = bodyBuffer ? bodyBuffer.toString('utf8') : null;
 
-  // EventEmitter methods (delegate to EventEmitter)
-  req.on = EventEmitter.prototype.on.bind(req);
-  req.once = EventEmitter.prototype.once.bind(req);
-  req.emit = EventEmitter.prototype.emit.bind(req);
-  req.removeListener = EventEmitter.prototype.removeListener.bind(req);
-  req.removeAllListeners = EventEmitter.prototype.removeAllListeners.bind(req);
-  req.setMaxListeners = EventEmitter.prototype.setMaxListeners.bind(req);
-  req.getMaxListeners = EventEmitter.prototype.getMaxListeners.bind(req);
-  req.listeners = EventEmitter.prototype.listeners.bind(req);
-  req.listenerCount = EventEmitter.prototype.listenerCount.bind(req);
-
-  // Stream methods
-  req.read = function (size) {
-    return null;
-  };
-  req.setEncoding = function (encoding) {
-    return this;
-  };
-  req.pause = function () {
-    return this;
-  };
-  req.resume = function () {
-    return this;
-  };
-  req.pipe = function (dest) {
-    return dest;
-  };
-  req.unpipe = function (dest) {
-    return this;
-  };
-  req.unshift = function (chunk) {
-    return this;
-  };
-  req.wrap = function (stream) {
-    return this;
-  };
-
-  // Additional methods
+  // Convenience helpers to mimic IncomingMessage API used by Next
   req.getHeader = function (name) {
     return this.headers[name.toLowerCase()];
   };
@@ -240,13 +225,17 @@ function createMockRequest(url, method, headers, body) {
     return name.toLowerCase() in this.headers;
   };
 
+  // Provide explicit async iterator for environments that consume the request via for-await
+  req[Symbol.asyncIterator] = async function* () {
+    if (bodyBuffer && !this._iterated) {
+      this._iterated = true;
+      yield bodyBuffer;
+    }
+  };
+
   return req;
 }
 
-/**
- * Create a complete mock ServerResponse object
- * This needs to have all the properties and methods that Next.js expects
- */
 function createMockResponse() {
   // Create an EventEmitter-like object for the response
   const res = Object.create(EventEmitter.prototype);
@@ -281,7 +270,14 @@ function createMockResponse() {
     return this;
   };
   res.setHeader = function (name, value) {
-    headers[name] = value;
+    // Normalize header value: if it's an array, join it; if it's not a string, convert it
+    if (Array.isArray(value)) {
+      headers[name] = value.join(', ');
+    } else if (typeof value !== 'string' && value != null) {
+      headers[name] = String(value);
+    } else {
+      headers[name] = value;
+    }
     return this;
   };
   res.appendHeader = function (name, value) {
@@ -488,33 +484,54 @@ function createServerRequestHandler(server) {
         // Check if it's already a string or Buffer (shouldn't happen with Web Request, but safe)
         if (typeof request.body === 'string') {
           body = request.body;
+          console.log('[createServerRequestHandler] Body is string, length:', body.length);
         } else if (Buffer.isBuffer(request.body)) {
-          body = request.body;
+          body = request.body.toString('utf8');
+          console.log('[createServerRequestHandler] Body is Buffer, converted to string, length:', body.length);
         } else if (request.body instanceof ReadableStream) {
-          // Read ReadableStream properly
+          // CRITICAL: DO NOT READ THE STREAM HERE
+          // Next.js needs to read it via req.json() or req.body
+          // If we read it here, the stream becomes locked and Next.js can't read it
+          // Instead, pass the ReadableStream directly to the mock request
+          // The mock request will create a new ReadableStream from the stored string when needed
           const contentType = headers['content-type'] || headers['Content-Type'] || '';
-          if (contentType.includes('application/json') || contentType.includes('text/')) {
-            // For JSON/text, read as text
-            body = await request.text();
-          } else {
-            // For binary, read as arrayBuffer then convert to Buffer
-            const arrayBuffer = await request.arrayBuffer();
-            body = Buffer.from(arrayBuffer);
+          console.log('[createServerRequestHandler] Body is ReadableStream, Content-Type:', contentType);
+          console.log('[createServerRequestHandler] ReadableStream locked:', request.body.locked);
+          console.log('[createServerRequestHandler] NOT reading stream - passing to Next.js intact');
+
+          // For logging only: clone the request to read body without consuming original
+          try {
+            const clonedRequest = request.clone();
+            const bodyText = await clonedRequest.text();
+            console.log('[createServerRequestHandler] Body length (from clone):', bodyText.length);
+            // Store as string for the mock request (Next.js will create its own ReadableStream)
+            body = bodyText;
+          } catch (cloneError) {
+            // If cloning fails, we can't log the body, but that's OK
+            // The original request body is still intact
+            console.warn('[createServerRequestHandler] Could not clone request for logging:', cloneError.message);
+            // We still need to pass something to createMockRequest
+            // But we can't read the stream, so we'll pass null and let Next.js handle it
+            body = null;
           }
         } else {
           // Fallback: try to read as text
-          console.warn('Unexpected body type:', typeof request.body, request.body?.constructor?.name);
+          console.warn('[createServerRequestHandler] Unexpected body type:', typeof request.body, request.body?.constructor?.name);
           body = await request.text();
+          console.log('[createServerRequestHandler] Read body as text (fallback), length:', body.length);
         }
       } catch (error) {
-        console.error('Error reading request body:', {
+        console.error('[createServerRequestHandler] Error reading request body:', {
           error: error.message,
           bodyType: typeof request.body,
           bodyConstructor: request.body?.constructor?.name,
+          stack: error.stack,
         });
         // Return 400 for invalid body
         throw new Error('Invalid request body: ' + error.message);
       }
+    } else {
+      console.log('[createServerRequestHandler] No body in request');
     }
 
     // Create complete mock request and response objects
@@ -542,14 +559,23 @@ function createServerRequestHandler(server) {
         const responseHeaders = res._headers || {};
         let responseBody = res._body || '';
 
+        // Normalize headers: ensure all header values are strings (not arrays)
+        const normalizedHeaders = {};
+        for (const [key, value] of Object.entries(responseHeaders)) {
+          normalizedHeaders[key] = Array.isArray(value) ? value.join(', ') : (typeof value === 'string' ? value : String(value || ''));
+        }
+
         // Check content-type to determine if response is binary
-        const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type'] || '';
-        const isBinary = contentType.startsWith('image/') ||
+        // Headers are now normalized to strings
+        const contentType = normalizedHeaders['content-type'] || normalizedHeaders['Content-Type'] || '';
+        const isBinary = contentType && (
+          contentType.startsWith('image/') ||
           contentType.startsWith('application/octet-stream') ||
           contentType.startsWith('font/') ||
           contentType.startsWith('application/javascript') ||
           contentType.startsWith('text/javascript') ||
-          contentType.includes('charset=binary');
+          contentType.includes('charset=binary')
+        );
 
         // Ensure responseBody is properly formatted
         let finalBody = responseBody;
@@ -574,7 +600,7 @@ function createServerRequestHandler(server) {
         }
 
         console.log('Response status:', statusCode);
-        console.log('Response headers:', Object.keys(responseHeaders));
+        console.log('Response headers:', Object.keys(normalizedHeaders));
         console.log('Response body length:', finalBody.length);
         console.log('Response body type:', typeof finalBody);
         console.log('Content-Type:', contentType);
@@ -594,12 +620,12 @@ function createServerRequestHandler(server) {
           const buffer = Buffer.from(finalBody, 'binary');
           resolve(new Response(buffer, {
             status: statusCode,
-            headers: responseHeaders,
+            headers: normalizedHeaders,
           }));
         } else {
           resolve(new Response(finalBody, {
             status: statusCode,
-            headers: responseHeaders,
+            headers: normalizedHeaders,
           }));
         }
       });
@@ -616,6 +642,12 @@ function createServerRequestHandler(server) {
           const statusCode = res.statusCode || 200;
           const responseHeaders = res._headers || {};
           let responseBody = res._body || '';
+
+          // Normalize headers: ensure all header values are strings (not arrays)
+          const normalizedHeaders = {};
+          for (const [key, value] of Object.entries(responseHeaders)) {
+            normalizedHeaders[key] = Array.isArray(value) ? value.join(', ') : (typeof value === 'string' ? value : String(value || ''));
+          }
 
           // Ensure responseBody is a string
           if (typeof responseBody !== 'string') {
@@ -641,14 +673,14 @@ function createServerRequestHandler(server) {
           }
 
           console.log('Response status:', statusCode);
-          console.log('Response headers:', Object.keys(responseHeaders));
+          console.log('Response headers:', Object.keys(normalizedHeaders));
           console.log('Response body length:', responseBody.length);
           console.log('Response body type:', typeof responseBody);
           console.log('Response body preview (first 100 chars):', responseBody.substring(0, 100));
 
           resolve(new Response(responseBody, {
             status: statusCode,
-            headers: responseHeaders,
+            headers: normalizedHeaders,
           }));
         }
       }, 10);
@@ -685,19 +717,28 @@ function createNextRequest(event) {
 
   // Handle body from Lambda event
   // Lambda Function URL provides body as string (may be base64 encoded)
+  // API Gateway v2 also provides body as string, but structure differs
   let body = undefined;
   if (event.body) {
     if (event.isBase64Encoded) {
       // Decode base64 to Buffer, then to string for JSON
       body = Buffer.from(event.body, 'base64').toString('utf8');
+      console.log('[createNextRequest] Body is base64 encoded, decoded length:', body.length);
     } else if (typeof event.body === 'string') {
       // Already a string, use as-is
       body = event.body;
+      console.log('[createNextRequest] Body is string, length:', body.length);
+      console.log('[createNextRequest] Body content (first 500 chars):', body.substring(0, 500));
+      console.log('[createNextRequest] Body content (full):', body);
     } else {
       // Shouldn't happen, but handle gracefully
-      console.warn('Unexpected event.body type:', typeof event.body);
+      console.warn('[createNextRequest] Unexpected event.body type:', typeof event.body);
+      console.warn('[createNextRequest] event.body value:', event.body);
       body = String(event.body);
+      console.log('[createNextRequest] Body converted to string:', body);
     }
+  } else {
+    console.log('[createNextRequest] No body in event');
   }
 
   // Create Web Request object
