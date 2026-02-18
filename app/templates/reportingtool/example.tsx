@@ -60,22 +60,36 @@ function TagBadge({ label, value }: { label: string; value: string }) {
   const color = isPrincipal
     ? "bg-[#11D4B3] text-[#02211A]"
     : isSignificant
-      ? "bg-[#11D4B3]/20 text-[#02211A]"
-      : "bg-gray-100 text-gray-500";
+    ? "bg-[#11D4B3]/20 text-[#02211A]"
+    : "bg-gray-100 text-gray-500";
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[9px] text-gray-500 w-[90px] shrink-0">{label}</span>
-      <span className={`text-[9px] font-medium px-2 py-0.5 rounded-full ${color}`}>{value}</span>
+      <span className="text-[9px] text-gray-500 w-[90px] shrink-0">
+        {label}
+      </span>
+      <span
+        className={`text-[9px] font-medium px-2 py-0.5 rounded-full ${color}`}
+      >
+        {value}
+      </span>
     </div>
   );
 }
 
-function Field({ label, value }: { label: string; value: string | null | undefined }) {
+function Field({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | null | undefined;
+}) {
   if (!value) return null;
   return (
     <div className="mb-2">
-      <p className="text-[9px] text-gray-400 uppercase tracking-wide mb-0.5">{label}</p>
+      <p className="text-[9px] text-gray-400 uppercase tracking-wide mb-0.5">
+        {label}
+      </p>
       <p className="text-gray-700 text-[10px]">{value}</p>
     </div>
   );
@@ -109,9 +123,7 @@ export default function Example({ data }: TemplateProps) {
           <h1 className="text-[#11D4B3] text-[16px] font-bold leading-tight mb-2">
             {d?.result_name ?? d?.title ?? "No title provided"}
           </h1>
-          <p className="text-[#E2E0DF]/80 text-[9px]">
-            {d?.result_lead}
-          </p>
+          <p className="text-[#E2E0DF]/80 text-[9px]">{d?.result_lead}</p>
         </div>
 
         {/* Content */}
@@ -119,8 +131,12 @@ export default function Example({ data }: TemplateProps) {
           {/* Description */}
           {d?.result_description && (
             <div className="mb-4">
-              <p className="text-[9px] text-gray-400 uppercase tracking-wide mb-1">Description</p>
-              <p className="text-gray-600 text-[10px] leading-[1.5]">{d.result_description}</p>
+              <p className="text-[9px] text-gray-400 uppercase tracking-wide mb-1">
+                Description
+              </p>
+              <p className="text-gray-600 text-[10px] leading-[1.5]">
+                {d.result_description}
+              </p>
             </div>
           )}
 
@@ -135,14 +151,8 @@ export default function Example({ data }: TemplateProps) {
             <Field label="Submission Status" value={d?.submission_status} />
             <Field label="Partners Applicable" value={d?.partners_applicable} />
             <Field label="KRS" value={d?.is_krs} />
-            <Field
-              label="Regions"
-              value={d?.regions?.join(", ") ?? "—"}
-            />
-            <Field
-              label="Countries"
-              value={d?.countries?.join(", ") ?? "—"}
-            />
+            <Field label="Regions" value={d?.regions?.join(", ") ?? "—"} />
+            <Field label="Countries" value={d?.countries?.join(", ") ?? "—"} />
             <Field label="Subnational" value={d?.subnational ?? "—"} />
           </div>
 
@@ -154,10 +164,18 @@ export default function Example({ data }: TemplateProps) {
               Impact Area Tags
             </p>
             <div className="grid grid-cols-2 gap-2">
-              {d?.gender_tag && <TagBadge label="Gender" value={d.gender_tag} />}
-              {d?.climate_tag && <TagBadge label="Climate" value={d.climate_tag} />}
-              {d?.nutrition_tag && <TagBadge label="Nutrition" value={d.nutrition_tag} />}
-              {d?.poverty_tag && <TagBadge label="Poverty" value={d.poverty_tag} />}
+              {d?.gender_tag && (
+                <TagBadge label="Gender" value={d.gender_tag} />
+              )}
+              {d?.climate_tag && (
+                <TagBadge label="Climate" value={d.climate_tag} />
+              )}
+              {d?.nutrition_tag && (
+                <TagBadge label="Nutrition" value={d.nutrition_tag} />
+              )}
+              {d?.poverty_tag && (
+                <TagBadge label="Poverty" value={d.poverty_tag} />
+              )}
               {d?.environmental_tag && (
                 <TagBadge label="Environment" value={d.environmental_tag} />
               )}
@@ -176,9 +194,13 @@ export default function Example({ data }: TemplateProps) {
                 {d.contributing_centers.map((c, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#11D4B3] shrink-0" />
-                    <span className="text-[10px] text-gray-700">{c.center_name}</span>
+                    <span className="text-[10px] text-gray-700">
+                      {c.center_name}
+                    </span>
                     {c.is_primary_center === 1 && (
-                      <span className="text-[8px] text-[#1a7a5a] font-bold">Primary</span>
+                      <span className="text-[8px] text-[#1a7a5a] font-bold">
+                        Primary
+                      </span>
                     )}
                   </div>
                 ))}
@@ -203,23 +225,35 @@ export default function Example({ data }: TemplateProps) {
                     {ev.evidence}
                   </a>
                   {ev.details && (
-                    <p className="text-gray-500 text-[9px] mt-1">{ev.details}</p>
+                    <p className="text-gray-500 text-[9px] mt-1">
+                      {ev.details}
+                    </p>
                   )}
                   <div className="flex flex-wrap gap-1.5 mt-1.5">
                     {ev.gender_related && (
-                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">Gender</span>
+                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">
+                        Gender
+                      </span>
                     )}
                     {ev.climate_related && (
-                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">Climate</span>
+                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">
+                        Climate
+                      </span>
                     )}
                     {ev.nutrition_related && (
-                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">Nutrition</span>
+                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">
+                        Nutrition
+                      </span>
                     )}
                     {ev.poverty_related && (
-                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">Poverty</span>
+                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">
+                        Poverty
+                      </span>
                     )}
                     {ev.environmental_biodiversity_related && (
-                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">Environment</span>
+                      <span className="text-[8px] bg-[#11D4B3]/15 text-[#02211A] px-1.5 py-0.5 rounded">
+                        Environment
+                      </span>
                     )}
                   </div>
                 </div>
@@ -231,14 +265,19 @@ export default function Example({ data }: TemplateProps) {
         {/* Bottom bar */}
         <div className="border-t border-gray-200 px-6 py-2 flex justify-between items-center text-[8px] text-gray-400">
           <p>
-            <span className="font-bold text-gray-500">PRMS Result</span> &middot; #{d?.result_code}
+            <span className="font-bold text-gray-500">PRMS Result</span>{" "}
+            &middot; #{d?.result_code}
           </p>
           <p className="font-bold text-[#1a7a5a]">CGIAR</p>
         </div>
       </div>
 
       {/* Right green strip */}
-      <img src="/img.png" className="w-[20px] h-full object-cover" alt="" />
+      <img
+        src="/public/img.png"
+        className="w-[20px] h-full object-cover"
+        alt=""
+      />
     </div>
   );
 }
