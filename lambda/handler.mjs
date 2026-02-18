@@ -214,19 +214,44 @@ function createMockRequest(url, method, headers, body) {
         console.log('[MockRequest] bodyString type:', typeof bodyString, 'length:', bodyString?.length || 0);
         console.log('[MockRequest] bodyBuffer exists:', !!bodyBuffer, 'type:', bodyBuffer?.constructor?.name);
 
-        // ALWAYS return string - Next.js body parsers expect string, not Buffer or object
+        // CRITICAL: Next.js may convert IncomingMessage to Request, which expects a ReadableStream
+        // But we have the body as string. We need to return a ReadableStream that can be read
+        // However, if Next.js accesses req.body directly (not via stream), it might expect a string
+        // The solution: Return a ReadableStream that reads from our stored string
+        // This way, Next.js can read it via req.json() without issues
+
         if (bodyString) {
+          console.log('[MockRequest] Creating ReadableStream from bodyString, length:', bodyString.length);
           console.log('[MockRequest] req.body content (first 500 chars):', bodyString.substring(0, 500));
           console.log('[MockRequest] req.body content (full):', bodyString);
-          return bodyString;
+
+          // Create a new ReadableStream from the string
+          // This allows Next.js to read it via req.json() without "locked" errors
+          const encoder = new TextEncoder();
+          const stream = new ReadableStream({
+            start(controller) {
+              controller.enqueue(encoder.encode(bodyString));
+              controller.close();
+            }
+          });
+          return stream;
         } else if (bodyBuffer) {
           // If bodyString is null but bodyBuffer exists, convert it
           const converted = bodyBuffer.toString('utf8');
           bodyString = converted; // Cache it
-          console.log('[MockRequest] Converted bodyBuffer to string, length:', converted.length);
+          console.log('[MockRequest] Converted bodyBuffer to string, creating ReadableStream, length:', converted.length);
           console.log('[MockRequest] req.body content (first 500 chars):', converted.substring(0, 500));
           console.log('[MockRequest] req.body content (full):', converted);
-          return converted;
+
+          // Create a new ReadableStream from the converted string
+          const encoder = new TextEncoder();
+          const stream = new ReadableStream({
+            start(controller) {
+              controller.enqueue(encoder.encode(converted));
+              controller.close();
+            }
+          });
+          return stream;
         } else {
           console.log('[MockRequest] No body available, returning null');
           return null;
@@ -732,23 +757,29 @@ function createServerRequestHandler(server) {
           console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
           console.log('[createServerRequestHandler] Body content (full):', body);
         } else if (request.body instanceof ReadableStream) {
-          // Read ReadableStream properly
+          // CRITICAL: Read ReadableStream ONCE and store as string
+          // Next.js will convert IncomingMessage to Request, which creates a new ReadableStream
+          // But we need to read it here to pass to the mock request
+          // The mock request's getter will return the string, which Next.js can use
           const contentType = headers['content-type'] || headers['Content-Type'] || '';
           console.log('[createServerRequestHandler] Body is ReadableStream, Content-Type:', contentType);
+          console.log('[createServerRequestHandler] ReadableStream locked:', request.body.locked);
 
           if (contentType.includes('application/json') || contentType.includes('text/') || !contentType) {
             // For JSON/text, read as text
             // If no content-type, assume text/JSON (common in Lambda Function URL)
+            // IMPORTANT: Read the stream ONCE here, store as string
             body = await request.text();
             console.log('[createServerRequestHandler] Read body as text, length:', body.length);
             console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
             console.log('[createServerRequestHandler] Body content (full):', body);
           } else {
-            // For binary, read as arrayBuffer then convert to Buffer
+            // For binary, read as arrayBuffer then convert to Buffer, then to string
             const arrayBuffer = await request.arrayBuffer();
-            body = Buffer.from(arrayBuffer);
-            console.log('[createServerRequestHandler] Read body as binary, length:', body.length);
-            console.log('[createServerRequestHandler] Body content (base64):', body.toString('base64').substring(0, 200));
+            const buffer = Buffer.from(arrayBuffer);
+            body = buffer.toString('utf8'); // Convert to string for consistency
+            console.log('[createServerRequestHandler] Read body as binary, converted to string, length:', body.length);
+            console.log('[createServerRequestHandler] Body content (base64):', buffer.toString('base64').substring(0, 200));
           }
         } else {
           // Fallback: try to read as text

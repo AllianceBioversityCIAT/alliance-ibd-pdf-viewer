@@ -57,14 +57,26 @@ async function parseJsonBody(input: unknown): Promise<unknown> {
   }
 
   // If it's a ReadableStream, read it first
+  // IMPORTANT: ReadableStream can only be read once, so we need to handle locked streams
   if (input instanceof ReadableStream) {
     try {
+      // Check if stream is locked (already being read)
+      if (input.locked) {
+        console.warn("[parseJsonBody] ReadableStream is locked, cannot read");
+        // If stream is locked, we can't read it - this means it was already consumed
+        // This shouldn't happen if we're handling the body correctly, but handle gracefully
+        throw new Error("ReadableStream is already locked/consumed - body may have been read twice");
+      }
+      
+      // Try to read the stream using Response.text() which handles the stream properly
+      // This is the standard way to read a ReadableStream
       const text = await new Response(input).text();
-      console.log("[parseJsonBody] Read ReadableStream, length:", text.length);
+      console.log("[parseJsonBody] Read ReadableStream via Response.text(), length:", text.length);
       return parseJsonBody(text); // Recursively parse the text
     } catch (e) {
       console.error("[parseJsonBody] Failed to read ReadableStream:", {
         error: e instanceof Error ? e.message : String(e),
+        streamLocked: input instanceof ReadableStream ? input.locked : 'N/A',
       });
       throw new Error(`Failed to read stream: ${e instanceof Error ? e.message : String(e)}`);
     }
