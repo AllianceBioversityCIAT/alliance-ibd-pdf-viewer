@@ -186,14 +186,10 @@ function createMockRequest(url, method, headers, body) {
       bodyString = body;
       bodyBuffer = Buffer.from(body, 'utf8');
       console.log('[createMockRequest] Body is string, length:', bodyString.length);
-      console.log('[createMockRequest] Body content (first 500 chars):', bodyString.substring(0, 500));
-      console.log('[createMockRequest] Body content (full):', bodyString);
     } else if (Buffer.isBuffer(body)) {
       bodyString = body.toString('utf8');
       bodyBuffer = body;
       console.log('[createMockRequest] Body is Buffer, converted to string, length:', bodyString.length);
-      console.log('[createMockRequest] Body content (first 500 chars):', bodyString.substring(0, 500));
-      console.log('[createMockRequest] Body content (full):', bodyString);
     } else {
       // If body is an object, stringify it (shouldn't happen, but handle gracefully)
       console.warn('[createMockRequest] Body is not string or Buffer, type:', typeof body);
@@ -201,8 +197,6 @@ function createMockRequest(url, method, headers, body) {
       bodyString = typeof body === 'object' ? JSON.stringify(body) : String(body);
       bodyBuffer = Buffer.from(bodyString, 'utf8');
       console.log('[createMockRequest] Body converted to string, length:', bodyString.length);
-      console.log('[createMockRequest] Body content (first 500 chars):', bodyString.substring(0, 500));
-      console.log('[createMockRequest] Body content (full):', bodyString);
     }
     // CRITICAL: Next.js in standalone mode may access req.body directly
     // Make body available as a getter that ALWAYS returns the string when accessed
@@ -222,11 +216,10 @@ function createMockRequest(url, method, headers, body) {
 
         if (bodyString) {
           console.log('[MockRequest] Creating ReadableStream from bodyString, length:', bodyString.length);
-          console.log('[MockRequest] req.body content (first 500 chars):', bodyString.substring(0, 500));
-          console.log('[MockRequest] req.body content (full):', bodyString);
 
           // Create a new ReadableStream from the string
           // This allows Next.js to read it via req.json() without "locked" errors
+          // IMPORTANT: Create a fresh stream each time the getter is called
           const encoder = new TextEncoder();
           const stream = new ReadableStream({
             start(controller) {
@@ -240,8 +233,6 @@ function createMockRequest(url, method, headers, body) {
           const converted = bodyBuffer.toString('utf8');
           bodyString = converted; // Cache it
           console.log('[MockRequest] Converted bodyBuffer to string, creating ReadableStream, length:', converted.length);
-          console.log('[MockRequest] req.body content (first 500 chars):', converted.substring(0, 500));
-          console.log('[MockRequest] req.body content (full):', converted);
 
           // Create a new ReadableStream from the converted string
           const encoder = new TextEncoder();
@@ -988,8 +979,6 @@ function createNextRequest(event) {
       // Decode base64 to Buffer, then to string for JSON
       body = Buffer.from(event.body, 'base64').toString('utf8');
       console.log('[createNextRequest] Body is base64 encoded, decoded length:', body.length);
-      console.log('[createNextRequest] Body content (first 500 chars):', body.substring(0, 500));
-      console.log('[createNextRequest] Body content (full):', body);
     } else if (typeof event.body === 'string') {
       // Already a string, use as-is
       body = event.body;
