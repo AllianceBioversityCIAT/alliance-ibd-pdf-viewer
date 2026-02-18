@@ -29,7 +29,7 @@ export function PageShell({
         style={{ width: 13, zIndex: 10 }}
       >
         <Image
-          src="/assets/prms/sidebar-pattern.png"
+          src="/public/assets/prms/sidebar-pattern.png"
           alt=""
           width={13}
           height={100}
@@ -40,7 +40,7 @@ export function PageShell({
       {/* Header */}
       <div className="bg-[#03211A]" style={{ padding: "42px 43px 30px" }}>
         <Image
-          src="/assets/prms/cgiar-logo.png"
+          src="/public/assets/prms/cgiar-logo.png"
           alt="CGIAR"
           width={120}
           height={44}

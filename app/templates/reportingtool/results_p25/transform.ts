@@ -9,11 +9,11 @@ import type {
 const IMPACT_AREA_MAP: Record<string, { name: string; icon_url?: string }> = {
   nutrition_tag: {
     name: "Nutrition, health & food security",
-    icon_url: "/assets/prms/icon-nutrition.png",
+    icon_url: "/public/assets/prms/icon-nutrition.png",
   },
   environmental_tag: {
     name: "Environment health & biodiversity",
-    icon_url: "/assets/prms/icon-environment.png",
+    icon_url: "/public/assets/prms/icon-environment.png",
   },
   climate_tag: { name: "Climate change adaptation & mitigation" },
   gender_tag: { name: "Gender equality, youth & social inclusion" },

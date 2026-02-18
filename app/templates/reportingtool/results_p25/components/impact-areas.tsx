@@ -1,13 +1,19 @@
+import Image from "next/image";
 import type { ImpactArea } from "../types";
 
-export function ImpactAreaCard({ area }: { area: ImpactArea }) {
+export function ImpactAreaCard({ area }: Readonly<{ area: ImpactArea }>) {
   return (
-    <div className="bg-[#e2e0df] flex-1 min-w-0" style={{ padding: "15px 19px" }}>
+    <div
+      className="bg-[#e2e0df] flex-1 min-w-0"
+      style={{ padding: "15px 19px" }}
+    >
       <div className="flex items-center gap-[7px] mb-[12px]">
         {area.icon_url && (
-          <img
+          <Image
             src={area.icon_url}
             alt=""
+            width={22}
+            height={22}
             className="w-[22px] h-[22px] object-cover"
           />
         )}
