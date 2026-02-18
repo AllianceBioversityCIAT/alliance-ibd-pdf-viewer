@@ -86,6 +86,36 @@ export interface InnovationCollaborator {
   email?: string;
 }
 
+// Policy Change (rt_id=1)
+export interface PolicyChangeField {
+  label: string;
+  value: string;
+}
+
+// Innovation Use (rt_id=2)
+export interface InnovationUseActor {
+  actor_type: string;
+  subtype: string;
+  women_total: number | null;
+  women_youth: number | null;
+  women_non_youth: number | null;
+  men_total: number | null;
+  men_youth: number | null;
+  men_non_youth: number | null;
+  total: number;
+}
+
+export interface InnovationUseOrganization {
+  type: string;
+  subtype: string;
+  how_many: string;
+}
+
+export interface InnovationUseMeasure {
+  unit_of_measure: string;
+  value: string;
+}
+
 // ── Display types (output of transform functions) ──
 
 export interface ImpactArea {
@@ -193,6 +223,19 @@ export interface PRMSResultData {
   innovation_investments?: InnovationInvestment[];
   innovation_actors?: InnovationActor[];
   innovation_organizations?: InnovationOrganization[];
+
+  // Policy Change (rt_id=1)
+  policy_type_name?: string;
+  policy_amount?: string;
+  policy_stage?: string;
+  policy_implementing_organizations?: string;
+
+  // Innovation Use (rt_id=2)
+  innovation_use_actors?: InnovationUseActor[];
+  innovation_use_organizations?: InnovationUseOrganization[];
+  innovation_use_measures?: InnovationUseMeasure[];
+  innovation_readiness_from?: string;
+  innovation_readiness_to?: string;
 
   // Other
   linked_results: unknown[];

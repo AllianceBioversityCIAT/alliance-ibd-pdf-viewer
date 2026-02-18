@@ -8,7 +8,24 @@ import type {
 } from "../types";
 import { ImpactAreaCard, OECDCriteria } from "./impact-areas";
 import { DataTable } from "./tables";
-import { Search } from "lucide-react";
+function SearchIcon({ size, className }: { size: number; className?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <circle cx="11" cy="11" r="8" />
+      <path d="M21 21l-4.3-4.3" />
+    </svg>
+  );
+}
 
 // ── Shared primitives ──
 
@@ -384,7 +401,7 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
         </>
       ) : (
         <div className="flex items-center justify-center gap-[10px] py-4 mx-auto">
-          <Search size={16} className="text-[#033529] rotate-y-180" />
+          <SearchIcon size={16} className="text-[#033529] rotate-y-180" />
           <p className="text-[#393939] text-[10px] leading-[1.15] font-semibold">
             This is yet to be determined
           </p>
