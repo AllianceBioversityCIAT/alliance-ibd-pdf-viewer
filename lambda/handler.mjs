@@ -31,15 +31,28 @@ process.chdir(STANDALONE_DIR);
 
 let requestHandler = null;
 let interceptedServer = null;
+let handlerInitialized = false;
 
 /**
  * Initialize Next.js request handler (lazy loading)
+ * CRITICAL: This should be called ONCE during cold start, not per request
  */
 async function getRequestHandler() {
   if (requestHandler) {
     return requestHandler;
   }
+  
+  // If initialization is in progress, wait for it
+  if (handlerInitializationPromise) {
+    return handlerInitializationPromise;
+  }
+  
+  // Start initialization
+  handlerInitializationPromise = initializeHandler();
+  return handlerInitializationPromise;
+}
 
+async function initializeHandler() {
   try {
     // Intercept http.createServer before Next.js loads
     // This allows us to capture the server instance that Next.js creates
@@ -138,9 +151,19 @@ async function getRequestHandler() {
   } catch (error) {
     console.error('Failed to load Next.js request handler:', error);
     console.error('Error stack:', error.stack);
+    handlerInitializationPromise = null; // Reset on error so we can retry
     throw error;
   }
 }
+
+// CRITICAL: Initialize Next.js handler during module load (cold start)
+// This ensures Next.js is ready before the first request
+// Don't await - let it initialize in background
+getRequestHandler().catch(err => {
+  console.error('Failed to initialize Next.js handler during cold start:', err);
+  // Reset promise so we can retry on first request
+  handlerInitializationPromise = null;
+});
 
 /**
  * Create a complete mock IncomingMessage object
@@ -198,81 +221,12 @@ function createMockRequest(url, method, headers, body) {
       bodyBuffer = Buffer.from(bodyString, 'utf8');
       console.log('[createMockRequest] Body converted to string, length:', bodyString.length);
     }
-    // CRITICAL: Next.js in standalone mode may access req.body directly
-    // Make body available as a getter that ALWAYS returns the string when accessed
-    // This ensures Next.js can read the body even if it doesn't use the stream
-    // Also need to ensure the stream can emit the body when Next.js reads via stream
-    Object.defineProperty(req, 'body', {
-      get: function () {
-        console.log('[MockRequest] req.body accessed via getter');
-        console.log('[MockRequest] bodyString type:', typeof bodyString, 'length:', bodyString?.length || 0);
-        console.log('[MockRequest] bodyBuffer exists:', !!bodyBuffer, 'type:', bodyBuffer?.constructor?.name);
-
-        // CRITICAL: Next.js may convert IncomingMessage to Request, which expects a ReadableStream
-        // But we have the body as string. We need to return a ReadableStream that can be read
-        // However, if Next.js accesses req.body directly (not via stream), it might expect a string
-        // The solution: Return a ReadableStream that reads from our stored string
-        // This way, Next.js can read it via req.json() without issues
-
-        if (bodyString) {
-          console.log('[MockRequest] Creating ReadableStream from bodyString, length:', bodyString.length);
-
-          // Create a new ReadableStream from the string
-          // This allows Next.js to read it via req.json() without "locked" errors
-          // IMPORTANT: Create a fresh stream each time the getter is called
-          const encoder = new TextEncoder();
-          const stream = new ReadableStream({
-            start(controller) {
-              controller.enqueue(encoder.encode(bodyString));
-              controller.close();
-            }
-          });
-          return stream;
-        } else if (bodyBuffer) {
-          // If bodyString is null but bodyBuffer exists, convert it
-          const converted = bodyBuffer.toString('utf8');
-          bodyString = converted; // Cache it
-          console.log('[MockRequest] Converted bodyBuffer to string, creating ReadableStream, length:', converted.length);
-
-          // Create a new ReadableStream from the converted string
-          const encoder = new TextEncoder();
-          const stream = new ReadableStream({
-            start(controller) {
-              controller.enqueue(encoder.encode(converted));
-              controller.close();
-            }
-          });
-          return stream;
-        } else {
-          console.log('[MockRequest] No body available, returning null');
-          return null;
-        }
-      },
-      set: function (value) {
-        console.log('[MockRequest] req.body set to:', typeof value, 'constructor:', value?.constructor?.name);
-        if (typeof value === 'string') {
-          bodyString = value;
-          bodyBuffer = Buffer.from(value, 'utf8');
-          console.log('[MockRequest] Set body as string, length:', value.length);
-        } else if (Buffer.isBuffer(value)) {
-          bodyString = value.toString('utf8');
-          bodyBuffer = value;
-          console.log('[MockRequest] Set body as Buffer, converted to string, length:', bodyString.length);
-        } else if (value === null || value === undefined) {
-          bodyString = null;
-          bodyBuffer = null;
-          console.log('[MockRequest] Set body to null/undefined');
-        } else {
-          // For objects, stringify them (but this shouldn't happen - body should always be string)
-          console.warn('[MockRequest] Setting body to non-string/non-Buffer value, stringifying');
-          bodyString = JSON.stringify(value);
-          bodyBuffer = Buffer.from(bodyString, 'utf8');
-          console.log('[MockRequest] Stringified body, length:', bodyString.length);
-        }
-      },
-      enumerable: true,
-      configurable: true
-    });
+    // CRITICAL: Next.js API routes read body from the Node.js stream (data events)
+    // NOT from req.body directly. The body is parsed by Next.js body parser middleware.
+    // We store the body as Buffer for stream compatibility, but don't expose it via req.body
+    // Next.js will read from the stream events (data/end) that we emit
+    // Only set req.body if Next.js body parser has already parsed it (which it hasn't yet)
+    // For now, leave req.body undefined - Next.js will populate it after parsing the stream
     // Also store as internal properties for stream operations
     req._bodyString = bodyString;
     req._bodyBuffer = bodyBuffer;
@@ -744,30 +698,30 @@ function createServerRequestHandler(server) {
           body = request.body.toString('utf8');
           console.log('[createServerRequestHandler] Body is Buffer, converted to string, length:', body.length);
         } else if (request.body instanceof ReadableStream) {
-          // CRITICAL: DO NOT READ THE STREAM HERE
-          // Next.js needs to read it via req.json() or req.body
-          // If we read it here, the stream becomes locked and Next.js can't read it
-          // Instead, pass the ReadableStream directly to the mock request
-          // The mock request will create a new ReadableStream from the stored string when needed
+          // CRITICAL: Read the stream ONCE and convert to Buffer/string
+          // Next.js API routes expect the body as a Node.js stream (Buffer), not Web ReadableStream
+          // We read it here and pass as Buffer to createMockRequest, which will make it available as a Node stream
           const contentType = headers['content-type'] || headers['Content-Type'] || '';
           console.log('[createServerRequestHandler] Body is ReadableStream, Content-Type:', contentType);
           console.log('[createServerRequestHandler] ReadableStream locked:', request.body.locked);
-          console.log('[createServerRequestHandler] NOT reading stream - passing to Next.js intact');
 
-          // For logging only: clone the request to read body without consuming original
+          // Read the stream and convert to Buffer (Node.js format)
+          // This is the ONLY place we read the stream - Next.js will read from our Node stream
           try {
-            const clonedRequest = request.clone();
-            const bodyText = await clonedRequest.text();
-            console.log('[createServerRequestHandler] Body length (from clone):', bodyText.length);
-            // Store as string for the mock request (Next.js will create its own ReadableStream)
-            body = bodyText;
-          } catch (cloneError) {
-            // If cloning fails, we can't log the body, but that's OK
-            // The original request body is still intact
-            console.warn('[createServerRequestHandler] Could not clone request for logging:', cloneError.message);
-            // We still need to pass something to createMockRequest
-            // But we can't read the stream, so we'll pass null and let Next.js handle it
-            body = null;
+            if (contentType.includes('application/json') || contentType.includes('text/') || !contentType) {
+              // For JSON/text, read as text then convert to Buffer
+              const bodyText = await request.text();
+              body = bodyText; // Store as string, createMockRequest will convert to Buffer
+              console.log('[createServerRequestHandler] Read body as text, length:', body.length);
+            } else {
+              // For binary, read as arrayBuffer then convert to Buffer
+              const arrayBuffer = await request.arrayBuffer();
+              body = Buffer.from(arrayBuffer); // Store as Buffer
+              console.log('[createServerRequestHandler] Read body as binary, length:', body.length);
+            }
+          } catch (readError) {
+            console.error('[createServerRequestHandler] Error reading ReadableStream:', readError.message);
+            throw new Error('Failed to read request body: ' + readError.message);
           }
         } else {
           // Fallback: try to read as text
@@ -1101,6 +1055,10 @@ function serveStaticFile(filePath) {
  * Main Lambda handler
  */
 export const handler = async (event, context) => {
+  // CRITICAL: Don't wait for empty event loop - Lambda should terminate after response
+  // This prevents timeouts when Next.js server keeps the event loop alive
+  context.callbackWaitsForEmptyEventLoop = false;
+  
   try {
     const url = event.rawPath || event.path || '/';
 
