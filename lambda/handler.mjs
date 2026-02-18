@@ -204,7 +204,39 @@ function createMockRequest(url, method, headers, body) {
       console.log('[createMockRequest] Body content (first 500 chars):', bodyString.substring(0, 500));
       console.log('[createMockRequest] Body content (full):', bodyString);
     }
-    req.body = bodyBuffer;
+    // CRITICAL: Next.js in standalone mode may access req.body directly
+    // Make body available as a getter that returns the string when accessed
+    // This ensures Next.js can read the body even if it doesn't use the stream
+    // Also need to ensure the stream can emit the body when Next.js reads via stream
+    Object.defineProperty(req, 'body', {
+      get: function () {
+        console.log('[MockRequest] req.body accessed via getter, returning:', typeof bodyString, 'length:', bodyString?.length || 0);
+        if (bodyString) {
+          console.log('[MockRequest] req.body content (first 500 chars):', bodyString.substring(0, 500));
+          console.log('[MockRequest] req.body content (full):', bodyString);
+        }
+        // Return string for Next.js body parsers (they expect string, not Buffer)
+        return bodyString;
+      },
+      set: function (value) {
+        console.log('[MockRequest] req.body set to:', typeof value, 'length:', value?.length || 0);
+        if (typeof value === 'string') {
+          bodyString = value;
+          bodyBuffer = Buffer.from(value, 'utf8');
+        } else if (Buffer.isBuffer(value)) {
+          bodyString = value.toString('utf8');
+          bodyBuffer = value;
+        } else {
+          bodyString = String(value);
+          bodyBuffer = Buffer.from(bodyString, 'utf8');
+        }
+      },
+      enumerable: true,
+      configurable: true
+    });
+    // Also store as internal properties for stream operations
+    req._bodyString = bodyString;
+    req._bodyBuffer = bodyBuffer;
   } else {
     console.log('[createMockRequest] No body provided');
   }
@@ -235,8 +267,8 @@ function createMockRequest(url, method, headers, body) {
       console.log('[MockRequest] Body content being returned (Buffer, first 500 bytes as string):', bodyBuffer.toString('utf8').substring(0, 500));
       console.log('[MockRequest] Body content being returned (Buffer, full as string):', bodyBuffer.toString('utf8'));
     }
-    bodyBuffer = null; // Mark as consumed
-    bodyString = null; // Also clear string version
+    // Don't clear bodyString/bodyBuffer here - Next.js might access req.body multiple times
+    // Only mark as ended
     req.readableEnded = true;
     req.emit('end');
     return data;
@@ -279,8 +311,8 @@ function createMockRequest(url, method, headers, body) {
           this.emit('end');
           this.readableEnded = true;
           this.complete = true;
-          bodyBuffer = null;
-          bodyString = null;
+          // Don't clear bodyBuffer/bodyString - Next.js might access req.body multiple times
+          // The getter will still return the string
         }
       });
     }
@@ -311,8 +343,8 @@ function createMockRequest(url, method, headers, body) {
           this.emit('end');
           this.readableEnded = true;
           this.complete = true;
-          bodyBuffer = null;
-          bodyString = null;
+          // Don't clear bodyBuffer/bodyString - Next.js might access req.body multiple times
+          // The getter will still return the string
         } else {
           console.log('[MockRequest] Body not emitted (once) - bodyBuffer:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
         }
@@ -362,8 +394,8 @@ function createMockRequest(url, method, headers, body) {
       this.emit('end');
       this.readableEnded = true;
       this.complete = true;
-      bodyBuffer = null;
-      bodyString = null;
+      // Don't clear bodyBuffer/bodyString - Next.js might access req.body multiple times
+      // The getter will still return the string
     } else {
       console.log('[MockRequest] resume() called but body not emitted - bodyBuffer:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
     }
