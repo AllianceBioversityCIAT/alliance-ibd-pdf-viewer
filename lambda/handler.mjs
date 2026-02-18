@@ -177,17 +177,32 @@ function createMockRequest(url, method, headers, body) {
 
   // Body handling - make body available as a readable stream
   // Next.js reads the body from the request stream, so we need to emit data events
+  // IMPORTANT: Store both string and Buffer versions
+  // Next.js body parsers expect strings, but we also need Buffer for stream operations
+  let bodyString = null;
   let bodyBuffer = null;
   if (body) {
     if (typeof body === 'string') {
+      bodyString = body;
       bodyBuffer = Buffer.from(body, 'utf8');
-      console.log('[createMockRequest] Body is string, converted to Buffer, length:', bodyBuffer.length, 'preview:', body.substring(0, 100));
+      console.log('[createMockRequest] Body is string, length:', bodyString.length);
+      console.log('[createMockRequest] Body content (first 500 chars):', bodyString.substring(0, 500));
+      console.log('[createMockRequest] Body content (full):', bodyString);
     } else if (Buffer.isBuffer(body)) {
+      bodyString = body.toString('utf8');
       bodyBuffer = body;
-      console.log('[createMockRequest] Body is Buffer, length:', bodyBuffer.length);
+      console.log('[createMockRequest] Body is Buffer, converted to string, length:', bodyString.length);
+      console.log('[createMockRequest] Body content (first 500 chars):', bodyString.substring(0, 500));
+      console.log('[createMockRequest] Body content (full):', bodyString);
     } else {
-      bodyBuffer = Buffer.from(String(body), 'utf8');
-      console.log('[createMockRequest] Body converted to Buffer, length:', bodyBuffer.length);
+      // If body is an object, stringify it (shouldn't happen, but handle gracefully)
+      console.warn('[createMockRequest] Body is not string or Buffer, type:', typeof body);
+      console.warn('[createMockRequest] Body value:', body);
+      bodyString = typeof body === 'object' ? JSON.stringify(body) : String(body);
+      bodyBuffer = Buffer.from(bodyString, 'utf8');
+      console.log('[createMockRequest] Body converted to string, length:', bodyString.length);
+      console.log('[createMockRequest] Body content (first 500 chars):', bodyString.substring(0, 500));
+      console.log('[createMockRequest] Body content (full):', bodyString);
     }
     req.body = bodyBuffer;
   } else {
@@ -202,14 +217,25 @@ function createMockRequest(url, method, headers, body) {
   req.readableObjectMode = false;
 
   // Override read() to return body data
+  // Next.js body parsers can read via read() or 'data' events
+  // Return Buffer (which is what Node.js streams return)
+  // If encoding is set, return string; otherwise return Buffer
   req.read = function (size) {
     if (!bodyBuffer) {
       return null; // EOF
     }
-    const data = bodyBuffer;
+    const data = this._encoding && bodyString ? bodyString : bodyBuffer;
+    console.log('[MockRequest] read() called, encoding:', this._encoding || 'none', 'returning:', typeof data, 'length:', data.length);
+    if (bodyString) {
+      console.log('[MockRequest] Body content being returned (first 500 chars):', bodyString.substring(0, 500));
+      console.log('[MockRequest] Body content being returned (full):', bodyString);
+    } else {
+      console.log('[MockRequest] Body content being returned (Buffer, first 500 bytes as string):', bodyBuffer.toString('utf8').substring(0, 500));
+      console.log('[MockRequest] Body content being returned (Buffer, full as string):', bodyBuffer.toString('utf8'));
+    }
     bodyBuffer = null; // Mark as consumed
+    bodyString = null; // Also clear string version
     req.readableEnded = true;
-    console.log('[MockRequest] read() called, returning body, length:', data.length);
     req.emit('end');
     return data;
   };
@@ -223,6 +249,8 @@ function createMockRequest(url, method, headers, body) {
   // EventEmitter methods (delegate to EventEmitter)
   // Override 'on' to automatically emit body when 'data' listener is added
   // Next.js body parsers listen for 'data' events to read the stream
+  // CRITICAL: Emit Buffer (not string) - Node.js streams emit Buffers
+  // Next.js will convert Buffer to string internally when needed
   const originalOn = EventEmitter.prototype.on.bind(req);
   req.on = function (event, listener) {
     const result = originalOn(event, listener);
@@ -232,12 +260,23 @@ function createMockRequest(url, method, headers, body) {
       // Use setImmediate to ensure listener is registered before emitting
       setImmediate(() => {
         if (bodyBuffer && !this.readableEnded) {
-          console.log('[MockRequest] Emitting body data, length:', bodyBuffer.length);
-          this.emit('data', bodyBuffer);
+          // Check if encoding is set - if so, emit string; otherwise emit Buffer
+          const dataToEmit = this._encoding && bodyString ? bodyString : bodyBuffer;
+          console.log('[MockRequest] Emitting body data via on("data"), encoding:', this._encoding || 'none', 'type:', typeof dataToEmit, 'length:', dataToEmit.length);
+          if (bodyString) {
+            console.log('[MockRequest] Body content being emitted (first 500 chars):', bodyString.substring(0, 500));
+            console.log('[MockRequest] Body content being emitted (full):', bodyString);
+          } else {
+            console.log('[MockRequest] Body content being emitted (Buffer, first 500 bytes as string):', bodyBuffer.toString('utf8').substring(0, 500));
+            console.log('[MockRequest] Body content being emitted (Buffer, full as string):', bodyBuffer.toString('utf8'));
+          }
+          // Emit Buffer (default) or string (if encoding is set)
+          this.emit('data', dataToEmit);
           this.emit('end');
           this.readableEnded = true;
           this.complete = true;
           bodyBuffer = null;
+          bodyString = null;
         }
       });
     }
@@ -251,12 +290,23 @@ function createMockRequest(url, method, headers, body) {
     if (event === 'data' && bodyBuffer && !this.readableEnded) {
       setImmediate(() => {
         if (bodyBuffer && !this.readableEnded) {
-          console.log('[MockRequest] Emitting body data (once), length:', bodyBuffer.length);
-          this.emit('data', bodyBuffer);
+          // Check if encoding is set - if so, emit string; otherwise emit Buffer
+          const dataToEmit = this._encoding && bodyString ? bodyString : bodyBuffer;
+          console.log('[MockRequest] Emitting body data via once("data"), encoding:', this._encoding || 'none', 'type:', typeof dataToEmit, 'length:', dataToEmit.length);
+          if (bodyString) {
+            console.log('[MockRequest] Body content being emitted (first 500 chars):', bodyString.substring(0, 500));
+            console.log('[MockRequest] Body content being emitted (full):', bodyString);
+          } else {
+            console.log('[MockRequest] Body content being emitted (Buffer, first 500 bytes as string):', bodyBuffer.toString('utf8').substring(0, 500));
+            console.log('[MockRequest] Body content being emitted (Buffer, full as string):', bodyBuffer.toString('utf8'));
+          }
+          // Emit Buffer (default) or string (if encoding is set)
+          this.emit('data', dataToEmit);
           this.emit('end');
           this.readableEnded = true;
           this.complete = true;
           bodyBuffer = null;
+          bodyString = null;
         }
       });
     }
@@ -271,8 +321,12 @@ function createMockRequest(url, method, headers, body) {
   req.listenerCount = EventEmitter.prototype.listenerCount.bind(req);
 
   // Stream methods - read() is already set above for body handling
+  // setEncoding() affects how data is emitted - if encoding is set, emit strings instead of Buffers
   req.setEncoding = function (encoding) {
     this._encoding = encoding;
+    console.log('[MockRequest] setEncoding() called with:', encoding);
+    // If encoding is set, we need to emit strings instead of Buffers
+    // But we'll handle this in the emit handlers
     return this;
   };
   req.pause = function () {
@@ -284,12 +338,23 @@ function createMockRequest(url, method, headers, body) {
     // If body exists and hasn't been emitted, emit it now
     // This is called by Next.js body parsers
     if (bodyBuffer && !this.readableEnded) {
-      console.log('[MockRequest] resume() called, emitting body, length:', bodyBuffer.length);
-      this.emit('data', bodyBuffer);
+      // Check if encoding is set - if so, emit string; otherwise emit Buffer
+      const dataToEmit = this._encoding && bodyString ? bodyString : bodyBuffer;
+      console.log('[MockRequest] resume() called, emitting body, encoding:', this._encoding || 'none', 'type:', typeof dataToEmit, 'length:', dataToEmit.length);
+      if (bodyString) {
+        console.log('[MockRequest] Body content being emitted (first 500 chars):', bodyString.substring(0, 500));
+        console.log('[MockRequest] Body content being emitted (full):', bodyString);
+      } else {
+        console.log('[MockRequest] Body content being emitted (Buffer, first 500 bytes as string):', bodyBuffer.toString('utf8').substring(0, 500));
+        console.log('[MockRequest] Body content being emitted (Buffer, full as string):', bodyBuffer.toString('utf8'));
+      }
+      // Emit Buffer (default) or string (if encoding is set)
+      this.emit('data', dataToEmit);
       this.emit('end');
       this.readableEnded = true;
       this.complete = true;
       bodyBuffer = null;
+      bodyString = null;
     }
     return this;
   };
@@ -593,9 +658,13 @@ function createServerRequestHandler(server) {
         if (typeof request.body === 'string') {
           body = request.body;
           console.log('[createServerRequestHandler] Body is string, length:', body.length);
+          console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
+          console.log('[createServerRequestHandler] Body content (full):', body);
         } else if (Buffer.isBuffer(request.body)) {
           body = request.body.toString('utf8');
-          console.log('[createServerRequestHandler] Body is Buffer, length:', body.length);
+          console.log('[createServerRequestHandler] Body is Buffer, converted to string, length:', body.length);
+          console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
+          console.log('[createServerRequestHandler] Body content (full):', body);
         } else if (request.body instanceof ReadableStream) {
           // Read ReadableStream properly
           const contentType = headers['content-type'] || headers['Content-Type'] || '';
@@ -605,18 +674,23 @@ function createServerRequestHandler(server) {
             // For JSON/text, read as text
             // If no content-type, assume text/JSON (common in Lambda Function URL)
             body = await request.text();
-            console.log('[createServerRequestHandler] Read body as text, length:', body.length, 'preview:', body.substring(0, 100));
+            console.log('[createServerRequestHandler] Read body as text, length:', body.length);
+            console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
+            console.log('[createServerRequestHandler] Body content (full):', body);
           } else {
             // For binary, read as arrayBuffer then convert to Buffer
             const arrayBuffer = await request.arrayBuffer();
             body = Buffer.from(arrayBuffer);
             console.log('[createServerRequestHandler] Read body as binary, length:', body.length);
+            console.log('[createServerRequestHandler] Body content (base64):', body.toString('base64').substring(0, 200));
           }
         } else {
           // Fallback: try to read as text
           console.warn('[createServerRequestHandler] Unexpected body type:', typeof request.body, request.body?.constructor?.name);
           body = await request.text();
           console.log('[createServerRequestHandler] Read body as text (fallback), length:', body.length);
+          console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
+          console.log('[createServerRequestHandler] Body content (full):', body);
         }
       } catch (error) {
         console.error('[createServerRequestHandler] Error reading request body:', {
@@ -821,15 +895,21 @@ function createNextRequest(event) {
     if (event.isBase64Encoded) {
       // Decode base64 to Buffer, then to string for JSON
       body = Buffer.from(event.body, 'base64').toString('utf8');
-      console.log('[createNextRequest] Body is base64 encoded, decoded length:', body.length, 'preview:', body.substring(0, 100));
+      console.log('[createNextRequest] Body is base64 encoded, decoded length:', body.length);
+      console.log('[createNextRequest] Body content (first 500 chars):', body.substring(0, 500));
+      console.log('[createNextRequest] Body content (full):', body);
     } else if (typeof event.body === 'string') {
       // Already a string, use as-is
       body = event.body;
-      console.log('[createNextRequest] Body is string, length:', body.length, 'preview:', body.substring(0, 100));
+      console.log('[createNextRequest] Body is string, length:', body.length);
+      console.log('[createNextRequest] Body content (first 500 chars):', body.substring(0, 500));
+      console.log('[createNextRequest] Body content (full):', body);
     } else {
       // Shouldn't happen, but handle gracefully
       console.warn('[createNextRequest] Unexpected event.body type:', typeof event.body);
+      console.warn('[createNextRequest] event.body value:', event.body);
       body = String(event.body);
+      console.log('[createNextRequest] Body converted to string:', body);
     }
   } else {
     console.log('[createNextRequest] No body in event');
