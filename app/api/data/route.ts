@@ -33,8 +33,17 @@ export async function POST(req: NextRequest) {
   let data: unknown;
   try {
     data = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  } catch (error) {
+    // Log error details for debugging (without exposing sensitive data)
+    console.error("[POST /api/data] JSON parse error:", {
+      error: error instanceof Error ? error.message : String(error),
+      contentType: req.headers.get("content-type"),
+      hasBody: !!req.body,
+    });
+    return NextResponse.json(
+      { error: "Invalid JSON body", message: "The request body could not be parsed as JSON" },
+      { status: 400 }
+    );
   }
 
   try {

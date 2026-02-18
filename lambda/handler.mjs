@@ -181,12 +181,17 @@ function createMockRequest(url, method, headers, body) {
   if (body) {
     if (typeof body === 'string') {
       bodyBuffer = Buffer.from(body, 'utf8');
+      console.log('[createMockRequest] Body is string, converted to Buffer, length:', bodyBuffer.length, 'preview:', body.substring(0, 100));
     } else if (Buffer.isBuffer(body)) {
       bodyBuffer = body;
+      console.log('[createMockRequest] Body is Buffer, length:', bodyBuffer.length);
     } else {
       bodyBuffer = Buffer.from(String(body), 'utf8');
+      console.log('[createMockRequest] Body converted to Buffer, length:', bodyBuffer.length);
     }
     req.body = bodyBuffer;
+  } else {
+    console.log('[createMockRequest] No body provided');
   }
 
   // Make request readable as a stream
@@ -204,6 +209,7 @@ function createMockRequest(url, method, headers, body) {
     const data = bodyBuffer;
     bodyBuffer = null; // Mark as consumed
     req.readableEnded = true;
+    console.log('[MockRequest] read() called, returning body, length:', data.length);
     req.emit('end');
     return data;
   };
@@ -216,13 +222,17 @@ function createMockRequest(url, method, headers, body) {
 
   // EventEmitter methods (delegate to EventEmitter)
   // Override 'on' to automatically emit body when 'data' listener is added
+  // Next.js body parsers listen for 'data' events to read the stream
   const originalOn = EventEmitter.prototype.on.bind(req);
   req.on = function (event, listener) {
     const result = originalOn(event, listener);
     // When Next.js adds a 'data' listener, emit the body immediately
+    // This is critical: Next.js body parsers use 'data' events to read the stream
     if (event === 'data' && bodyBuffer && !this.readableEnded) {
-      process.nextTick(() => {
+      // Use setImmediate to ensure listener is registered before emitting
+      setImmediate(() => {
         if (bodyBuffer && !this.readableEnded) {
+          console.log('[MockRequest] Emitting body data, length:', bodyBuffer.length);
           this.emit('data', bodyBuffer);
           this.emit('end');
           this.readableEnded = true;
@@ -233,7 +243,25 @@ function createMockRequest(url, method, headers, body) {
     }
     return result;
   };
-  req.once = EventEmitter.prototype.once.bind(req);
+
+  // Also override 'once' for the same reason
+  const originalOnce = EventEmitter.prototype.once.bind(req);
+  req.once = function (event, listener) {
+    const result = originalOnce(event, listener);
+    if (event === 'data' && bodyBuffer && !this.readableEnded) {
+      setImmediate(() => {
+        if (bodyBuffer && !this.readableEnded) {
+          console.log('[MockRequest] Emitting body data (once), length:', bodyBuffer.length);
+          this.emit('data', bodyBuffer);
+          this.emit('end');
+          this.readableEnded = true;
+          this.complete = true;
+          bodyBuffer = null;
+        }
+      });
+    }
+    return result;
+  };
   req.emit = EventEmitter.prototype.emit.bind(req);
   req.removeListener = EventEmitter.prototype.removeListener.bind(req);
   req.removeAllListeners = EventEmitter.prototype.removeAllListeners.bind(req);
@@ -256,6 +284,7 @@ function createMockRequest(url, method, headers, body) {
     // If body exists and hasn't been emitted, emit it now
     // This is called by Next.js body parsers
     if (bodyBuffer && !this.readableEnded) {
+      console.log('[MockRequest] resume() called, emitting body, length:', bodyBuffer.length);
       this.emit('data', bodyBuffer);
       this.emit('end');
       this.readableEnded = true;
@@ -563,33 +592,44 @@ function createServerRequestHandler(server) {
         // Check if it's already a string or Buffer (shouldn't happen with Web Request, but safe)
         if (typeof request.body === 'string') {
           body = request.body;
+          console.log('[createServerRequestHandler] Body is string, length:', body.length);
         } else if (Buffer.isBuffer(request.body)) {
-          body = request.body;
+          body = request.body.toString('utf8');
+          console.log('[createServerRequestHandler] Body is Buffer, length:', body.length);
         } else if (request.body instanceof ReadableStream) {
           // Read ReadableStream properly
           const contentType = headers['content-type'] || headers['Content-Type'] || '';
-          if (contentType.includes('application/json') || contentType.includes('text/')) {
+          console.log('[createServerRequestHandler] Body is ReadableStream, Content-Type:', contentType);
+
+          if (contentType.includes('application/json') || contentType.includes('text/') || !contentType) {
             // For JSON/text, read as text
+            // If no content-type, assume text/JSON (common in Lambda Function URL)
             body = await request.text();
+            console.log('[createServerRequestHandler] Read body as text, length:', body.length, 'preview:', body.substring(0, 100));
           } else {
             // For binary, read as arrayBuffer then convert to Buffer
             const arrayBuffer = await request.arrayBuffer();
             body = Buffer.from(arrayBuffer);
+            console.log('[createServerRequestHandler] Read body as binary, length:', body.length);
           }
         } else {
           // Fallback: try to read as text
-          console.warn('Unexpected body type:', typeof request.body, request.body?.constructor?.name);
+          console.warn('[createServerRequestHandler] Unexpected body type:', typeof request.body, request.body?.constructor?.name);
           body = await request.text();
+          console.log('[createServerRequestHandler] Read body as text (fallback), length:', body.length);
         }
       } catch (error) {
-        console.error('Error reading request body:', {
+        console.error('[createServerRequestHandler] Error reading request body:', {
           error: error.message,
           bodyType: typeof request.body,
           bodyConstructor: request.body?.constructor?.name,
+          stack: error.stack,
         });
         // Return 400 for invalid body
         throw new Error('Invalid request body: ' + error.message);
       }
+    } else {
+      console.log('[createServerRequestHandler] No body in request');
     }
 
     // Create complete mock request and response objects
@@ -775,19 +815,24 @@ function createNextRequest(event) {
 
   // Handle body from Lambda event
   // Lambda Function URL provides body as string (may be base64 encoded)
+  // API Gateway v2 also provides body as string, but structure differs
   let body = undefined;
   if (event.body) {
     if (event.isBase64Encoded) {
       // Decode base64 to Buffer, then to string for JSON
       body = Buffer.from(event.body, 'base64').toString('utf8');
+      console.log('[createNextRequest] Body is base64 encoded, decoded length:', body.length, 'preview:', body.substring(0, 100));
     } else if (typeof event.body === 'string') {
       // Already a string, use as-is
       body = event.body;
+      console.log('[createNextRequest] Body is string, length:', body.length, 'preview:', body.substring(0, 100));
     } else {
       // Shouldn't happen, but handle gracefully
-      console.warn('Unexpected event.body type:', typeof event.body);
+      console.warn('[createNextRequest] Unexpected event.body type:', typeof event.body);
       body = String(event.body);
     }
+  } else {
+    console.log('[createNextRequest] No body in event');
   }
 
   // Create Web Request object
