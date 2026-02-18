@@ -8,51 +8,20 @@ import {
   TheoryOfChangeCard,
   GeoLocationBox,
   EvidenceCard,
+  KeyValueTable,
   QABox,
   type ImpactArea,
   type TheoryOfChange,
   type Partner,
-  type BundledInnovation,
   type GeoLocation,
   type Evidence,
-  type QAAdjustment,
 } from "./components";
 
-interface InnovationCollaborator {
-  name: string;
-  email?: string;
+interface PolicyChange {
+  fields: { label: string; value: string }[];
 }
 
-interface InnovationDevelopment {
-  developer_name: string;
-  developer_email?: string;
-  developer_institution?: string;
-  current_readiness_level?: string;
-  current_readiness_label?: string;
-  readiness_justification?: string;
-  collaborators?: InnovationCollaborator[];
-  innovation_nature?: string;
-  innovation_type?: string;
-  reference_materials?: string[];
-}
-
-interface Investment {
-  entity: string;
-  name: string;
-  usd_investment: string;
-}
-
-interface InnovationActor {
-  type: string;
-  actors: string;
-}
-
-interface InnovationOrganization {
-  type: string;
-  subtype: string;
-}
-
-interface ResultSummaryData {
+interface CapacitySharingData {
   result_type: string;
   title: string;
   generated_date: string;
@@ -63,128 +32,18 @@ interface ResultSummaryData {
   lead_contact_person: string;
   lead_contact_email: string;
   impact_areas: ImpactArea[];
-  qa_adjustments: QAAdjustment[];
   theory_of_change?: TheoryOfChange;
   contributing_program?: string;
   contributing_centers?: string[];
   contributing_projects?: string[];
   partners?: Partner[];
-  bundled_innovations?: BundledInnovation[];
   geo_location?: GeoLocation;
   evidences?: Evidence[];
-  innovation_development?: InnovationDevelopment;
-  investments?: Investment[];
-  innovation_actors?: InnovationActor[];
-  innovation_organizations?: InnovationOrganization[];
+  policy_changes?: PolicyChange[];
 }
 
-function InnovationDevelopmentSection({ innovation }: { innovation: InnovationDevelopment }) {
-  return (
-    <div className="flex gap-[20px]">
-      <div className="flex flex-col gap-[8px] text-[10px] flex-1 min-w-0">
-        {/* Developer */}
-        <p style={{ lineHeight: 1.5 }}>
-          <span className="font-bold text-[#1d1d1d]">Innovation Developer:</span>{" "}
-          <span className="text-[#393939]">
-            {innovation.developer_name}
-            {innovation.developer_email && (
-              <>
-                {" "}
-                <span className="text-[#065f4a]">(</span>
-                <a href={`mailto:${innovation.developer_email}`} className="text-[#065f4a] underline">
-                  {innovation.developer_email}
-                </a>
-                <span className="text-[#065f4a]">)</span>
-              </>
-            )}
-            {innovation.developer_institution && ` ${innovation.developer_institution}`}
-          </span>
-        </p>
-
-        {/* Readiness level */}
-        {innovation.current_readiness_level && (
-          <p style={{ lineHeight: 1.5 }}>
-            <span className="font-bold text-[#1d1d1d]">Current readiness of this innovation:</span>{" "}
-            <span className="text-[#393939]">
-              <span className="font-medium">{innovation.current_readiness_level}</span>
-              {innovation.current_readiness_label && ` - ${innovation.current_readiness_label}`}
-            </span>
-          </p>
-        )}
-
-        {/* Readiness justification */}
-        {innovation.readiness_justification && (
-          <p style={{ lineHeight: 1.5 }}>
-            <span className="font-bold text-[#1d1d1d]">Innovation readiness justification:</span>{" "}
-            <span className="text-[#393939]">{innovation.readiness_justification}</span>
-          </p>
-        )}
-
-        {/* Collaborators */}
-        {innovation.collaborators && innovation.collaborators.length > 0 && (
-          <div className="flex flex-col gap-[5px]">
-            <p className="font-bold text-[#1d1d1d] leading-[1.15]">Innovation collaborators:</p>
-            <ul className="list-disc ml-[15px] text-[#393939]">
-              {innovation.collaborators.map((c, i) => (
-                <li key={i} className="leading-[1.5]">
-                  {c.name}{c.email && `, ${c.email}`}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Innovation nature */}
-        {innovation.innovation_nature && (
-          <p style={{ lineHeight: 1.5 }}>
-            <span className="font-bold text-[#1d1d1d]">Innovation nature:</span>{" "}
-            <span className="text-[#393939]">{innovation.innovation_nature}</span>
-          </p>
-        )}
-
-        {/* Innovation type */}
-        {innovation.innovation_type && (
-          <p style={{ lineHeight: 1.5 }}>
-            <span className="font-bold text-[#1d1d1d]">Innovation type:</span>{" "}
-            <span className="text-[#393939]">{innovation.innovation_type}</span>
-          </p>
-        )}
-
-        {/* Reference materials */}
-        {innovation.reference_materials && innovation.reference_materials.length > 0 && (
-          <div className="flex flex-col gap-[5px]">
-            <p className="font-bold text-[#1d1d1d] leading-[1.15]">Reference materials:</p>
-            <ul className="list-disc ml-[15px]">
-              {innovation.reference_materials.map((url, i) => (
-                <li key={i} className="leading-[1.5]">
-                  <a href={url} className="text-[#065f4a] underline break-all">{url}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-
-      {/* Readiness scale infographic */}
-      <div className="flex flex-col items-center shrink-0" style={{ width: 182 }}>
-        <img
-          src="/assets/prms/readiness-scale.png"
-          alt="Innovation Readiness Scale"
-          className="w-full"
-        />
-        <p className="text-[#818181] text-[8px] leading-[1.367] text-center mt-[4px]">
-          Learn more in{" "}
-          <a href="https://www.scalingreadiness.org" className="text-[#065f4a] underline">
-            www.scalingreadiness.org
-          </a>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-export default function ResultSummary({ data }: TemplateProps) {
-  const d = data as ResultSummaryData | null;
+export default function CapacitySharingForDevelopment({ data }: TemplateProps) {
+  const d = data as CapacitySharingData | null;
 
   return (
     <div className="bg-white relative" style={{ fontFamily: "'Noto Sans', sans-serif" }}>
@@ -262,7 +121,7 @@ export default function ResultSummary({ data }: TemplateProps) {
       {/* Body content */}
       <div className="flex flex-col gap-[20px]" style={{ padding: "20px 43px 40px", maxWidth: 552 }}>
         {/* QA Assessment box */}
-        <QABox adjustments={d?.qa_adjustments ?? []} />
+        <QABox />
 
         {/* Result details section */}
         <div className="flex flex-col gap-[10px]">
@@ -332,7 +191,7 @@ export default function ResultSummary({ data }: TemplateProps) {
         </div>
 
         {/* Contributors and Partners section */}
-        {(d?.theory_of_change || d?.contributing_program || d?.partners?.length || d?.bundled_innovations?.length) && (
+        {(d?.theory_of_change || d?.contributing_program || d?.partners?.length) && (
           <div className="flex flex-col gap-[10px]">
             <SectionTitle>Contributors and Partners</SectionTitle>
 
@@ -390,17 +249,6 @@ export default function ResultSummary({ data }: TemplateProps) {
                 />
               </div>
             )}
-
-            {/* Bundled innovations table */}
-            {d?.bundled_innovations && d.bundled_innovations.length > 0 && (
-              <div className="flex flex-col gap-[10px]">
-                <SubSectionTitle>Bundled innovations</SubSectionTitle>
-                <DataTable
-                  columns={["Portfolio", "Phase", "Code", "Indicator", "Title"]}
-                  rows={d.bundled_innovations.map((b) => [b.portfolio, b.phase, b.code, b.indicator, b.title])}
-                />
-              </div>
-            )}
           </div>
         )}
 
@@ -424,53 +272,15 @@ export default function ResultSummary({ data }: TemplateProps) {
           </div>
         )}
 
-        {/* Innovation Development details section */}
-        {d?.innovation_development && (
-          <div className="flex flex-col gap-[10px]">
-            <SectionTitle>Innovation Development details</SectionTitle>
-            <InnovationDevelopmentSection innovation={d.innovation_development} />
-          </div>
-        )}
-
-        {/* CGIAR and Partners estimated USD investment */}
-        {d?.investments && d.investments.length > 0 && (
-          <div className="flex flex-col gap-[10px]">
-            <SubSectionTitle>CGIAR and Partners estimated USD investment</SubSectionTitle>
-            <DataTable
-              columns={["Entity", "Name", "USD investment"]}
-              rows={d.investments.map((inv) => [inv.entity, inv.name, inv.usd_investment])}
-            />
-          </div>
-        )}
-
-        {/* Anticipated Innovation users */}
-        {(d?.innovation_actors?.length || d?.innovation_organizations?.length) && (
-          <div className="flex flex-col gap-[15px]">
-            <SubSectionTitle>Anticipated Innovation users</SubSectionTitle>
-
-            {/* Actors table */}
-            {d?.innovation_actors && d.innovation_actors.length > 0 && (
-              <div className="flex flex-col gap-[5px]">
-                <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">Actors</p>
-                <DataTable
-                  columns={["#", "Type", "Actors"]}
-                  rows={d.innovation_actors.map((a, i) => [String(i + 1), a.type, a.actors])}
-                />
-              </div>
-            )}
-
-            {/* Organizations table */}
-            {d?.innovation_organizations && d.innovation_organizations.length > 0 && (
-              <div className="flex flex-col gap-[5px]">
-                <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">Organizations</p>
-                <DataTable
-                  columns={["#", "Type", "Subtype"]}
-                  rows={d.innovation_organizations.map((o, i) => [String(i + 1), o.type, o.subtype])}
-                />
-              </div>
-            )}
-          </div>
-        )}
+        {/* Policy Change sections */}
+        {d?.policy_changes && d.policy_changes.length > 0 &&
+          d.policy_changes.map((pc, i) => (
+            <div key={i} className="flex flex-col gap-[10px]">
+              <SectionTitle>Policy Change</SectionTitle>
+              <KeyValueTable rows={pc.fields} />
+            </div>
+          ))
+        }
       </div>
     </div>
   );
