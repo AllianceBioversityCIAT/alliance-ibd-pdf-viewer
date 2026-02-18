@@ -281,7 +281,14 @@ function createMockResponse() {
     return this;
   };
   res.setHeader = function (name, value) {
-    headers[name] = value;
+    // Normalize header value: if it's an array, join it; if it's not a string, convert it
+    if (Array.isArray(value)) {
+      headers[name] = value.join(', ');
+    } else if (typeof value !== 'string' && value != null) {
+      headers[name] = String(value);
+    } else {
+      headers[name] = value;
+    }
     return this;
   };
   res.appendHeader = function (name, value) {
@@ -543,13 +550,19 @@ function createServerRequestHandler(server) {
         let responseBody = res._body || '';
 
         // Check content-type to determine if response is binary
-        const contentType = responseHeaders['content-type'] || responseHeaders['Content-Type'] || '';
-        const isBinary = contentType.startsWith('image/') ||
+        // Headers can be arrays in Node.js, so ensure we get a string
+        const contentTypeHeader = responseHeaders['content-type'] || responseHeaders['Content-Type'];
+        const contentType = Array.isArray(contentTypeHeader) 
+          ? contentTypeHeader[0] 
+          : (typeof contentTypeHeader === 'string' ? contentTypeHeader : '');
+        const isBinary = contentType && typeof contentType === 'string' && (
+          contentType.startsWith('image/') ||
           contentType.startsWith('application/octet-stream') ||
           contentType.startsWith('font/') ||
           contentType.startsWith('application/javascript') ||
           contentType.startsWith('text/javascript') ||
-          contentType.includes('charset=binary');
+          contentType.includes('charset=binary')
+        );
 
         // Ensure responseBody is properly formatted
         let finalBody = responseBody;
@@ -574,7 +587,7 @@ function createServerRequestHandler(server) {
         }
 
         console.log('Response status:', statusCode);
-        console.log('Response headers:', Object.keys(responseHeaders));
+        console.log('Response headers:', Object.keys(normalizedHeaders));
         console.log('Response body length:', finalBody.length);
         console.log('Response body type:', typeof finalBody);
         console.log('Content-Type:', contentType);
@@ -594,12 +607,12 @@ function createServerRequestHandler(server) {
           const buffer = Buffer.from(finalBody, 'binary');
           resolve(new Response(buffer, {
             status: statusCode,
-            headers: responseHeaders,
+            headers: normalizedHeaders,
           }));
         } else {
           resolve(new Response(finalBody, {
             status: statusCode,
-            headers: responseHeaders,
+            headers: normalizedHeaders,
           }));
         }
       });
@@ -616,6 +629,12 @@ function createServerRequestHandler(server) {
           const statusCode = res.statusCode || 200;
           const responseHeaders = res._headers || {};
           let responseBody = res._body || '';
+
+          // Normalize headers: ensure all header values are strings (not arrays)
+          const normalizedHeaders = {};
+          for (const [key, value] of Object.entries(responseHeaders)) {
+            normalizedHeaders[key] = Array.isArray(value) ? value.join(', ') : (typeof value === 'string' ? value : String(value || ''));
+          }
 
           // Ensure responseBody is a string
           if (typeof responseBody !== 'string') {
@@ -641,14 +660,14 @@ function createServerRequestHandler(server) {
           }
 
           console.log('Response status:', statusCode);
-          console.log('Response headers:', Object.keys(responseHeaders));
+          console.log('Response headers:', Object.keys(normalizedHeaders));
           console.log('Response body length:', responseBody.length);
           console.log('Response body type:', typeof responseBody);
           console.log('Response body preview (first 100 chars):', responseBody.substring(0, 100));
 
           resolve(new Response(responseBody, {
             status: statusCode,
-            headers: responseHeaders,
+            headers: normalizedHeaders,
           }));
         }
       }, 10);
