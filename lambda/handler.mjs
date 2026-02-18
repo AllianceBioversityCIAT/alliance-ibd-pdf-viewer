@@ -175,17 +175,64 @@ function createMockRequest(url, method, headers, body) {
   };
   req.connection = req.socket;
 
-  // Body handling
+  // Body handling - make body available as a readable stream
+  // Next.js reads the body from the request stream, so we need to emit data events
+  let bodyBuffer = null;
   if (body) {
     if (typeof body === 'string') {
-      req.body = body;
+      bodyBuffer = Buffer.from(body, 'utf8');
     } else if (Buffer.isBuffer(body)) {
-      req.body = body;
+      bodyBuffer = body;
+    } else {
+      bodyBuffer = Buffer.from(String(body), 'utf8');
     }
+    req.body = bodyBuffer;
   }
 
+  // Make request readable as a stream
+  // Next.js will read from the stream using 'data' events
+  req.readable = true;
+  req.readableEnded = false;
+  req.readableFlowing = null;
+  req.readableObjectMode = false;
+
+  // Override read() to return body data
+  req.read = function (size) {
+    if (!bodyBuffer) {
+      return null; // EOF
+    }
+    const data = bodyBuffer;
+    bodyBuffer = null; // Mark as consumed
+    req.readableEnded = true;
+    req.emit('end');
+    return data;
+  };
+
+  // Don't emit data immediately - let Next.js body parser trigger it via resume() or read()
+  // The body will be emitted when:
+  // 1. Next.js calls req.resume() (most common for body parsers)
+  // 2. Next.js calls req.read() (via our override above)
+  // 3. Next.js pipes the request (via our pipe() override)
+
   // EventEmitter methods (delegate to EventEmitter)
-  req.on = EventEmitter.prototype.on.bind(req);
+  // Override 'on' to automatically emit body when 'data' listener is added
+  const originalOn = EventEmitter.prototype.on.bind(req);
+  req.on = function (event, listener) {
+    const result = originalOn(event, listener);
+    // When Next.js adds a 'data' listener, emit the body immediately
+    if (event === 'data' && bodyBuffer && !this.readableEnded) {
+      process.nextTick(() => {
+        if (bodyBuffer && !this.readableEnded) {
+          this.emit('data', bodyBuffer);
+          this.emit('end');
+          this.readableEnded = true;
+          this.complete = true;
+          bodyBuffer = null;
+        }
+      });
+    }
+    return result;
+  };
   req.once = EventEmitter.prototype.once.bind(req);
   req.emit = EventEmitter.prototype.emit.bind(req);
   req.removeListener = EventEmitter.prototype.removeListener.bind(req);
@@ -195,26 +242,47 @@ function createMockRequest(url, method, headers, body) {
   req.listeners = EventEmitter.prototype.listeners.bind(req);
   req.listenerCount = EventEmitter.prototype.listenerCount.bind(req);
 
-  // Stream methods
-  req.read = function (size) {
-    return null;
-  };
+  // Stream methods - read() is already set above for body handling
   req.setEncoding = function (encoding) {
+    this._encoding = encoding;
     return this;
   };
   req.pause = function () {
+    this.readableFlowing = false;
     return this;
   };
   req.resume = function () {
+    this.readableFlowing = true;
+    // If body exists and hasn't been emitted, emit it now
+    // This is called by Next.js body parsers
+    if (bodyBuffer && !this.readableEnded) {
+      this.emit('data', bodyBuffer);
+      this.emit('end');
+      this.readableEnded = true;
+      this.complete = true;
+      bodyBuffer = null;
+    }
     return this;
   };
   req.pipe = function (dest) {
+    // Pipe body to destination
+    if (bodyBuffer) {
+      dest.write(bodyBuffer);
+      dest.end();
+      bodyBuffer = null;
+    }
     return dest;
   };
   req.unpipe = function (dest) {
     return this;
   };
   req.unshift = function (chunk) {
+    // Prepend chunk to body buffer
+    if (bodyBuffer) {
+      bodyBuffer = Buffer.concat([Buffer.from(chunk), bodyBuffer]);
+    } else {
+      bodyBuffer = Buffer.from(chunk);
+    }
     return this;
   };
   req.wrap = function (stream) {
