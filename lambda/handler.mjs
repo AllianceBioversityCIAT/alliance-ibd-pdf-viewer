@@ -221,7 +221,9 @@ function createMockRequest(url, method, headers, body) {
   // Return Buffer (which is what Node.js streams return)
   // If encoding is set, return string; otherwise return Buffer
   req.read = function (size) {
+    console.log('[MockRequest] read() called with size:', size, 'bodyBuffer exists:', !!bodyBuffer);
     if (!bodyBuffer) {
+      console.log('[MockRequest] read() returning null (EOF)');
       return null; // EOF
     }
     const data = this._encoding && bodyString ? bodyString : bodyBuffer;
@@ -253,10 +255,12 @@ function createMockRequest(url, method, headers, body) {
   // Next.js will convert Buffer to string internally when needed
   const originalOn = EventEmitter.prototype.on.bind(req);
   req.on = function (event, listener) {
+    console.log('[MockRequest] on() called with event:', event, 'listener type:', typeof listener, 'listener name:', listener?.name || 'anonymous');
     const result = originalOn(event, listener);
     // When Next.js adds a 'data' listener, emit the body immediately
     // This is critical: Next.js body parsers use 'data' events to read the stream
     if (event === 'data' && bodyBuffer && !this.readableEnded) {
+      console.log('[MockRequest] Data listener added, bodyBuffer exists:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
       // Use setImmediate to ensure listener is registered before emitting
       setImmediate(() => {
         if (bodyBuffer && !this.readableEnded) {
@@ -286,8 +290,10 @@ function createMockRequest(url, method, headers, body) {
   // Also override 'once' for the same reason
   const originalOnce = EventEmitter.prototype.once.bind(req);
   req.once = function (event, listener) {
+    console.log('[MockRequest] once() called with event:', event, 'listener type:', typeof listener);
     const result = originalOnce(event, listener);
     if (event === 'data' && bodyBuffer && !this.readableEnded) {
+      console.log('[MockRequest] Data listener added (once), bodyBuffer exists:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
       setImmediate(() => {
         if (bodyBuffer && !this.readableEnded) {
           // Check if encoding is set - if so, emit string; otherwise emit Buffer
@@ -307,6 +313,8 @@ function createMockRequest(url, method, headers, body) {
           this.complete = true;
           bodyBuffer = null;
           bodyString = null;
+        } else {
+          console.log('[MockRequest] Body not emitted (once) - bodyBuffer:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
         }
       });
     }
@@ -334,6 +342,7 @@ function createMockRequest(url, method, headers, body) {
     return this;
   };
   req.resume = function () {
+    console.log('[MockRequest] resume() called, bodyBuffer exists:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
     this.readableFlowing = true;
     // If body exists and hasn't been emitted, emit it now
     // This is called by Next.js body parsers
@@ -355,6 +364,8 @@ function createMockRequest(url, method, headers, body) {
       this.complete = true;
       bodyBuffer = null;
       bodyString = null;
+    } else {
+      console.log('[MockRequest] resume() called but body not emitted - bodyBuffer:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
     }
     return this;
   };
