@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import http from 'http';
 import { EventEmitter } from 'events';
+import { Readable } from 'stream';
 import { readFileSync, existsSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -146,11 +147,38 @@ async function getRequestHandler() {
  * Create a complete mock IncomingMessage object
  * This needs to have all the properties and methods that Next.js expects
  */
-function createMockRequest(url, method, headers, body) {
-  // Create an EventEmitter-like object for the request
-  const req = Object.create(EventEmitter.prototype);
 
-  // Set properties
+function createMockRequest(url, method, headers, body) {
+  // Normalize body into a Buffer once so it can be streamed or stringified safely
+  let bodyBuffer = null;
+  if (body) {
+    if (typeof body === 'string') {
+      bodyBuffer = Buffer.from(body, 'utf8');
+      console.log('[createMockRequest] Body is string, length:', bodyBuffer.length);
+    } else if (Buffer.isBuffer(body)) {
+      bodyBuffer = body;
+      console.log('[createMockRequest] Body is Buffer, length:', bodyBuffer.length);
+    } else {
+      bodyBuffer = Buffer.from(typeof body === 'object' ? JSON.stringify(body) : String(body), 'utf8');
+      console.warn('[createMockRequest] Body was non-string/non-Buffer, stringified. Length:', bodyBuffer.length);
+    }
+  } else {
+    console.log('[createMockRequest] No body provided');
+  }
+
+  // Use a real Readable stream so Next.js body parsing (which relies on Node streams & async iterators)
+  // works reliably. The stream will push the body once and then end.
+  const req = new Readable({
+    read() {
+      if (bodyBuffer && !this._bodyPushed) {
+        this._bodyPushed = true;
+        this.push(bodyBuffer);
+      }
+      this.push(null);
+    }
+  });
+
+  // Core request properties expected by Next.js' Node server
   req.url = url;
   req.method = method;
   req.headers = headers;
@@ -166,7 +194,6 @@ function createMockRequest(url, method, headers, body) {
   req.complete = false;
   req.aborted = false;
   req.upgrade = false;
-  req.readable = true;
   req.socket = {
     remoteAddress: '127.0.0.1',
     remotePort: 0,
@@ -175,289 +202,11 @@ function createMockRequest(url, method, headers, body) {
   };
   req.connection = req.socket;
 
-  // Body handling - make body available as a readable stream
-  // Next.js reads the body from the request stream, so we need to emit data events
-  // IMPORTANT: Store both string and Buffer versions
-  // Next.js body parsers expect strings, but we also need Buffer for stream operations
-  let bodyString = null;
-  let bodyBuffer = null;
-  if (body) {
-    if (typeof body === 'string') {
-      bodyString = body;
-      bodyBuffer = Buffer.from(body, 'utf8');
-      console.log('[createMockRequest] Body is string, length:', bodyString.length);
-    } else if (Buffer.isBuffer(body)) {
-      bodyString = body.toString('utf8');
-      bodyBuffer = body;
-      console.log('[createMockRequest] Body is Buffer, converted to string, length:', bodyString.length);
-    } else {
-      // If body is an object, stringify it (shouldn't happen, but handle gracefully)
-      console.warn('[createMockRequest] Body is not string or Buffer, type:', typeof body);
-      console.warn('[createMockRequest] Body value:', body);
-      bodyString = typeof body === 'object' ? JSON.stringify(body) : String(body);
-      bodyBuffer = Buffer.from(bodyString, 'utf8');
-      console.log('[createMockRequest] Body converted to string, length:', bodyString.length);
-    }
-    // CRITICAL FIX: Next.js API routes (App Router) convert IncomingMessage to Request
-    // When Next.js accesses req.body, it expects a ReadableStream that it can read via req.json()
-    // The problem: If we return a ReadableStream, Next.js may try to parse it directly as JSON
-    // The solution: Return a ReadableStream that can be read correctly, ensuring it's not locked
-    // Next.js will read the stream via req.json(), which internally calls request.body.getReader()
-    Object.defineProperty(req, 'body', {
-      get: function () {
-        console.log('[MockRequest] req.body accessed via getter');
+  // Expose body helper fields for any downstream logging/handlers
+  req._bodyBuffer = bodyBuffer;
+  req._bodyString = bodyBuffer ? bodyBuffer.toString('utf8') : null;
 
-        // If bodyString exists, create a fresh ReadableStream that can be read
-        if (bodyString) {
-          console.log('[MockRequest] Creating ReadableStream from bodyString, length:', bodyString.length);
-
-          // Create a new ReadableStream that can be read by Next.js
-          // IMPORTANT: This stream must be readable and not locked
-          const encoder = new TextEncoder();
-          return new ReadableStream({
-            start(controller) {
-              // Enqueue the body data immediately
-              controller.enqueue(encoder.encode(bodyString));
-              controller.close();
-            }
-          });
-        } else if (bodyBuffer) {
-          // If bodyBuffer exists, convert to string and create stream
-          const converted = bodyBuffer.toString('utf8');
-          bodyString = converted; // Cache it
-          console.log('[MockRequest] Converted bodyBuffer to string, creating ReadableStream, length:', converted.length);
-
-          const encoder = new TextEncoder();
-          return new ReadableStream({
-            start(controller) {
-              controller.enqueue(encoder.encode(converted));
-              controller.close();
-            }
-          });
-        } else {
-          console.log('[MockRequest] No body available, returning null');
-          return null;
-        }
-      },
-      set: function (value) {
-        console.log('[MockRequest] req.body set to:', typeof value, 'constructor:', value?.constructor?.name);
-        // Allow Next.js body parser to set the parsed body
-        if (typeof value === 'string') {
-          bodyString = value;
-          bodyBuffer = Buffer.from(value, 'utf8');
-          console.log('[MockRequest] Set body as string, length:', value.length);
-        } else if (Buffer.isBuffer(value)) {
-          bodyString = value.toString('utf8');
-          bodyBuffer = value;
-          console.log('[MockRequest] Set body as Buffer, converted to string, length:', bodyString.length);
-        } else if (value === null || value === undefined) {
-          bodyString = null;
-          bodyBuffer = null;
-          console.log('[MockRequest] Set body to null/undefined');
-        } else {
-          // For objects, stringify them (but this shouldn't happen - body should always be string)
-          console.warn('[MockRequest] Setting body to non-string/non-Buffer value, stringifying');
-          bodyString = JSON.stringify(value);
-          bodyBuffer = Buffer.from(bodyString, 'utf8');
-          console.log('[MockRequest] Stringified body, length:', bodyString.length);
-        }
-      },
-      enumerable: true,
-      configurable: true
-    });
-    // Also store as internal properties for stream operations
-    req._bodyString = bodyString;
-    req._bodyBuffer = bodyBuffer;
-  } else {
-    console.log('[createMockRequest] No body provided');
-  }
-
-  // Make request readable as a stream
-  // Next.js will read from the stream using 'data' events
-  req.readable = true;
-  req.readableEnded = false;
-  req.readableFlowing = null;
-  req.readableObjectMode = false;
-
-  // Override read() to return body data
-  // Next.js body parsers can read via read() or 'data' events
-  // Return Buffer (which is what Node.js streams return)
-  // If encoding is set, return string; otherwise return Buffer
-  req.read = function (size) {
-    console.log('[MockRequest] read() called with size:', size, 'bodyBuffer exists:', !!bodyBuffer);
-    if (!bodyBuffer) {
-      console.log('[MockRequest] read() returning null (EOF)');
-      return null; // EOF
-    }
-    const data = this._encoding && bodyString ? bodyString : bodyBuffer;
-    console.log('[MockRequest] read() called, encoding:', this._encoding || 'none', 'returning:', typeof data, 'length:', data.length);
-    if (bodyString) {
-      console.log('[MockRequest] Body content being returned (first 500 chars):', bodyString.substring(0, 500));
-      console.log('[MockRequest] Body content being returned (full):', bodyString);
-    } else {
-      console.log('[MockRequest] Body content being returned (Buffer, first 500 bytes as string):', bodyBuffer.toString('utf8').substring(0, 500));
-      console.log('[MockRequest] Body content being returned (Buffer, full as string):', bodyBuffer.toString('utf8'));
-    }
-    // Don't clear bodyString/bodyBuffer here - Next.js might access req.body multiple times
-    // Only mark as ended
-    req.readableEnded = true;
-    req.emit('end');
-    return data;
-  };
-
-  // Don't emit data immediately - let Next.js body parser trigger it via resume() or read()
-  // The body will be emitted when:
-  // 1. Next.js calls req.resume() (most common for body parsers)
-  // 2. Next.js calls req.read() (via our override above)
-  // 3. Next.js pipes the request (via our pipe() override)
-
-  // EventEmitter methods (delegate to EventEmitter)
-  // Override 'on' to automatically emit body when 'data' listener is added
-  // Next.js body parsers listen for 'data' events to read the stream
-  // CRITICAL: Emit Buffer (not string) - Node.js streams emit Buffers
-  // Next.js will convert Buffer to string internally when needed
-  const originalOn = EventEmitter.prototype.on.bind(req);
-  req.on = function (event, listener) {
-    console.log('[MockRequest] on() called with event:', event, 'listener type:', typeof listener, 'listener name:', listener?.name || 'anonymous');
-    const result = originalOn(event, listener);
-    // When Next.js adds a 'data' listener, emit the body immediately
-    // This is critical: Next.js body parsers use 'data' events to read the stream
-    if (event === 'data' && bodyBuffer && !this.readableEnded) {
-      console.log('[MockRequest] Data listener added, bodyBuffer exists:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
-      // Use setImmediate to ensure listener is registered before emitting
-      setImmediate(() => {
-        if (bodyBuffer && !this.readableEnded) {
-          // Check if encoding is set - if so, emit string; otherwise emit Buffer
-          const dataToEmit = this._encoding && bodyString ? bodyString : bodyBuffer;
-          console.log('[MockRequest] Emitting body data via on("data"), encoding:', this._encoding || 'none', 'type:', typeof dataToEmit, 'length:', dataToEmit.length);
-          if (bodyString) {
-            console.log('[MockRequest] Body content being emitted (first 500 chars):', bodyString.substring(0, 500));
-            console.log('[MockRequest] Body content being emitted (full):', bodyString);
-          } else {
-            console.log('[MockRequest] Body content being emitted (Buffer, first 500 bytes as string):', bodyBuffer.toString('utf8').substring(0, 500));
-            console.log('[MockRequest] Body content being emitted (Buffer, full as string):', bodyBuffer.toString('utf8'));
-          }
-          // Emit Buffer (default) or string (if encoding is set)
-          this.emit('data', dataToEmit);
-          this.emit('end');
-          this.readableEnded = true;
-          this.complete = true;
-          // Don't clear bodyBuffer/bodyString - Next.js might access req.body multiple times
-          // The getter will still return the string
-        }
-      });
-    }
-    return result;
-  };
-
-  // Also override 'once' for the same reason
-  const originalOnce = EventEmitter.prototype.once.bind(req);
-  req.once = function (event, listener) {
-    console.log('[MockRequest] once() called with event:', event, 'listener type:', typeof listener);
-    const result = originalOnce(event, listener);
-    if (event === 'data' && bodyBuffer && !this.readableEnded) {
-      console.log('[MockRequest] Data listener added (once), bodyBuffer exists:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
-      setImmediate(() => {
-        if (bodyBuffer && !this.readableEnded) {
-          // Check if encoding is set - if so, emit string; otherwise emit Buffer
-          const dataToEmit = this._encoding && bodyString ? bodyString : bodyBuffer;
-          console.log('[MockRequest] Emitting body data via once("data"), encoding:', this._encoding || 'none', 'type:', typeof dataToEmit, 'length:', dataToEmit.length);
-          if (bodyString) {
-            console.log('[MockRequest] Body content being emitted (first 500 chars):', bodyString.substring(0, 500));
-            console.log('[MockRequest] Body content being emitted (full):', bodyString);
-          } else {
-            console.log('[MockRequest] Body content being emitted (Buffer, first 500 bytes as string):', bodyBuffer.toString('utf8').substring(0, 500));
-            console.log('[MockRequest] Body content being emitted (Buffer, full as string):', bodyBuffer.toString('utf8'));
-          }
-          // Emit Buffer (default) or string (if encoding is set)
-          this.emit('data', dataToEmit);
-          this.emit('end');
-          this.readableEnded = true;
-          this.complete = true;
-          // Don't clear bodyBuffer/bodyString - Next.js might access req.body multiple times
-          // The getter will still return the string
-        } else {
-          console.log('[MockRequest] Body not emitted (once) - bodyBuffer:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
-        }
-      });
-    }
-    return result;
-  };
-  req.emit = EventEmitter.prototype.emit.bind(req);
-  req.removeListener = EventEmitter.prototype.removeListener.bind(req);
-  req.removeAllListeners = EventEmitter.prototype.removeAllListeners.bind(req);
-  req.setMaxListeners = EventEmitter.prototype.setMaxListeners.bind(req);
-  req.getMaxListeners = EventEmitter.prototype.getMaxListeners.bind(req);
-  req.listeners = EventEmitter.prototype.listeners.bind(req);
-  req.listenerCount = EventEmitter.prototype.listenerCount.bind(req);
-
-  // Stream methods - read() is already set above for body handling
-  // setEncoding() affects how data is emitted - if encoding is set, emit strings instead of Buffers
-  req.setEncoding = function (encoding) {
-    this._encoding = encoding;
-    console.log('[MockRequest] setEncoding() called with:', encoding);
-    // If encoding is set, we need to emit strings instead of Buffers
-    // But we'll handle this in the emit handlers
-    return this;
-  };
-  req.pause = function () {
-    this.readableFlowing = false;
-    return this;
-  };
-  req.resume = function () {
-    console.log('[MockRequest] resume() called, bodyBuffer exists:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
-    this.readableFlowing = true;
-    // If body exists and hasn't been emitted, emit it now
-    // This is called by Next.js body parsers
-    if (bodyBuffer && !this.readableEnded) {
-      // Check if encoding is set - if so, emit string; otherwise emit Buffer
-      const dataToEmit = this._encoding && bodyString ? bodyString : bodyBuffer;
-      console.log('[MockRequest] resume() called, emitting body, encoding:', this._encoding || 'none', 'type:', typeof dataToEmit, 'length:', dataToEmit.length);
-      if (bodyString) {
-        console.log('[MockRequest] Body content being emitted (first 500 chars):', bodyString.substring(0, 500));
-        console.log('[MockRequest] Body content being emitted (full):', bodyString);
-      } else {
-        console.log('[MockRequest] Body content being emitted (Buffer, first 500 bytes as string):', bodyBuffer.toString('utf8').substring(0, 500));
-        console.log('[MockRequest] Body content being emitted (Buffer, full as string):', bodyBuffer.toString('utf8'));
-      }
-      // Emit Buffer (default) or string (if encoding is set)
-      this.emit('data', dataToEmit);
-      this.emit('end');
-      this.readableEnded = true;
-      this.complete = true;
-      // Don't clear bodyBuffer/bodyString - Next.js might access req.body multiple times
-      // The getter will still return the string
-    } else {
-      console.log('[MockRequest] resume() called but body not emitted - bodyBuffer:', !!bodyBuffer, 'readableEnded:', this.readableEnded);
-    }
-    return this;
-  };
-  req.pipe = function (dest) {
-    // Pipe body to destination
-    if (bodyBuffer) {
-      dest.write(bodyBuffer);
-      dest.end();
-      bodyBuffer = null;
-    }
-    return dest;
-  };
-  req.unpipe = function (dest) {
-    return this;
-  };
-  req.unshift = function (chunk) {
-    // Prepend chunk to body buffer
-    if (bodyBuffer) {
-      bodyBuffer = Buffer.concat([Buffer.from(chunk), bodyBuffer]);
-    } else {
-      bodyBuffer = Buffer.from(chunk);
-    }
-    return this;
-  };
-  req.wrap = function (stream) {
-    return this;
-  };
-
-  // Additional methods
+  // Convenience helpers to mimic IncomingMessage API used by Next
   req.getHeader = function (name) {
     return this.headers[name.toLowerCase()];
   };
@@ -476,13 +225,17 @@ function createMockRequest(url, method, headers, body) {
     return name.toLowerCase() in this.headers;
   };
 
+  // Provide explicit async iterator for environments that consume the request via for-await
+  req[Symbol.asyncIterator] = async function* () {
+    if (bodyBuffer && !this._iterated) {
+      this._iterated = true;
+      yield bodyBuffer;
+    }
+  };
+
   return req;
 }
 
-/**
- * Create a complete mock ServerResponse object
- * This needs to have all the properties and methods that Next.js expects
- */
 function createMockResponse() {
   // Create an EventEmitter-like object for the response
   const res = Object.create(EventEmitter.prototype);
