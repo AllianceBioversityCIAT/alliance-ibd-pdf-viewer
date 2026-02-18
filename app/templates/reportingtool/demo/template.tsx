@@ -273,11 +273,7 @@ export default function Example({ data }: TemplateProps) {
       </div>
 
       {/* Right green strip */}
-      <img
-        src="/public/img.png"
-        className="w-[20px] h-full object-cover"
-        alt=""
-      />
+      <img src="/img.png" className="w-[20px] h-full object-cover" alt="" />
     </div>
   );
 }

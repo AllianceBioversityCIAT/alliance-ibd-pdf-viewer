@@ -35,7 +35,7 @@ export function QABox({
         style={{ width: 106, padding: "8px 17px" }}
       >
         <Image
-          src="/public/assets/prms/shield-badge.png"
+          src="/assets/prms/shield-badge.png"
           alt="Quality Assured"
           width={57}
           height={57}

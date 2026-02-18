@@ -134,7 +134,7 @@ function TheoryOfChangeCard({ toc }: Readonly<{ toc: TheoryOfChange }>) {
         <div className="flex items-center justify-center gap-1.5">
           <div className="bg-white rounded-full w-6 h-6 flex items-center justify-center">
             <Image
-              src="/public/assets/prms/icon-toc.png"
+              src="/assets/prms/icon-toc.png"
               alt=""
               width={18}
               height={8}
@@ -159,7 +159,7 @@ function TheoryOfChangeCard({ toc }: Readonly<{ toc: TheoryOfChange }>) {
             className="flex items-center gap-[2px] shrink-0"
           >
             <Image
-              src="/public/assets/prms/icon-link.svg"
+              src="/assets/prms/icon-link.svg"
               alt=""
               width={10}
               height={7}
@@ -339,11 +339,11 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
               style={{
                 width: 70,
                 height: 70,
-                WebkitMaskImage: `url(/public/assets/prms/${geo.geo_focus.toLowerCase()}-mask.svg)`,
+                WebkitMaskImage: `url(/assets/prms/${geo.geo_focus.toLowerCase()}-mask.svg)`,
                 WebkitMaskSize: "contain",
                 WebkitMaskRepeat: "no-repeat",
                 WebkitMaskPosition: "center",
-                maskImage: `url(/public/assets/prms/${geo.geo_focus.toLowerCase()}-mask.svg)`,
+                maskImage: `url(/assets/prms/${geo.geo_focus.toLowerCase()}-mask.svg)`,
                 maskSize: "contain",
                 maskRepeat: "no-repeat",
                 maskPosition: "center",
