@@ -549,13 +549,16 @@ function createServerRequestHandler(server) {
         const responseHeaders = res._headers || {};
         let responseBody = res._body || '';
 
+        // Normalize headers: ensure all header values are strings (not arrays)
+        const normalizedHeaders = {};
+        for (const [key, value] of Object.entries(responseHeaders)) {
+          normalizedHeaders[key] = Array.isArray(value) ? value.join(', ') : (typeof value === 'string' ? value : String(value || ''));
+        }
+
         // Check content-type to determine if response is binary
-        // Headers can be arrays in Node.js, so ensure we get a string
-        const contentTypeHeader = responseHeaders['content-type'] || responseHeaders['Content-Type'];
-        const contentType = Array.isArray(contentTypeHeader) 
-          ? contentTypeHeader[0] 
-          : (typeof contentTypeHeader === 'string' ? contentTypeHeader : '');
-        const isBinary = contentType && typeof contentType === 'string' && (
+        // Headers are now normalized to strings
+        const contentType = normalizedHeaders['content-type'] || normalizedHeaders['Content-Type'] || '';
+        const isBinary = contentType && (
           contentType.startsWith('image/') ||
           contentType.startsWith('application/octet-stream') ||
           contentType.startsWith('font/') ||
