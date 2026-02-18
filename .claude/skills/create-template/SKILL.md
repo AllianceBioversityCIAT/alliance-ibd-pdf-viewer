@@ -27,18 +27,18 @@ If the response is too large, use `get_metadata` first to get the node structure
 **This is mandatory.** Before creating anything, scan for reusable components:
 
 1. Read ALL `.tsx` files in `app/templates/` recursively
-2. Check if any of these patterns already exist as extracted components:
-   - Label-value pairs (`LabelValue`)
-   - Impact area cards (`ImpactAreaCard`)
-   - QA assessment boxes (`QABox`)
-   - Tag badges (`TagBadge`)
-   - Section headers, dividers, info grids
+2. Check the `results_p25/components/` library first — it contains many reusable components:
+   - `page-shell.tsx` — `PageShell`: standard PRMS header, sidebar strip, body wrapper
+   - `common-sections.tsx` — `SectionTitle`, `SubSectionTitle`, `LabelValue`, `ResultDetailsSection`, `ContributorsSection`, `GeographicSection`, `EvidenceSection`
+   - `qa-box.tsx` — `QABox` (shield badge), `KPQABox` (circle "KP")
+   - `impact-areas.tsx` — `ImpactAreaCard`, `OECDCriteria`
+   - `tables.tsx` — `DataTable`, `KeyValueTable`
 3. Check `public/assets/` for existing static assets (icons, logos, patterns)
 
 **Reuse rules:**
 
-- If a component already exists in another template that matches what the Figma design needs, **import and reuse it** — do NOT duplicate it. Extract it to a shared location if needed.
-- If a visual pattern repeats 2+ times within the new template, **extract it as a local component** in the same file with props for the varying parts.
+- If a component already exists in `results_p25/components/` or another template, **import and reuse it** — do NOT duplicate it.
+- If a visual pattern repeats 2+ times within the new template, **extract it as a local component** with props for the varying parts.
 - Components should only receive **text strings, numbers, booleans, and URLs** as props. Never pass JSX or complex rendering logic as props.
 - Icon/image URLs come from the data JSON — store static assets in `public/assets/{project}/` and reference via data props.
 
@@ -54,6 +54,9 @@ Define a TypeScript interface for the JSON data the template expects:
 
 ### Step 4: Build the template
 
+**Two formats are supported:**
+
+#### File-based (simple templates)
 Create `app/templates/{project}/{template-name}.tsx`:
 
 ```tsx
@@ -67,13 +70,27 @@ export default function MyTemplate({ data }: TemplateProps) {
   const d = data as MyData | null;
   return (
     <div style={{ fontFamily: "'Noto Sans', sans-serif" }}>
-      {/* Google Fonts - include if using Noto Sans/Serif */}
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;700&family=Noto+Serif:wght@400;500&display=swap');`}</style>
       {/* ... template content ... */}
     </div>
   );
 }
 ```
+
+#### Folder-based (complex templates with shared components)
+Create `app/templates/{project}/{template-name}/template.tsx`:
+
+```
+{template-name}/
+  template.tsx          ← entry point (import TemplateProps from "../..")
+  template.demo.json    ← demo data
+  types.ts              ← TypeScript interfaces
+  transform.ts          ← data extraction helpers
+  components/           ← sub-components (NOT discovered as templates)
+    my-component.tsx
+```
+
+**Naming restriction**: Never name files `layout.tsx`, `page.tsx`, `loading.tsx` inside `app/` — Next.js treats them as App Router route files.
 
 **Layout rules (CRITICAL):**
 
@@ -123,11 +140,11 @@ Figma asset URLs expire after 7 days — download immediately. Store in `public/
 
 ### Step 6: Create demo data
 
-Create `app/templates/{project}/{template-name}.demo.json` with realistic dummy data matching your interface. This lets you test via:
+Create demo data matching your interface:
+- **File-based**: `app/templates/{project}/{template-name}.demo.json`
+- **Folder-based**: `app/templates/{project}/{template-name}/template.demo.json`
 
-```
-http://localhost:3000/{template-name}?demo=true
-```
+Test via: `http://localhost:3000/{template-name}?demo=true`
 
 ### Step 7: Validate
 
@@ -140,12 +157,14 @@ http://localhost:3000/{template-name}?demo=true
 
 Before finishing, confirm:
 
+- [ ] Checked `results_p25/components/` for reusable components (PageShell, SectionTitle, QABox, DataTable, etc.)
 - [ ] No duplicate components — anything that exists elsewhere was imported, not copied
 - [ ] Repeating patterns within the template are extracted as local components
 - [ ] All dynamic content comes from the `data` prop, not hardcoded
 - [ ] No duplicate assets — verified existing `public/assets/` before downloading
 - [ ] Static assets are stored in `public/assets/` and referenced correctly
 - [ ] No pagination, no fixed-height layouts, no absolute positioning on content
+- [ ] No files named `layout.tsx`, `page.tsx`, or other App Router conventions inside component folders
 - [ ] Demo JSON created with realistic test data
 - [ ] TypeScript compiles cleanly
 - [ ] **Colors visually verified** against Figma screenshot — not just copied from MCP code output

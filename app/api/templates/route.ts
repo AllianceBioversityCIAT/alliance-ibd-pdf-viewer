@@ -14,8 +14,19 @@ function walk(dir: string): TemplateInfo[] {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
-      results.push(...walk(full));
-    } else if (entry.endsWith(".tsx") && entry !== "index.tsx") {
+      // Folder-based template: directory contains template.tsx
+      const templateFile = join(full, "template.tsx");
+      if (existsSync(templateFile)) {
+        const demoFile = join(full, "template.demo.json");
+        results.push({ name: entry, hasDemo: existsSync(demoFile) });
+      } else {
+        results.push(...walk(full));
+      }
+    } else if (
+      entry.endsWith(".tsx") &&
+      entry !== "index.tsx" &&
+      entry !== "components.tsx"
+    ) {
       const name = entry.replace(/\.tsx$/, "");
       const demoFile = join(dir, `${name}.demo.json`);
       results.push({ name, hasDemo: existsSync(demoFile) });

@@ -19,6 +19,11 @@ function findInDir(dir: string, fileName: string): string | null {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
+      // Folder-based template: {name}/template.tsx
+      if (entry === fileName.replace(/\.tsx$/, "")) {
+        const templateFile = join(full, "template.tsx");
+        if (existsSync(templateFile)) return templateFile;
+      }
       const found = findInDir(full, fileName);
       if (found) return found;
     } else if (entry === fileName) {
@@ -41,9 +46,13 @@ function findTemplate(name: string): string | null {
 
 function loadDemoData(templatePath: string): unknown | null {
   const base = join(process.cwd(), "app", "templates");
+  // File-based: {name}.demo.json  |  Folder-based: {name}/template.demo.json
   const demoFile = join(base, `${templatePath}.demo.json`);
-  if (!existsSync(demoFile)) return null;
-  return JSON.parse(readFileSync(demoFile, "utf-8"));
+  if (existsSync(demoFile)) return JSON.parse(readFileSync(demoFile, "utf-8"));
+  // For folder-based templates, templatePath ends with "{name}/template"
+  const folderDemo = join(base, templatePath.replace(/\/template$/, ""), "template.demo.json");
+  if (existsSync(folderDemo)) return JSON.parse(readFileSync(folderDemo, "utf-8"));
+  return null;
 }
 
 export default async function TemplatePage({ params, searchParams }: Props) {

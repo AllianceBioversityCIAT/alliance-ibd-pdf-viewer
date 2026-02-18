@@ -1,0 +1,180 @@
+{
+  "rt_id": 7,
+  "result_code": 5892,
+  "result_name": "Integrating traditional agricultural practices with modern technology for enhanced productivity",
+  "result_type": "Innovation Development",
+  "result_level": "Output",
+  "result_description": "The content of the Planting Date Advisories was developed into messages and disseminated to farmers across Bihar through the dissemination platforms of BAU, JEEViKA and IFFCO kisan. The advisories were approved and accepted by the Convergence Platform in the form of text and audio to be disseminated to farmers across the state.",
+  "title": "Planting Date Advisories disseminated in Africa",
+  "phase_name": "Reporting 2025",
+  "generation_date_footer": "Tuesday, June 18th, 2025, at 21:18 CET",
+  "submission_status": "Submitted",
+  "submission_data": "2025-06-18",
+  "primary_submitter_name": "Science Program (SP) 02 - Sustainable Farming",
+  "lead_contact_person": "Obilo Chinyere",
+  "result_lead": "o.chinyere@cgiar.org",
+  "nutrition_tag": "(2) Principal",
+  "climate_tag": "(0) Not targeted",
+  "poverty_tag": "(0) Not targeted",
+  "gender_tag": "(1) Significant",
+  "environmental_tag": "(1) Significant",
+  "portfolio_acronym": "P25",
+  "is_krs": "No",
+  "krs_link": null,
+  "geo_focus": "Global",
+  "regions": ["Eastern Africa", "Southern Africa", "Western Africa"],
+  "countries": ["Ethiopia", "South Africa"],
+  "subnational": null,
+  "toc_primary": [
+    {
+      "initiative_short_name": "Science program 02 - Sustainable Farming",
+      "action_area": "Area of work 01 - Climate Adaptation and Mitigation",
+      "toc_result_title": "Climate hazards to prioritized geographies and systems",
+      "indicator": "Number of quantified climate change-related hazards that affect agronomic"
+    }
+  ],
+  "primary_submitter_data": {
+    "toc_url": "https://toc.cgiar.org/diagram/sp02"
+  },
+  "contributing_centers": [
+    {
+      "center_name": "International Potato Center / Centro Internacional de la Papa (CIP)",
+      "is_primary_center": 1
+    },
+    {
+      "center_name": "Africa Rice Center / Centro Africano del Arroz (AfricaRice)",
+      "is_primary_center": 0
+    }
+  ],
+  "contributing_initiatives": [
+    {
+      "initiative_short_name": "Science Program (SP) 01 - Breeding for tomorrow"
+    }
+  ],
+  "non_pooled_projects": [
+    {
+      "project_title": "IWMI - Implementation of conservation agriculture in Africa and Asia"
+    },
+    {
+      "project_title": "ICARDA - Farmers trained on protection against wheat disease apply CGIAR innovation in their work"
+    }
+  ],
+  "linked_evidences": [
+    {
+      "details": null,
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "gender_related": false,
+      "climate_related": true,
+      "poverty_related": false,
+      "nutrition_related": true,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "Agriculture is a transformative shift that redefines how we grow food, combining scientific knowledge, cutting-edge technology, and a long-term vision centered on sustainability.",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Info%20Hub.aspx",
+      "gender_related": true,
+      "climate_related": false,
+      "poverty_related": true,
+      "nutrition_related": false,
+      "environmental_biodiversity_related": true
+    }
+  ],
+  "materials_evidence": [
+    {
+      "label": "Materials Evidence",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Info%20Hub.aspx"
+    }
+  ],
+  "partners_applicable": "Yes",
+  "non_kp_partner_data": [
+    {
+      "partner_name": "JEEVIKA - Jeevika",
+      "country_hq_name": "India (IN)",
+      "institution_type": "NGO Local (General)"
+    },
+    {
+      "partner_name": "DOA - Department of Agriculture West Bengal (India)",
+      "country_hq_name": "India (IN)",
+      "institution_type": "Government (Subnational)"
+    }
+  ],
+  "kp_partner_data": null,
+  "qa_adjustments": [
+    {
+      "label": "Innovation Readiness",
+      "from_value": "Level 5",
+      "to_value": "Level 7"
+    }
+  ],
+  "bundled_innovations": [
+    {
+      "portfolio": "P25",
+      "phase": "2025",
+      "code": "5892",
+      "indicator": "Policy Change",
+      "title": "Youth engagement in agricultural transformation"
+    },
+    {
+      "portfolio": "P25",
+      "phase": "2025",
+      "code": "5892",
+      "indicator": "Policy Change",
+      "title": "Empowering farmers through sustainable agricultural practices"
+    }
+  ],
+  "readiness_level": "Level 7",
+  "readiness_details": "Prototype",
+  "readiness_justification": "Scaling report included to show level 7, as we are conducting uncontrolled testing right now. Launch events and several testing workshops with users were held in 2023.",
+  "innovation_nature": "Incremental innovation (Innovations that already exist and undergo constant, steady progress, and improvement.)",
+  "innovation_type": "Capacity development innovation (Innovations that strengthen capacity, including farmer, extension or investor decision-support services; accelerator/ incubator programs; manuals, training programs and curricula; online courses.)",
+  "url_readiness": null,
+  "innovation_developers": [
+    {
+      "name": "Amit Srivastava",
+      "email": "A.srivastava@cgiar.org",
+      "institution": "International Rice Research Institute (IRRI)"
+    }
+  ],
+  "innovation_collaborators": [
+    { "name": "Virender Kumar", "email": "virender.kumar@irri.org" },
+    { "name": "Prakashan Chellattan Veettil", "email": "pcveettil@irri.org" },
+    { "name": "Balwinder Singh", "email": "pcveettil@irri.org" }
+  ],
+  "innovation_investments": [
+    {
+      "entity": "CGIAR Science Program/ Accelerator",
+      "name": "Not provided",
+      "usd_investment": "Not provided"
+    },
+    {
+      "entity": "CGIAR W3 or bilateral projects",
+      "name": "International Maize and Wheat Improvement Center / Centro Internacional de Mejoramiento de Maíz y Trigo",
+      "usd_investment": "$5,000"
+    },
+    {
+      "entity": "Partners",
+      "name": "DOA - Department of Agriculture West Bengal (India)",
+      "usd_investment": "$8,000"
+    }
+  ],
+  "innovation_actors": [
+    {
+      "type": "Farmers/(agro) pastoralist/herders/fishers",
+      "actors": "Men (Non-youth)"
+    },
+    {
+      "type": "Researchers",
+      "actors": "Sex and age disaggregation does not apply"
+    }
+  ],
+  "innovation_organizations": [
+    {
+      "type": "Research organizations and universities",
+      "subtype": "Research organizations and universities International (Universities)"
+    }
+  ],
+  "linked_results": [],
+  "previous_portfolio": [],
+  "has_actor_data": "No",
+  "actor_data": null
+}
