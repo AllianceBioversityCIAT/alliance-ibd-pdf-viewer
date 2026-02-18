@@ -25,10 +25,9 @@ if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = 'production';
 }
 
-// Set working directory to standalone directory so Next.js can find static files
-// Next.js standalone expects to run from its own directory
-const STANDALONE_DIR = join(__dirname, '.next', 'standalone');
-process.chdir(STANDALONE_DIR);
+// IMPORTANT: Keep process.cwd() at the Lambda task root (where /public lives).
+// Changing cwd to .next/standalone breaks Next.js static file resolution because
+// it looks for public assets relative to process.cwd().
 
 let requestHandler = null;
 let interceptedServer = null;
