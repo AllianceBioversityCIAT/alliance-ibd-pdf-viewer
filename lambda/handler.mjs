@@ -749,45 +749,40 @@ function createServerRequestHandler(server) {
         if (typeof request.body === 'string') {
           body = request.body;
           console.log('[createServerRequestHandler] Body is string, length:', body.length);
-          console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
-          console.log('[createServerRequestHandler] Body content (full):', body);
         } else if (Buffer.isBuffer(request.body)) {
           body = request.body.toString('utf8');
           console.log('[createServerRequestHandler] Body is Buffer, converted to string, length:', body.length);
-          console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
-          console.log('[createServerRequestHandler] Body content (full):', body);
         } else if (request.body instanceof ReadableStream) {
-          // CRITICAL: Read ReadableStream ONCE and store as string
-          // Next.js will convert IncomingMessage to Request, which creates a new ReadableStream
-          // But we need to read it here to pass to the mock request
-          // The mock request's getter will return the string, which Next.js can use
+          // CRITICAL: DO NOT READ THE STREAM HERE
+          // Next.js needs to read it via req.json() or req.body
+          // If we read it here, the stream becomes locked and Next.js can't read it
+          // Instead, pass the ReadableStream directly to the mock request
+          // The mock request will create a new ReadableStream from the stored string when needed
           const contentType = headers['content-type'] || headers['Content-Type'] || '';
           console.log('[createServerRequestHandler] Body is ReadableStream, Content-Type:', contentType);
           console.log('[createServerRequestHandler] ReadableStream locked:', request.body.locked);
+          console.log('[createServerRequestHandler] NOT reading stream - passing to Next.js intact');
 
-          if (contentType.includes('application/json') || contentType.includes('text/') || !contentType) {
-            // For JSON/text, read as text
-            // If no content-type, assume text/JSON (common in Lambda Function URL)
-            // IMPORTANT: Read the stream ONCE here, store as string
-            body = await request.text();
-            console.log('[createServerRequestHandler] Read body as text, length:', body.length);
-            console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
-            console.log('[createServerRequestHandler] Body content (full):', body);
-          } else {
-            // For binary, read as arrayBuffer then convert to Buffer, then to string
-            const arrayBuffer = await request.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            body = buffer.toString('utf8'); // Convert to string for consistency
-            console.log('[createServerRequestHandler] Read body as binary, converted to string, length:', body.length);
-            console.log('[createServerRequestHandler] Body content (base64):', buffer.toString('base64').substring(0, 200));
+          // For logging only: clone the request to read body without consuming original
+          try {
+            const clonedRequest = request.clone();
+            const bodyText = await clonedRequest.text();
+            console.log('[createServerRequestHandler] Body length (from clone):', bodyText.length);
+            // Store as string for the mock request (Next.js will create its own ReadableStream)
+            body = bodyText;
+          } catch (cloneError) {
+            // If cloning fails, we can't log the body, but that's OK
+            // The original request body is still intact
+            console.warn('[createServerRequestHandler] Could not clone request for logging:', cloneError.message);
+            // We still need to pass something to createMockRequest
+            // But we can't read the stream, so we'll pass null and let Next.js handle it
+            body = null;
           }
         } else {
           // Fallback: try to read as text
           console.warn('[createServerRequestHandler] Unexpected body type:', typeof request.body, request.body?.constructor?.name);
           body = await request.text();
           console.log('[createServerRequestHandler] Read body as text (fallback), length:', body.length);
-          console.log('[createServerRequestHandler] Body content (first 500 chars):', body.substring(0, 500));
-          console.log('[createServerRequestHandler] Body content (full):', body);
         }
       } catch (error) {
         console.error('[createServerRequestHandler] Error reading request body:', {
