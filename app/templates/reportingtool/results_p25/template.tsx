@@ -16,8 +16,8 @@ import {
 } from "./components/common-sections";
 import { InnovationDevelopmentSections } from "./components/innovation-development";
 import { KPDetailsSection } from "./components/knowledge-product";
-import { PolicyChangePlaceholder } from "./components/policy-change";
-import { InnovationUsePlaceholder } from "./components/innovation-use";
+import { PolicyChangeSection } from "./components/policy-change";
+import { InnovationUseSections } from "./components/innovation-use";
 
 export default function ResultsP25({ data }: Readonly<TemplateProps>) {
   const d = data as PRMSResultData | null;
@@ -35,7 +35,23 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       phaseName={d?.phase_name ?? "—"}
     >
       {/* QA Box — KPQABox for Knowledge Products, standard QABox otherwise */}
-      {d?.rt_id === 6 ? <KPQABox /> : <QABox adjustments={d?.qa_adjustments} />}
+      {d?.rt_id === 6 ? (
+        <KPQABox />
+      ) : (
+        <QABox
+          adjustments={d?.qa_adjustments}
+          readinessTransition={
+            d?.rt_id === 2 &&
+            d?.innovation_readiness_from &&
+            d?.innovation_readiness_to
+              ? {
+                  from: d.innovation_readiness_from,
+                  to: d.innovation_readiness_to,
+                }
+              : undefined
+          }
+        />
+      )}
 
       {/* Common sections */}
       {d && <ResultDetailsSection data={d} impactAreas={impactAreas} />}
@@ -46,8 +62,8 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       {/* Variant-specific sections based on rt_id */}
       {d?.rt_id === 7 && <InnovationDevelopmentSections data={d} />}
       {d?.rt_id === 6 && <KPDetailsSection data={d} />}
-      {d?.rt_id === 1 && <PolicyChangePlaceholder />}
-      {d?.rt_id === 2 && <InnovationUsePlaceholder />}
+      {d?.rt_id === 1 && <PolicyChangeSection data={d} />}
+      {d?.rt_id === 2 && <InnovationUseSections data={d} />}
       {/* rt_id === 5 (Capacity Sharing) — common sections only, no extra content */}
     </PageShell>
   );

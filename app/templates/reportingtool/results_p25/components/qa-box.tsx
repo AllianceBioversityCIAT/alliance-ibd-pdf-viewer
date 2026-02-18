@@ -1,10 +1,33 @@
 import Image from "next/image";
 import type { QAAdjustment } from "../types";
-import { ArrowRightIcon } from "lucide-react";
+
+function ArrowRight() {
+  return (
+    <svg
+      width="11"
+      height="8"
+      viewBox="0 0 11 8"
+      fill="none"
+      className="text-[#033529] shrink-0"
+    >
+      <path
+        d="M7 1L10 4M10 4L7 7M10 4H1"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 export function QABox({
   adjustments,
-}: Readonly<{ adjustments?: QAAdjustment[] }>) {
+  readinessTransition,
+}: Readonly<{
+  adjustments?: QAAdjustment[];
+  readinessTransition?: { from: string; to: string };
+}>) {
   return (
     <div className="bg-[#e2e0df] flex overflow-hidden">
       <div
@@ -37,7 +60,25 @@ export function QABox({
             </a>
           </p>
         </div>
-        {adjustments && adjustments.length > 0 && (
+        {readinessTransition && (
+          <div className="flex flex-col gap-[5px]">
+            <p className="text-[#1d1d1d] text-[9px] font-bold leading-[1.15]">
+              Innovation Use:
+            </p>
+            <div className="flex items-center gap-[5px] text-[9px]">
+              <span className="mr-[2px]">&bull;</span>
+              <span className="text-[#393939]">
+                <span className="font-medium">Innovation Readiness:</span>{" "}
+                {readinessTransition.from}
+              </span>
+              <ArrowRight />
+              <span className="text-[#033529] font-medium">
+                {readinessTransition.to}
+              </span>
+            </div>
+          </div>
+        )}
+        {!readinessTransition && adjustments && adjustments.length > 0 && (
           <div className="flex flex-col gap-[5px]">
             <p className="text-[#1d1d1d] text-[9px] font-bold leading-[1.15]">
               Core data points that were adjusted during the QA process:
@@ -52,7 +93,7 @@ export function QABox({
                     <span className="font-medium">{adj.label}:</span>{" "}
                     {adj.from_value}
                   </span>
-                  <ArrowRightIcon className="w-[11px] h-[8px] text-[#033529]" />
+                  <ArrowRight />
                   <span className="text-[#033529] font-medium">
                     {adj.to_value}
                   </span>
