@@ -205,30 +205,53 @@ function createMockRequest(url, method, headers, body) {
       console.log('[createMockRequest] Body content (full):', bodyString);
     }
     // CRITICAL: Next.js in standalone mode may access req.body directly
-    // Make body available as a getter that returns the string when accessed
+    // Make body available as a getter that ALWAYS returns the string when accessed
     // This ensures Next.js can read the body even if it doesn't use the stream
     // Also need to ensure the stream can emit the body when Next.js reads via stream
     Object.defineProperty(req, 'body', {
       get: function () {
-        console.log('[MockRequest] req.body accessed via getter, returning:', typeof bodyString, 'length:', bodyString?.length || 0);
+        console.log('[MockRequest] req.body accessed via getter');
+        console.log('[MockRequest] bodyString type:', typeof bodyString, 'length:', bodyString?.length || 0);
+        console.log('[MockRequest] bodyBuffer exists:', !!bodyBuffer, 'type:', bodyBuffer?.constructor?.name);
+
+        // ALWAYS return string - Next.js body parsers expect string, not Buffer or object
         if (bodyString) {
           console.log('[MockRequest] req.body content (first 500 chars):', bodyString.substring(0, 500));
           console.log('[MockRequest] req.body content (full):', bodyString);
+          return bodyString;
+        } else if (bodyBuffer) {
+          // If bodyString is null but bodyBuffer exists, convert it
+          const converted = bodyBuffer.toString('utf8');
+          bodyString = converted; // Cache it
+          console.log('[MockRequest] Converted bodyBuffer to string, length:', converted.length);
+          console.log('[MockRequest] req.body content (first 500 chars):', converted.substring(0, 500));
+          console.log('[MockRequest] req.body content (full):', converted);
+          return converted;
+        } else {
+          console.log('[MockRequest] No body available, returning null');
+          return null;
         }
-        // Return string for Next.js body parsers (they expect string, not Buffer)
-        return bodyString;
       },
       set: function (value) {
-        console.log('[MockRequest] req.body set to:', typeof value, 'length:', value?.length || 0);
+        console.log('[MockRequest] req.body set to:', typeof value, 'constructor:', value?.constructor?.name);
         if (typeof value === 'string') {
           bodyString = value;
           bodyBuffer = Buffer.from(value, 'utf8');
+          console.log('[MockRequest] Set body as string, length:', value.length);
         } else if (Buffer.isBuffer(value)) {
           bodyString = value.toString('utf8');
           bodyBuffer = value;
+          console.log('[MockRequest] Set body as Buffer, converted to string, length:', bodyString.length);
+        } else if (value === null || value === undefined) {
+          bodyString = null;
+          bodyBuffer = null;
+          console.log('[MockRequest] Set body to null/undefined');
         } else {
-          bodyString = String(value);
+          // For objects, stringify them (but this shouldn't happen - body should always be string)
+          console.warn('[MockRequest] Setting body to non-string/non-Buffer value, stringifying');
+          bodyString = JSON.stringify(value);
           bodyBuffer = Buffer.from(bodyString, 'utf8');
+          console.log('[MockRequest] Stringified body, length:', bodyString.length);
         }
       },
       enumerable: true,
