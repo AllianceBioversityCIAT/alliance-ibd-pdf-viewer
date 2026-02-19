@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { Paginator } from "./paginator";
 
 interface PageShellProps {
   resultType: string;
@@ -101,10 +102,10 @@ export function PageShell({
         </div>
       </div>
 
-      {/* Body */}
-      <div className="flex flex-col gap-[20px] pt-5 pb-10 px-11 max-w-[calc(100%-13px)]">
+      {/* Body — Paginator reads paperHeight from URL and handles page breaks */}
+      <Paginator className="flex flex-col gap-[20px] pt-5 pb-10 px-11 max-w-[calc(100%-13px)]">
         {children}
-      </div>
+      </Paginator>
     </div>
   );
 }
