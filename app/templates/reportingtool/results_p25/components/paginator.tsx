@@ -44,6 +44,7 @@ export function Paginator({
   const searchParams = useSearchParams();
   const paperHeight = Number(searchParams.get("paperHeight")) || 0;
   const debug = searchParams.get("debug") === "true";
+  const noPaginate = searchParams.get("noPaginate") === "true";
 
   const config: PaginationConfig = {
     ...DEFAULT_CONFIG,
@@ -53,7 +54,7 @@ export function Paginator({
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !paperHeight) return;
+    if (!container || !paperHeight || noPaginate) return;
 
     const timer = setTimeout(() => {
       paginate(container, paperHeight, config);
@@ -61,7 +62,7 @@ export function Paginator({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [paperHeight, debug]);
+  }, [paperHeight, debug, noPaginate]);
 
   return (
     <div ref={containerRef} className={className}>
