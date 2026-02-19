@@ -109,7 +109,7 @@ export function ResultDetailsSection({
           />
         )}
 
-        {impactAreas.length > 0 && (
+        {impactAreas?.length > 0 && (
           <div className="flex flex-col gap-[5px]">
             <p className="text-[#1d1d1d] text-[10px] font-bold leading-[1.15]">
               Impact Areas targeted
@@ -260,7 +260,7 @@ export function ContributorsSection({
                   Contributing CGIAR Centers:
                 </p>
                 <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
-                  {data.contributing_centers.map((c, i) => (
+                  {data.contributing_centers?.map((c, i) => (
                     <li
                       key={`${c.center_name}-${i}`}
                       className="leading-normal"
@@ -308,7 +308,7 @@ export function ContributorsSection({
           <SubSectionTitle>Partners</SubSectionTitle>
           <DataTable
             columns={["Name", "Country HQ", "Institution type"]}
-            rows={data.non_kp_partner_data!.map((p) => [
+            rows={(data.non_kp_partner_data ?? []).map((p) => [
               p.partner_name,
               p.partner_country_hq,
               p.partner_type,
@@ -322,7 +322,7 @@ export function ContributorsSection({
           <SubSectionTitle>Bundled innovations</SubSectionTitle>
           <DataTable
             columns={["Portfolio", "Phase", "Code", "Indicator", "Title"]}
-            rows={data.bundled_innovations!.map((b) => [
+            rows={(data.bundled_innovations ?? []).map((b) => [
               b.portfolio,
               b.phase,
               b.code,
@@ -370,8 +370,8 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                 Regions specified for this result:
               </p>
               <div className="flex flex-wrap gap-[6px]">
-                {geo.regions.length > 0 ? (
-                  geo.regions.map((r, i) => (
+                {geo.regions?.length > 0 ? (
+                  geo.regions?.map((r, i) => (
                     <span
                       key={`${r}-${i}`}
                       className="text-[#393939] leading-normal"
@@ -477,7 +477,7 @@ function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
 export function EvidenceSection({
   evidences,
 }: Readonly<{ evidences: Evidence[] }>) {
-  if (evidences.length === 0) return null;
+  if (!evidences?.length) return null;
   return (
     <div className="flex flex-col gap-[10px]">
       <SectionTitle>Evidence</SectionTitle>
