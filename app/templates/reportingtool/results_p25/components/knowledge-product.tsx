@@ -3,7 +3,7 @@ import { SectionTitle } from "./common-sections";
 import { KeyValueTable } from "./tables";
 
 export function KPDetailsSection({ data }: { data: PRMSResultData }) {
-  if (!data.kp_partner_data || data.kp_partner_data.length === 0) return null;
+  if (!data.kp_partner_data?.length) return null;
 
   return (
     <div className="flex flex-col gap-[10px]">

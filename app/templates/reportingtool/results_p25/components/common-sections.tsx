@@ -105,7 +105,7 @@ export function ResultDetailsSection({
           />
         )}
 
-        {impactAreas.length > 0 && (
+        {impactAreas?.length > 0 && (
           <div className="flex flex-col gap-[5px]">
             <p className="text-[#1d1d1d] text-[10px] font-bold leading-[1.15]">
               Impact Areas targeted
@@ -198,19 +198,14 @@ export function ContributorsSection({
   data: PRMSResultData;
   tocEntries: TheoryOfChange[];
 }>) {
-  const hasContributingInitiatives =
-    data.contributing_initiatives && data.contributing_initiatives.length > 0;
-  const hasCenters =
-    data.contributing_centers && data.contributing_centers.length > 0;
-  const hasProjects =
-    data.non_pooled_projects && data.non_pooled_projects.length > 0;
-  const hasPartners =
-    data.non_kp_partner_data && data.non_kp_partner_data.length > 0;
-  const hasBundled =
-    data.bundled_innovations && data.bundled_innovations.length > 0;
+  const hasContributingInitiatives = !!data.contributing_initiatives?.length;
+  const hasCenters = !!data.contributing_centers?.length;
+  const hasProjects = !!data.non_pooled_projects?.length;
+  const hasPartners = !!data.non_kp_partner_data?.length;
+  const hasBundled = !!data.bundled_innovations?.length;
 
   const hasAnything =
-    tocEntries.length > 0 ||
+    tocEntries?.length > 0 ||
     hasContributingInitiatives ||
     hasCenters ||
     hasProjects ||
@@ -223,7 +218,7 @@ export function ContributorsSection({
     <div className="flex flex-col gap-[10px]">
       <SectionTitle>Contributors and Partners</SectionTitle>
 
-      {tocEntries.map((toc, i) => (
+      {tocEntries?.map((toc, i) => (
         <div
           key={`${toc.program_name}-${i}`}
           className="flex flex-col gap-[10px]"
@@ -238,7 +233,7 @@ export function ContributorsSection({
           <SubSectionTitle>Contributors</SubSectionTitle>
           <div className="flex flex-col gap-[8px] text-[10px]">
             {hasContributingInitiatives &&
-              data.contributing_initiatives!.map((init, i) => (
+              data.contributing_initiatives?.map((init, i) => (
                 <LabelValue
                   key={`${init.initiative_short_name}-${i}`}
                   label="Contributing Program"
@@ -252,7 +247,7 @@ export function ContributorsSection({
                   Contributing CGIAR Centers:
                 </p>
                 <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
-                  {data.contributing_centers.map((c, i) => (
+                  {data.contributing_centers?.map((c, i) => (
                     <li
                       key={`${c.center_name}-${i}`}
                       className="leading-normal"
@@ -275,7 +270,7 @@ export function ContributorsSection({
                   Contributing W3 and/or bilateral projects:
                 </p>
                 <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
-                  {data.non_pooled_projects!.map((p, i) => (
+                  {data.non_pooled_projects?.map((p, i) => (
                     <li
                       key={`${p.project_title}-${i}`}
                       className="leading-normal"
@@ -295,7 +290,7 @@ export function ContributorsSection({
           <SubSectionTitle>Partners</SubSectionTitle>
           <DataTable
             columns={["Name", "Country HQ", "Institution type"]}
-            rows={data.non_kp_partner_data!.map((p) => [
+            rows={(data.non_kp_partner_data ?? []).map((p) => [
               p.partner_name,
               p.country_hq_name,
               p.institution_type,
@@ -309,7 +304,7 @@ export function ContributorsSection({
           <SubSectionTitle>Bundled innovations</SubSectionTitle>
           <DataTable
             columns={["Portfolio", "Phase", "Code", "Indicator", "Title"]}
-            rows={data.bundled_innovations!.map((b) => [
+            rows={(data.bundled_innovations ?? []).map((b) => [
               b.portfolio,
               b.phase,
               b.code,
@@ -357,8 +352,8 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                 Regions specified for this result:
               </p>
               <div className="flex flex-wrap gap-[6px]">
-                {geo.regions.length > 0 ? (
-                  geo.regions.map((r, i) => (
+                {geo.regions?.length > 0 ? (
+                  geo.regions?.map((r, i) => (
                     <span
                       key={`${r}-${i}`}
                       className="text-[#393939] leading-normal"
@@ -380,8 +375,8 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                 Countries specified for this result:
               </p>
               <div className="flex flex-wrap gap-[6px]">
-                {geo.countries.length > 0 ? (
-                  geo.countries.map((c, i) => (
+                {geo.countries?.length > 0 ? (
+                  geo.countries?.map((c, i) => (
                     <span
                       key={`${c}-${i}`}
                       className="text-[#393939] leading-normal"
@@ -457,7 +452,7 @@ function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
 export function EvidenceSection({
   evidences,
 }: Readonly<{ evidences: Evidence[] }>) {
-  if (evidences.length === 0) return null;
+  if (!evidences?.length) return null;
   return (
     <div className="flex flex-col gap-[10px]">
       <SectionTitle>Evidence</SectionTitle>

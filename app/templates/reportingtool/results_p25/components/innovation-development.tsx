@@ -8,15 +8,11 @@ export function InnovationDevelopmentSections({
 }: Readonly<{
   data: PRMSResultData;
 }>) {
-  const hasDevelopers =
-    data.innovation_developers && data.innovation_developers.length > 0;
-  const hasCollaborators =
-    data.innovation_collaborators && data.innovation_collaborators.length > 0;
-  const hasInvestments =
-    data.innovation_investments && data.innovation_investments.length > 0;
-  const hasActors = data.innovation_actors && data.innovation_actors.length > 0;
-  const hasOrgs =
-    data.innovation_organizations && data.innovation_organizations.length > 0;
+  const hasDevelopers = !!data.innovation_developers?.length;
+  const hasCollaborators = !!data.innovation_collaborators?.length;
+  const hasInvestments = !!data.innovation_investments?.length;
+  const hasActors = !!data.innovation_actors?.length;
+  const hasOrgs = !!data.innovation_organizations?.length;
 
   const hasDetails =
     hasDevelopers ||
@@ -36,7 +32,7 @@ export function InnovationDevelopmentSections({
           <div className="flex gap-[20px]">
             <div className="flex flex-col gap-[8px] text-[10px] flex-1 min-w-0">
               {hasDevelopers &&
-                data.innovation_developers!.map((dev, i) => (
+                data.innovation_developers?.map((dev, i) => (
                   <p key={`${dev.name}-${i}`} style={{ lineHeight: 1.5 }}>
                     <span className="font-bold text-[#1d1d1d]">
                       Innovation Developer:
@@ -90,7 +86,7 @@ export function InnovationDevelopmentSections({
                     Innovation collaborators:
                   </p>
                   <ul className="list-disc ml-[15px] text-[#393939]">
-                    {data.innovation_collaborators!.map((c, i) => (
+                    {data.innovation_collaborators?.map((c, i) => (
                       <li key={`${c.name}-${i}`} className="leading-normal">
                         {c.name}
                         {c.email && `, ${c.email}`}
@@ -178,7 +174,7 @@ export function InnovationDevelopmentSections({
           </SubSectionTitle>
           <DataTable
             columns={["Entity", "Name", "USD investment"]}
-            rows={data.innovation_investments!.map((inv) => [
+            rows={(data.innovation_investments ?? []).map((inv) => [
               inv.entity,
               inv.name,
               inv.usd_investment,
@@ -198,7 +194,7 @@ export function InnovationDevelopmentSections({
               </p>
               <DataTable
                 columns={["#", "Type", "Actors"]}
-                rows={data.innovation_actors!.map((a, i) => [
+                rows={(data.innovation_actors ?? []).map((a, i) => [
                   String(i + 1),
                   a.type,
                   a.actors,
@@ -214,7 +210,7 @@ export function InnovationDevelopmentSections({
               </p>
               <DataTable
                 columns={["#", "Type", "Subtype"]}
-                rows={data.innovation_organizations!.map((o, i) => [
+                rows={(data.innovation_organizations ?? []).map((o, i) => [
                   String(i + 1),
                   o.type,
                   o.subtype,

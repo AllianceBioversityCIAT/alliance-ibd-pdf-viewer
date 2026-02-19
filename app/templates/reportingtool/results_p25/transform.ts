@@ -65,7 +65,7 @@ export function extractTocEntries(data: PRMSResultData): TheoryOfChange[] {
   if (!data.toc_primary || data.toc_primary.length === 0) return [];
   const tocUrl = data.primary_submitter_data?.toc_url;
 
-  return data.toc_primary.map((entry) => ({
+  return (data.toc_primary ?? []).map((entry) => ({
     program_name: entry.initiative_short_name,
     area_of_work: entry.action_area,
     toc_url: tocUrl,
