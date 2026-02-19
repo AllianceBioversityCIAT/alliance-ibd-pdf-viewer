@@ -20,6 +20,12 @@ const IMPACT_AREA_MAP: Record<string, { name: string; icon_url?: string }> = {
   poverty_tag: { name: "Poverty reduction, livelihoods & jobs" },
 };
 
+function toArray(val: unknown): string[] {
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string" && val) return val.split(",").map((s) => s.trim()).filter(Boolean);
+  return [];
+}
+
 function parseTag(tag: string): { score: number; label: string } | null {
   const match = /^\((\d+)\)\s*(.+)$/.exec(tag);
   if (!match) return null;
@@ -55,9 +61,8 @@ export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
 
 export function extractGeoLocation(data: PRMSResultData): GeoLocation | null {
   if (!data.geo_focus) return null;
-  const regions = data.regions ?? [];
-  const countries = data.countries ?? [];
-  if (!regions.length && !countries.length) return null;
+  const regions = toArray(data.regions);
+  const countries = toArray(data.countries);
   return { geo_focus: data.geo_focus, regions, countries };
 }
 
@@ -65,7 +70,7 @@ export function extractTocEntries(data: PRMSResultData): TheoryOfChange[] {
   if (!data.toc_primary || data.toc_primary.length === 0) return [];
   const tocUrl = data.primary_submitter_data?.toc_url;
 
-  return data.toc_primary.map((entry) => ({
+  return (data.toc_primary ?? []).map((entry) => ({
     program_name: entry.initiative_short_name,
     area_of_work: entry.action_area,
     toc_url: tocUrl,

@@ -174,13 +174,9 @@ function ReadinessScale({ currentLevel }: { currentLevel: number }) {
 }
 
 export function InnovationUseSections({ data }: { data: PRMSResultData }) {
-  const hasActors =
-    data.innovation_use_actors && data.innovation_use_actors.length > 0;
-  const hasOrgs =
-    data.innovation_use_organizations &&
-    data.innovation_use_organizations.length > 0;
-  const hasMeasures =
-    data.innovation_use_measures && data.innovation_use_measures.length > 0;
+  const hasActors = !!data.innovation_use_actors?.length;
+  const hasOrgs = !!data.innovation_use_organizations?.length;
+  const hasMeasures = !!data.innovation_use_measures?.length;
   const currentLevel = data.readiness_level
     ? parseInt(data.readiness_level.replace(/\D/g, ""), 10)
     : null;
@@ -199,7 +195,7 @@ export function InnovationUseSections({ data }: { data: PRMSResultData }) {
             Actors - Number of people using the innovation, disaggregated by
             gender:
           </p>
-          <ActorsTable actors={data.innovation_use_actors!} />
+          <ActorsTable actors={data.innovation_use_actors ?? []} />
         </div>
       )}
 
@@ -208,7 +204,7 @@ export function InnovationUseSections({ data }: { data: PRMSResultData }) {
           <SubSectionTitle>Organizations</SubSectionTitle>
           <DataTable
             columns={["Type", "Subtype", "How many"]}
-            rows={data.innovation_use_organizations!.map((o) => [
+            rows={(data.innovation_use_organizations ?? []).map((o) => [
               o.type,
               o.subtype,
               o.how_many,
@@ -225,10 +221,10 @@ export function InnovationUseSections({ data }: { data: PRMSResultData }) {
           <DataTable
             columns={[
               "#Unit of measure",
-              ...data.innovation_use_measures!.map((m) => m.unit_of_measure),
+              ...(data.innovation_use_measures ?? []).map((m) => m.unit_of_measure),
             ]}
             rows={[
-              ["Value", ...data.innovation_use_measures!.map((m) => m.value)],
+              ["Value", ...(data.innovation_use_measures ?? []).map((m) => m.value)],
             ]}
           />
         </div>
