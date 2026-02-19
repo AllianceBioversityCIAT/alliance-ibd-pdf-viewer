@@ -1,4 +1,5 @@
 import type { TemplateProps } from "../..";
+import { formatDateCET } from "../../utils";
 import type { PRMSResultData } from "./types";
 import {
   extractImpactAreas,
@@ -24,14 +25,22 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
 
   const impactAreas = d ? extractImpactAreas(d) : [];
   const geo = d ? extractGeoLocation(d) : null;
-  const tocEntries = d ? extractTocEntries(d) : [];
+  const tocEntries = d
+    ? extractTocEntries(d)
+    : {
+        toc_primary: [],
+        toc_url: "",
+        toc_internal_id: "",
+        contributor_name: "",
+        contributor_can_match_result: false,
+      };
   const evidences = d ? extractEvidences(d) : [];
 
   return (
     <PageShell
       resultType={d?.result_type ?? "Result Type"}
       resultName={d?.result_name ?? d?.title ?? "No title provided"}
-      generationDate={d?.generation_date_footer ?? "—"}
+      generationDate={formatDateCET(new Date())}
       phaseName={d?.phase_name ?? "—"}
     >
       {/* QA Box — KPQABox for Knowledge Products, standard QABox otherwise */}

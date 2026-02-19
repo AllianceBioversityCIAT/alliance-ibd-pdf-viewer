@@ -181,7 +181,7 @@ export function InnovationDevelopmentSections({
             rows={data.innovation_investments!.map((inv) => [
               inv.entity,
               inv.name,
-              inv.usd_investment,
+              inv.is_not_determined ? "Not provided" : inv.budget,
             ])}
           />
         </div>
@@ -200,8 +200,10 @@ export function InnovationDevelopmentSections({
                 columns={["#", "Type", "Actors"]}
                 rows={data.innovation_actors!.map((a, i) => [
                   String(i + 1),
-                  a.type,
-                  a.actors,
+                  a.actor_name,
+                  `Women ${
+                    a.women ? "(Non-youth)" : a.women_youth && "(Youth)"
+                  }, Men ${a.men ? "(Non-youth)" : a.men_youth && "(Youth)"}`,
                 ])}
               />
             </div>
@@ -216,8 +218,10 @@ export function InnovationDevelopmentSections({
                 columns={["#", "Type", "Subtype"]}
                 rows={data.innovation_organizations!.map((o, i) => [
                   String(i + 1),
-                  o.type,
-                  o.subtype,
+                  o.organization_name === "Other"
+                    ? `${o.organization_name}: ${o.other_type}`
+                    : o.organization_name,
+                  o.organization_sub_type,
                 ])}
               />
             </div>

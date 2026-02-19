@@ -12,32 +12,38 @@ export interface LinkedEvidence {
 
 export interface ContributingCenter {
   center_name: string;
-  is_primary_center: number;
+  is_primary_center: boolean;
 }
 
 export interface TocPrimaryEntry {
-  initiative_short_name: string;
-  action_area: string;
+  toc_level_name: string;
+  toc_work_package_acronym: string;
   toc_result_title: string;
-  indicator?: string;
+  toc_indicator: string;
+  toc_result_description: string;
 }
 
 export interface PrimarySubmitterData {
-  toc_url?: string;
+  toc_url: string;
+  toc_internal_id: string;
+  contributor_name: string;
+  contributor_can_match_result: boolean;
 }
 
 export interface ContributingInitiative {
   initiative_short_name: string;
 }
 
-export interface NonPooledProject {
+export interface BilateralProject {
   project_title: string;
+  is_lead_project: boolean;
 }
 
 export interface PartnerEntry {
   partner_name: string;
-  country_hq_name: string;
-  institution_type: string;
+  partner_country_hq: string;
+  partner_type: string;
+  partner_delivery_type: string;
 }
 
 export interface KPField {
@@ -62,17 +68,22 @@ export interface BundledInnovation {
 export interface InnovationInvestment {
   entity: string;
   name: string;
-  usd_investment: string;
+  budget: string;
+  is_not_determined: boolean;
 }
 
 export interface InnovationActor {
-  type: string;
-  actors: string;
+  actor_name: string;
+  women: boolean;
+  women_youth: boolean;
+  men: boolean;
+  men_youth: boolean;
 }
 
 export interface InnovationOrganization {
-  type: string;
-  subtype: string;
+  organization_name: string;
+  other_type: string;
+  organization_sub_type: string;
 }
 
 export interface InnovationDeveloper {
@@ -128,15 +139,11 @@ export interface ImpactArea {
 export interface GeoLocation {
   geo_focus: string;
   regions: string[];
-  countries: string[];
+  countries: { name: string; code: string }[];
 }
 
-export interface TheoryOfChange {
-  program_name: string;
-  area_of_work: string;
-  toc_url?: string;
-  high_level_output?: string;
-  indicator?: string;
+export interface TheoryOfChange extends PrimarySubmitterData {
+  toc_primary: TocPrimaryEntry[];
 }
 
 export interface Evidence {
@@ -157,6 +164,7 @@ export interface PRMSResultData {
   result_level: string;
   result_description: string;
   title: string;
+  short_title: string;
 
   // Phase & dates
   phase_name: string;
@@ -184,7 +192,7 @@ export interface PRMSResultData {
   // Geographic
   geo_focus: string;
   regions: string[] | null;
-  countries: string[] | null;
+  countries: { name: string; code: string }[] | null;
   subnational: string | null;
 
   // Theory of Change
@@ -194,7 +202,7 @@ export interface PRMSResultData {
   // Contributors
   contributing_centers: ContributingCenter[];
   contributing_initiatives: ContributingInitiative[] | null;
-  non_pooled_projects: NonPooledProject[] | null;
+  bilateral_projects: BilateralProject[] | null;
 
   // Evidence
   linked_evidences: LinkedEvidence[];
