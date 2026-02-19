@@ -55,9 +55,8 @@ export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
 
 export function extractGeoLocation(data: PRMSResultData): GeoLocation | null {
   if (!data.geo_focus) return null;
-  const regions = data.regions ?? [];
-  const countries = data.countries ?? [];
-  if (!regions.length && !countries.length) return null;
+  const regions = toArray(data.regions);
+  const countries = toArray(data.countries);
   return { geo_focus: data.geo_focus, regions, countries };
 }
 
