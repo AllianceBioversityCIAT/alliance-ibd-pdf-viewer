@@ -20,6 +20,12 @@ const IMPACT_AREA_MAP: Record<string, { name: string; icon_url?: string }> = {
   poverty_tag: { name: "Poverty reduction, livelihoods & jobs" },
 };
 
+function toArray(val: unknown): string[] {
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string" && val) return val.split(",").map((s) => s.trim()).filter(Boolean);
+  return [];
+}
+
 function parseTag(tag: string): { score: number; label: string } | null {
   const match = /^\((\d+)\)\s*(.+)$/.exec(tag);
   if (!match) return null;
