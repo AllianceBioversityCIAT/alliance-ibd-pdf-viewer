@@ -99,19 +99,23 @@ function paginate(container: HTMLElement, paperHeight: number, config: Paginatio
 
   const pageRoot = findPageRoot(container);
   const pageRootTop = pageRoot.getBoundingClientRect().top + window.scrollY;
-  const gap = parseFloat(getComputedStyle(container).gap) || 0;
 
-  // Phase 1: Process content — push overflowing elements, split tables
-  processContent(container, pageRootTop, paperHeight, config, gap);
+  // Walk all leaf content blocks in the DOM tree and push any that
+  // cross a footer zone to the next page. Multi-pass handles
+  // table-split continuations and cascading shifts.
+  let safety = 10;
+  while (safety-- > 0) {
+    if (!processPass(container, pageRootTop, paperHeight, config)) break;
+  }
 
-  // Phase 2: Kill padding-bottom so it doesn't add space after our calculation
+  // Kill padding-bottom so it doesn't add space after our calculation
   container.style.paddingBottom = "0";
 
-  // Phase 3: Calculate total pages & place absolute footers
+  // Place absolute footers
   const totalPages = Math.ceil(pageRoot.scrollHeight / paperHeight);
   placeFooters(pageRoot, totalPages, paperHeight, config);
 
-  // Phase 4: Pad to exact multiple of paperHeight
+  // Pad to exact multiple of paperHeight
   const target = totalPages * paperHeight;
   const current = pageRoot.scrollHeight;
   if (current < target) {
@@ -122,189 +126,138 @@ function paginate(container: HTMLElement, paperHeight: number, config: Paginatio
   }
 }
 
-// ── Content processing (overflow detection + section breaking + table splitting) ──
+// ── Block collection ──
 
-function processContent(
+/**
+ * Walks the DOM tree inside `container` and collects "content blocks" —
+ * the granular elements that should be checked for page breaks.
+ *
+ *   - Recurses into plain wrapper divs (no background, border, shadow)
+ *   - Stops at styled blocks (cards, colored divs) → atomic
+ *   - Stops at non-div elements (tables, headings, paragraphs) → atomic
+ *   - Stops at leaf elements (no children) → atomic
+ *
+ * Returns blocks in document order (top-to-bottom).
+ */
+function collectBlocks(container: HTMLElement): HTMLElement[] {
+  const blocks: HTMLElement[] = [];
+
+  function walk(el: HTMLElement) {
+    if (
+      el.hasAttribute("data-paginator-spacer") ||
+      el.hasAttribute("data-paginator-footer")
+    ) return;
+
+    const children = Array.from(el.children).filter(
+      (c): c is HTMLElement => c instanceof HTMLElement,
+    );
+
+    // No element children → leaf block
+    if (children.length === 0) {
+      if (el !== container) blocks.push(el);
+      return;
+    }
+
+    // Plain wrapper → recurse into children
+    if (el === container || isPlainWrapper(el)) {
+      for (const child of children) walk(child);
+      return;
+    }
+
+    // Styled / semantic block → treat as atomic unit
+    blocks.push(el);
+  }
+
+  walk(container);
+  return blocks;
+}
+
+/** A plain wrapper is a div/section/article with no visual styling. */
+function isPlainWrapper(el: HTMLElement): boolean {
+  const tag = el.tagName;
+  if (tag !== "DIV" && tag !== "SECTION" && tag !== "ARTICLE") return false;
+
+  const s = getComputedStyle(el);
+  const bg = s.backgroundColor;
+  if (bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return false;
+  if (s.borderTopWidth !== "0px" || s.borderBottomWidth !== "0px") return false;
+  if (s.boxShadow !== "none") return false;
+
+  return true;
+}
+
+// ── Single processing pass ──
+
+/**
+ * One pass over all content blocks. For each block that extends past
+ * the safe zone, either split the table or push it to the next page.
+ * Returns true if any DOM changes were made (caller should re-run).
+ */
+function processPass(
   container: HTMLElement,
   pageRootTop: number,
   paperHeight: number,
   config: PaginationConfig,
-  gap: number,
-) {
-  let cursor = 0;
-  let safety = 500;
+): boolean {
+  const blocks = collectBlocks(container);
+  let changed = false;
 
-  while (cursor < container.children.length && safety-- > 0) {
-    const child = container.children[cursor] as HTMLElement;
+  for (const block of blocks) {
+    if (!block.isConnected) continue;
 
-    // Skip our own spacers / continuations
-    if (child.hasAttribute("data-paginator-spacer")) {
-      cursor++;
-      continue;
-    }
-
-    const rect = child.getBoundingClientRect();
+    const rect = block.getBoundingClientRect();
     const top = rect.top + window.scrollY - pageRootTop;
     const bottom = rect.bottom + window.scrollY - pageRootTop;
     const page = Math.floor(top / paperHeight);
     const safeEnd = getSafeZoneEnd(page, paperHeight, config);
 
-    // Element fits — move on
-    if (bottom <= safeEnd) {
-      cursor++;
-      continue;
+    // Fits on its page — skip
+    if (bottom <= safeEnd) continue;
+
+    // Element taller than usable area AND already at page start — skip
+    // (nothing we can do, it'll overflow regardless)
+    const contentStart = getContentStart(page, paperHeight, config);
+    const usableHeight = safeEnd - contentStart;
+    if (rect.height > usableHeight && top - contentStart < 5) continue;
+
+    // Try table splitting for TABLE elements
+    if (block.tagName === "TABLE") {
+      const spaceAvailable = safeEnd - top;
+      if (spaceAvailable > 80) {
+        if (splitTable(block, safeEnd, page, paperHeight, config, pageRootTop)) {
+          changed = true;
+          continue;
+        }
+      }
     }
 
-    // ── Overflow detected ──
-    // Strategy: dig into the section's internal children to find the
-    // exact element that crosses the boundary, then either:
-    //   a) Break the section there (move overflow children to next page)
-    //   b) Split a table at the row level
-    //   c) Last resort — push the entire section to next page
-
-    const resolved = resolveOverflow(
-      child, safeEnd, page, paperHeight, config, pageRootTop, gap, container,
-    );
-
-    if (resolved) {
-      cursor += resolved; // skip original section + spacer (+ continuation)
-      continue;
-    }
-
-    // Last resort: push entire element to next page
+    // Push to next page
     const nextStart = getContentStart(page + 1, paperHeight, config);
-    const spacerHeight = nextStart - top - gap;
+    const parentGap =
+      parseFloat(getComputedStyle(block.parentElement!).gap) || 0;
+    const spacerHeight = nextStart - top - parentGap;
 
     if (spacerHeight > 0) {
       const spacer = document.createElement("div");
       spacer.setAttribute("data-paginator-spacer", "push");
       spacer.style.cssText = `height:${spacerHeight}px; flex-shrink:0;`;
-      child.parentNode?.insertBefore(spacer, child);
-      cursor++; // skip the spacer
-    }
-
-    cursor++;
-  }
-}
-
-/**
- * Tries to resolve an overflow by looking INSIDE the section:
- *  1. Walk the section's direct children
- *  2. Find which internal child crosses safeEnd
- *  3. If there are children before it that fit → break the section there
- *  4. If the crossing child contains a table → split the table
- *  5. Returns the number of cursor positions to skip, or 0 if unresolved
- */
-function resolveOverflow(
-  section: HTMLElement,
-  safeEnd: number,
-  page: number,
-  paperHeight: number,
-  config: PaginationConfig,
-  pageRootTop: number,
-  gap: number,
-  container: HTMLElement,
-): number {
-  const innerChildren = Array.from(section.children) as HTMLElement[];
-  if (innerChildren.length < 2) {
-    // Section has 0-1 children — check if that child has a table to split
-    const table = section.querySelector("table");
-    if (table) {
-      const didSplit = splitTable(section, table, safeEnd, page, paperHeight, config, pageRootTop, gap);
-      if (didSplit) return 3; // section + spacer + continuation
-    }
-    return 0;
-  }
-
-  // Find the internal child that crosses safeEnd
-  let crossIndex = -1;
-  for (let i = 0; i < innerChildren.length; i++) {
-    const childBottom =
-      innerChildren[i].getBoundingClientRect().bottom + window.scrollY - pageRootTop;
-    if (childBottom > safeEnd) {
-      crossIndex = i;
-      break;
+      block.parentNode?.insertBefore(spacer, block);
+      changed = true;
     }
   }
 
-  if (crossIndex < 0) return 0; // shouldn't happen
-
-  // If there are children before the crossing one that fit,
-  // break the section: move crossIndex+ to a continuation wrapper on next page
-  if (crossIndex > 0) {
-    return breakSection(section, innerChildren, crossIndex, page, paperHeight, config, pageRootTop, gap);
-  }
-
-  // The FIRST internal child itself overflows — try table splitting on it
-  const crossingChild = innerChildren[0];
-  const table =
-    crossingChild.tagName === "TABLE"
-      ? crossingChild
-      : crossingChild.querySelector("table");
-
-  if (table) {
-    const spaceAvailable = safeEnd - (crossingChild.getBoundingClientRect().top + window.scrollY - pageRootTop);
-    if (spaceAvailable > 80) {
-      const didSplit = splitTable(section, table, safeEnd, page, paperHeight, config, pageRootTop, gap);
-      if (didSplit) return 3;
-    }
-  }
-
-  return 0; // couldn't resolve — caller will push entire section
-}
-
-/**
- * Breaks a section by moving internal children from `breakIndex` onward
- * into a new wrapper element on the next page.
- * Returns cursor skip count (3: original section + spacer + wrapper).
- */
-function breakSection(
-  section: HTMLElement,
-  innerChildren: HTMLElement[],
-  breakIndex: number,
-  page: number,
-  paperHeight: number,
-  config: PaginationConfig,
-  pageRootTop: number,
-  gap: number,
-): number {
-  // Create wrapper that inherits no special styling (children have their own)
-  const wrapper = document.createElement("div");
-  wrapper.setAttribute("data-paginator-spacer", "section-continuation");
-
-  // Move children from breakIndex onward into wrapper (reverse order to maintain sequence)
-  for (let i = innerChildren.length - 1; i >= breakIndex; i--) {
-    wrapper.insertBefore(innerChildren[i], wrapper.firstChild);
-  }
-
-  // Calculate spacer to bridge to next page content start
-  const nextStart = getContentStart(page + 1, paperHeight, config);
-  const sectionBottom =
-    section.getBoundingClientRect().bottom + window.scrollY - pageRootTop;
-  const spacerHeight = nextStart - sectionBottom - 2 * gap;
-
-  const spacer = document.createElement("div");
-  spacer.setAttribute("data-paginator-spacer", "section-break");
-  spacer.style.cssText = `height:${Math.max(0, spacerHeight)}px; flex-shrink:0;`;
-
-  // Insert after section: section → spacer → continuation wrapper
-  section.after(spacer);
-  spacer.after(wrapper);
-
-  return 3; // skip: section(1) + spacer(1) + wrapper will be checked on next iteration
+  return changed;
 }
 
 // ── Table splitting ──
 
 function splitTable(
-  sectionEl: HTMLElement,
   tableEl: HTMLElement,
   safeEnd: number,
   page: number,
   paperHeight: number,
   config: PaginationConfig,
   pageRootTop: number,
-  gap: number,
 ): boolean {
   const thead = tableEl.querySelector("thead");
   const tbody = tableEl.querySelector("tbody") || tableEl;
@@ -312,47 +265,44 @@ function splitTable(
 
   if (rows.length < 2) return false;
 
-  // Find the last row that fits before safeEnd
+  // Find the first row that overflows
   let splitIndex = -1;
   for (let i = 0; i < rows.length; i++) {
-    const rowBottom = rows[i].getBoundingClientRect().bottom + window.scrollY - pageRootTop;
+    const rowBottom =
+      rows[i].getBoundingClientRect().bottom + window.scrollY - pageRootTop;
     if (rowBottom > safeEnd) {
       splitIndex = i;
       break;
     }
   }
 
-  // Can't split if the very first row overflows
   if (splitIndex <= 0) return false;
 
-  // Build continuation table: clone table + thead, move overflow rows
+  // Build continuation table: clone structure + thead, move overflow rows
   const cloneTable = tableEl.cloneNode(false) as HTMLElement;
   if (thead) cloneTable.appendChild(thead.cloneNode(true));
   const cloneTbody = document.createElement("tbody");
 
-  // Move rows from splitIndex onward into the clone (mutates original table)
   for (let i = rows.length - 1; i >= splitIndex; i--) {
     cloneTbody.insertBefore(rows[i], cloneTbody.firstChild);
   }
   cloneTable.appendChild(cloneTbody);
 
-  const wrapper = document.createElement("div");
-  wrapper.setAttribute("data-paginator-spacer", "table-continuation");
-  wrapper.appendChild(cloneTable);
-
-  // Spacer: bridge from section bottom to next page content start
-  // Subtract 2 gaps (spacer + wrapper add 2 new flex children)
+  // Spacer to bridge to next page content start
   const nextStart = getContentStart(page + 1, paperHeight, config);
-  const sectionBottom = sectionEl.getBoundingClientRect().bottom + window.scrollY - pageRootTop;
-  const spacerHeight = nextStart - sectionBottom - 2 * gap;
+  const tableBottom =
+    tableEl.getBoundingClientRect().bottom + window.scrollY - pageRootTop;
+  const parentGap =
+    parseFloat(getComputedStyle(tableEl.parentElement!).gap) || 0;
+  const spacerHeight = nextStart - tableBottom - parentGap;
 
   const spacer = document.createElement("div");
   spacer.setAttribute("data-paginator-spacer", "table-split");
   spacer.style.cssText = `height:${Math.max(0, spacerHeight)}px; flex-shrink:0;`;
 
-  // Insert: section → spacer → continuation
-  sectionEl.after(spacer);
-  spacer.after(wrapper);
+  // Insert: table → spacer → continuation table
+  tableEl.after(spacer);
+  spacer.after(cloneTable);
 
   return true;
 }
