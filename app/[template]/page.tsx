@@ -71,16 +71,18 @@ export default async function TemplatePage({ params, searchParams }: Props) {
   }
 
   let data: unknown;
+  let dataError: string | null = null;
 
   if (demo === "true") {
     data = loadDemoData(templatePath);
-    if (data === null) notFound();
+    if (data === null) dataError = "No demo data available for this template.";
+  } else if (!uuid) {
+    dataError = "No UUID was provided. A valid uuid query parameter is required to load result data.";
   } else {
-    if (!uuid) notFound();
     data = await getItem(uuid);
-    if (data === null) notFound();
-
-    if (test !== "true") {
+    if (data === null) {
+      dataError = `No data found for UUID "${uuid}". The record may have expired or does not exist.`;
+    } else if (test !== "true") {
       try {
         await deleteItem(uuid);
       } catch {
@@ -90,6 +92,32 @@ export default async function TemplatePage({ params, searchParams }: Props) {
   }
 
   const width = Math.max(100, Math.min(5000, Number(paperWidth) || 600));
+
+  if (dataError) {
+    return (
+      <div style={{ width: `${width}px`, fontFamily: "'Noto Sans', Arial, sans-serif" }}>
+        <div style={{
+          margin: "60px auto",
+          maxWidth: 480,
+          padding: "40px 32px",
+          textAlign: "center",
+        }}>
+          <div style={{
+            width: 56, height: 56, margin: "0 auto 20px",
+            borderRadius: "50%", background: "#fef2f2",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 28,
+          }}>!</div>
+          <h1 style={{ fontSize: 18, fontWeight: 600, color: "#1d1d1d", marginBottom: 8 }}>
+            Data not available
+          </h1>
+          <p style={{ fontSize: 13, color: "#818181", lineHeight: 1.5 }}>
+            {dataError}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: `${width}px` }}>
