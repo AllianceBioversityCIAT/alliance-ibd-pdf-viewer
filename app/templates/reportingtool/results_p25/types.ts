@@ -267,7 +267,7 @@ export interface PRMSResultData {
   policy_type_name?: string;
   policy_amount?: string;
   policy_stage?: string;
-  policy_implementing_organizations?: string;
+  policy_implementing_organizations?: string[];
 
   // Innovation Use (rt_id=2)
   innovation_use_actors?: InnovationUseActor[];

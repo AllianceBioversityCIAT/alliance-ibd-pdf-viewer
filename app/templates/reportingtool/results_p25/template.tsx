@@ -70,11 +70,11 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       <EvidenceSection evidences={evidences} />
 
       {/* Variant-specific sections based on rt_id */}
+      {d?.rt_id === 1 && <PolicyChangeSection data={d} />}
+      {d?.rt_id === 2 && <InnovationUseSections data={d} />}
       {d?.rt_id === 5 && <CapacitySharingSections data={d} />}
       {d?.rt_id === 7 && <InnovationDevelopmentSections data={d} />}
       {d?.rt_id === 6 && <KPDetailsSection data={d} />}
-      {d?.rt_id === 1 && <PolicyChangeSection data={d} />}
-      {d?.rt_id === 2 && <InnovationUseSections data={d} />}
       {/* rt_id === 5 (Capacity Sharing) — common sections only, no extra content */}
     </PageShell>
   );
