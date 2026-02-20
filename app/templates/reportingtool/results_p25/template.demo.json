@@ -127,7 +127,7 @@
     }
   ],
   "readiness_level": "Level 9: Proven Innovation",
-  "readiness_level_justification": "Scaling report included to show level 9, as we are conducting uncontrolled testing right now. Launch events and several testing workshops with users were held in 2023.",
+  "readiness_justification": "Scaling report included to show level 9, as we are conducting uncontrolled testing right now. Launch events and several testing workshops with users were held in 2023.",
   "innovation_collaborators": [
     {
       "name": "Virender Kumar",
@@ -142,8 +142,8 @@
       "email": "pcveettil@irri.org"
     }
   ],
-  "characterization": "Incremental innovation (Innovations that already exist and undergo constant, steady progress, and improvement.)",
-  "nature": "Capacity development innovation (Innovations that strengthen capacity, including farmer, extension or investor decision-support services; accelerator/ incubator programs; manuals, training programs and curricula; online courses.)",
+  "innovation_nature": "Incremental innovation (Innovations that already exist and undergo constant, steady progress, and improvement.)",
+  "innovation_type": "Capacity development innovation (Innovations that strengthen capacity, including farmer, extension or investor decision-support services; accelerator/ incubator programs; manuals, training programs and curricula; online courses.)",
   "materials_evidence": [
     {
       "label": "Materials Evidence",

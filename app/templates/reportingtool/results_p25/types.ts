@@ -94,7 +94,7 @@ export interface InnovationDeveloper {
 
 export interface InnovationCollaborator {
   name: string;
-  email?: string;
+  email: string;
 }
 
 // Policy Change (rt_id=1)
