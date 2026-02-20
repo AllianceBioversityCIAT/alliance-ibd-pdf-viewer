@@ -19,6 +19,7 @@ import { InnovationDevelopmentSections } from "./components/innovation-developme
 import { KPDetailsSection } from "./components/knowledge-product";
 import { PolicyChangeSection } from "./components/policy-change";
 import { InnovationUseSections } from "./components/innovation-use";
+import CapacitySharingSections from "./components/capacity-sharing";
 
 export default function ResultsP25({ data }: Readonly<TemplateProps>) {
   const d = data as PRMSResultData | null;
@@ -69,6 +70,7 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       <EvidenceSection evidences={evidences} />
 
       {/* Variant-specific sections based on rt_id */}
+      {d?.rt_id === 5 && <CapacitySharingSections data={d} />}
       {d?.rt_id === 7 && <InnovationDevelopmentSections data={d} />}
       {d?.rt_id === 6 && <KPDetailsSection data={d} />}
       {d?.rt_id === 1 && <PolicyChangeSection data={d} />}

@@ -256,6 +256,13 @@ export interface PRMSResultData {
     reusable?: string;
   };
 
+  // Capacity Sharing for Development (rt_id=5)
+  capdev_female_using?: string;
+  capdev_male_using?: string;
+  capdev_term?: string;
+  capdev_delivery_method_name?: string;
+  capdev_organizations?: string[];
+
   // Policy Change (rt_id=1)
   policy_type_name?: string;
   policy_amount?: string;
