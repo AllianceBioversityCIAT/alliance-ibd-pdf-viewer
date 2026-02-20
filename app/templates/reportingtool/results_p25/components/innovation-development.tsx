@@ -16,7 +16,7 @@ export function InnovationDevelopmentSections({
 
   return (
     <>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <SectionTitle>Innovation Development details</SectionTitle>
 
         <div className="flex gap-[20px]">
@@ -155,7 +155,7 @@ export function InnovationDevelopmentSections({
       </div>
 
       {hasInvestments && (
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <SubSectionTitle>
             CGIAR and Partners estimated USD investment
           </SubSectionTitle>

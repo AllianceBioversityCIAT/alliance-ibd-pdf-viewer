@@ -101,6 +101,7 @@ export interface PolicyChangeField {
 // Innovation Use (rt_id=2)
 export interface InnovationUseActor {
   actor_type: string;
+  other_actor_type: string | null;
   subtype: string;
   women_total: number | null;
   women_youth: number | null;
@@ -109,6 +110,7 @@ export interface InnovationUseActor {
   men_youth: number | null;
   men_non_youth: number | null;
   total: number;
+  sex_and_age_disaggregation: boolean;
 }
 
 export interface InnovationUseOrganization {

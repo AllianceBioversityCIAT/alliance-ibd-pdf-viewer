@@ -7,7 +7,7 @@ export default function CapacitySharingSections({
   data,
 }: Readonly<{ data: PRMSResultData }>) {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Capacity Sharing for Development</SectionTitle>
       <KeyValueTable
         rows={[

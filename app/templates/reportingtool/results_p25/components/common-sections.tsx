@@ -74,7 +74,7 @@ export function ResultDetailsSection({
   impactAreas: ImpactArea[];
 }>) {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Result details</SectionTitle>
 
       <div className="flex flex-col gap-[8px]">
@@ -114,7 +114,7 @@ export function ResultDetailsSection({
             <p className="text-[#1d1d1d] text-[10px] font-bold leading-[1.15]">
               Impact Areas targeted
             </p>
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col gap-2.5">
               <div className="grid grid-cols-2 gap-2.5">
                 {impactAreas.map((area) => (
                   <ImpactAreaCard key={area.name} area={area} />
@@ -229,10 +229,10 @@ export function ContributorsSection({
   if (!hasAnything) return null;
 
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Contributors and Partners</SectionTitle>
 
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <SubSectionTitle>Theory of Change</SubSectionTitle>
         {tocEntries.toc_primary.map((toc, i) => (
           <TheoryOfChangeCard
@@ -244,7 +244,7 @@ export function ContributorsSection({
       </div>
 
       {(hasContributingInitiatives || hasCenters || hasBilateralProjects) && (
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <SubSectionTitle>Contributors</SubSectionTitle>
           <div className="flex flex-col gap-[8px] text-[10px]">
             <LabelValue
@@ -304,7 +304,7 @@ export function ContributorsSection({
       )}
 
       {hasPartners && (
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <SubSectionTitle>Partners</SubSectionTitle>
           <DataTable
             columns={["Name", "Country HQ", "Institution type"]}
@@ -318,7 +318,7 @@ export function ContributorsSection({
       )}
 
       {hasBundled && (
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <SubSectionTitle>Bundled innovations</SubSectionTitle>
           <DataTable
             columns={["Portfolio", "Phase", "Code", "Indicator", "Title"]}
@@ -420,7 +420,7 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
           </div>
         </>
       ) : (
-        <div className="flex items-center justify-center gap-[10px] py-4 mx-auto">
+        <div className="flex items-center justify-center gap-2.5 py-4 mx-auto">
           <SearchIcon size={16} className="text-[#033529] rotate-y-180" />
           <p className="text-[#393939] text-[10px] leading-[1.15] font-semibold">
             This is yet to be determined
@@ -435,7 +435,7 @@ export function GeographicSection({
   geo,
 }: Readonly<{ geo: GeoLocation | null }>) {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Geographic location</SectionTitle>
       <GeoLocationBox geo={geo} />
     </div>
@@ -447,7 +447,7 @@ export function GeographicSection({
 function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
   return (
     <div className="bg-[#e2e0df]" style={{ padding: "15px 19px" }}>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <p
           className="text-[#02211a] text-[9.5px] leading-[1.15]"
           style={{ fontFamily: "'Noto Serif', serif" }}
@@ -479,9 +479,9 @@ export function EvidenceSection({
 }: Readonly<{ evidences: Evidence[] }>) {
   if (!evidences?.length) return null;
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Evidence</SectionTitle>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         {evidences.map((ev, i) => (
           <EvidenceCard key={`${ev.label}-${i}`} evidence={ev} />
         ))}
