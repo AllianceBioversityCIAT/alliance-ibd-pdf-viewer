@@ -22,7 +22,11 @@ const IMPACT_AREA_MAP: Record<string, { name: string; icon_url?: string }> = {
 
 function toArray(val: unknown): string[] {
   if (Array.isArray(val)) return val;
-  if (typeof val === "string" && val) return val.split(",").map((s) => s.trim()).filter(Boolean);
+  if (typeof val === "string" && val)
+    return val
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   return [];
 }
 
@@ -62,21 +66,28 @@ export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
 export function extractGeoLocation(data: PRMSResultData): GeoLocation | null {
   if (!data.geo_focus) return null;
   const regions = toArray(data.regions);
-  const countries = toArray(data.countries);
+  const countries = data.countries ?? [];
   return { geo_focus: data.geo_focus, regions, countries };
 }
 
-export function extractTocEntries(data: PRMSResultData): TheoryOfChange[] {
-  if (!data.toc_primary || data.toc_primary.length === 0) return [];
-  const tocUrl = data.primary_submitter_data?.toc_url;
+export function extractTocEntries(data: PRMSResultData): TheoryOfChange {
+  if (
+    !data.toc_primary ||
+    data.toc_primary.length === 0 ||
+    !data.primary_submitter_data
+  )
+    return {
+      toc_primary: [],
+      toc_url: "",
+      toc_internal_id: "",
+      contributor_name: "",
+      contributor_can_match_result: false,
+    };
 
-  return (data.toc_primary ?? []).map((entry) => ({
-    program_name: entry.initiative_short_name,
-    area_of_work: entry.action_area,
-    toc_url: tocUrl,
-    high_level_output: entry.toc_result_title,
-    indicator: entry.indicator,
-  }));
+  return {
+    ...data.primary_submitter_data,
+    toc_primary: data.toc_primary,
+  };
 }
 
 export function extractEvidences(data: PRMSResultData): Evidence[] {

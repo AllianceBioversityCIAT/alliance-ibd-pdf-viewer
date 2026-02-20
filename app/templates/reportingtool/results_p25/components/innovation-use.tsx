@@ -1,31 +1,20 @@
+import Image from "next/image";
 import type { PRMSResultData, InnovationUseActor } from "../types";
-import { SectionTitle, SubSectionTitle } from "./common-sections";
+import { SectionTitle } from "./common-sections";
 import { DataTable } from "./tables";
-
-const READINESS_DESCRIPTIONS: Record<number, string> = {
-  9: "The innovation is commonly used at a large scale in non-initial locations by entities for whom the innovation was not initially developed",
-  8: "The innovation is used by some end-users or beneficiaries, at an intermediate scale, in non-initial locations",
-  7: "The innovation is commonly used by organizations not connected to the initial innovation development",
-  6: "The innovation is used by some organizations not connected to the initial innovation development",
-  5: "The innovation is commonly used by organizations connected to members in the initial innovation development",
-  4: "The innovation is used by some organizations connected to members in the initial innovation development",
-  3: "The innovation is commonly used by partners in the initial innovation development",
-  2: "The innovation is used by some partners to initiate innovation development",
-  1: "The innovation is used only for implementing innovation development",
-  0: "The innovation is not used",
-};
+import readinessScale from "../../../../../public/assets/prms/current_readiness_scale.svg";
 
 function GenderCell({
   total,
   youth,
   nonYouth,
-}: {
+}: Readonly<{
   total: number | null;
   youth: number | null;
   nonYouth: number | null;
-}) {
+}>) {
   if (total === null) {
-    return <span>Not applicable</span>;
+    return <span>Not provided</span>;
   }
   return (
     <div className="flex flex-col gap-[2px]">
@@ -38,10 +27,10 @@ function GenderCell({
   );
 }
 
-function ActorsTable({ actors }: { actors: InnovationUseActor[] }) {
+function ActorsTable({ actors }: Readonly<{ actors: InnovationUseActor[] }>) {
   return (
     <table
-      className="w-full text-[7.5px] border-collapse"
+      className="w-full text-[8.5px] border-collapse"
       style={{ fontFamily: "'Inter', 'Noto Sans', sans-serif" }}
     >
       <thead>
@@ -59,12 +48,19 @@ function ActorsTable({ actors }: { actors: InnovationUseActor[] }) {
       </thead>
       <tbody>
         {actors.map((actor, i) => (
-          <tr key={i} className="bg-white">
+          <tr
+            key={`${actor.actor_type}-${actor.subtype}-${i}`}
+            className="bg-white"
+          >
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px", borderLeft: "0.5px solid #e8ebed" }}
             >
-              {actor.actor_type}
+              {actor.other_actor_type
+                ? `${actor.actor_type}: ${
+                    actor.other_actor_type ?? "Not provided"
+                  }`
+                : actor.actor_type ?? "Not provided"}
             </td>
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
@@ -76,27 +72,35 @@ function ActorsTable({ actors }: { actors: InnovationUseActor[] }) {
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
-              <GenderCell
-                total={actor.women_total}
-                youth={actor.women_youth}
-                nonYouth={actor.women_non_youth}
-              />
+              {actor.sex_and_age_disaggregation ? (
+                "Not applicable"
+              ) : (
+                <GenderCell
+                  total={actor.women_total}
+                  youth={actor.women_youth}
+                  nonYouth={actor.women_non_youth}
+                />
+              )}
             </td>
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
-              <GenderCell
-                total={actor.men_total}
-                youth={actor.men_youth}
-                nonYouth={actor.men_non_youth}
-              />
+              {actor.sex_and_age_disaggregation ? (
+                "Not applicable"
+              ) : (
+                <GenderCell
+                  total={actor.men_total}
+                  youth={actor.men_youth}
+                  nonYouth={actor.men_non_youth}
+                />
+              )}
             </td>
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
-              {actor.total}
+              {actor.total ?? "Not provided"}
             </td>
           </tr>
         ))}
@@ -105,134 +109,73 @@ function ActorsTable({ actors }: { actors: InnovationUseActor[] }) {
   );
 }
 
-function ReadinessScale({ currentLevel }: { currentLevel: number }) {
-  const levels = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
-
-  return (
-    <div className="flex flex-col gap-[15px]">
-      <p className="text-[10px] leading-[1.15]">
-        <span className="font-bold text-[#1d1d1d]">
-          Current readiness of this innovation:
-        </span>{" "}
-        <span className="text-[#393939]">Level {currentLevel}</span>
-      </p>
-      <div className="relative">
-        {/* Gradient bar behind circles */}
-        <div
-          className="absolute left-[20px] right-[20px] h-[12px]"
-          style={{
-            top: 14,
-            background:
-              "linear-gradient(to right, #176028, #1f6838, #27984a, #45a85a, #5cb86c, #6cb88b, #5a9fc1, #7bb8d0, #a0c8d8, #c1c5ca)",
-            borderRadius: 6,
-          }}
-        />
-        {/* Circles */}
-        <div className="relative flex justify-between">
-          {levels.map((level) => {
-            const isCurrent = level === currentLevel;
-            const isActive = level >= currentLevel;
-
-            return (
-              <div
-                key={level}
-                className="flex flex-col items-center"
-                style={{ width: `${100 / 10}%` }}
-              >
-                <div
-                  className="flex items-center justify-center rounded-full z-10"
-                  style={{
-                    width: isCurrent ? 36 : 30,
-                    height: isCurrent ? 36 : 30,
-                    backgroundColor: isCurrent ? "#065f4a" : "white",
-                    color: isCurrent
-                      ? "white"
-                      : isActive
-                        ? "#065f4a"
-                        : "#9ca3af",
-                    border: `${isCurrent ? 3 : 2}px solid ${isActive ? "#065f4a" : "#9ca3af"}`,
-                    fontSize: isCurrent ? 14 : 11,
-                    fontWeight: 700,
-                    marginTop: isCurrent ? -3 : 0,
-                  }}
-                >
-                  {level}
-                </div>
-                <p
-                  className="text-[#818181] text-center leading-[1.3]"
-                  style={{ fontSize: 5, marginTop: 6, maxWidth: 50 }}
-                >
-                  {READINESS_DESCRIPTIONS[level]}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function InnovationUseSections({ data }: { data: PRMSResultData }) {
-  const hasActors = !!data.innovation_use_actors?.length;
-  const hasOrgs = !!data.innovation_use_organizations?.length;
-  const hasMeasures = !!data.innovation_use_measures?.length;
-  const currentLevel = data.readiness_level
-    ? parseInt(data.readiness_level.replace(/\D/g, ""), 10)
-    : null;
-
-  const hasAnything =
-    hasActors || hasOrgs || hasMeasures || currentLevel !== null;
-  if (!hasAnything) return null;
-
+export function InnovationUseSections({
+  data,
+}: Readonly<{ data: PRMSResultData }>) {
   return (
     <div className="flex flex-col gap-[15px]">
       <SectionTitle>Innovation Use</SectionTitle>
 
-      {hasActors && (
-        <div className="flex flex-col gap-[10px]">
-          <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
-            Actors - Number of people using the innovation, disaggregated by
-            gender:
-          </p>
-          <ActorsTable actors={data.innovation_use_actors ?? []} />
-        </div>
-      )}
+      <div className="flex flex-col gap-2.5">
+        <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+          Actors - Number of people using the innovation, disaggregated by
+          gender:
+        </p>
+        <ActorsTable actors={data.innovation_use_actors ?? []} />
+      </div>
 
-      {hasOrgs && (
-        <div className="flex flex-col gap-[10px]">
-          <SubSectionTitle>Organizations</SubSectionTitle>
-          <DataTable
-            columns={["Type", "Subtype", "How many"]}
-            rows={(data.innovation_use_organizations ?? []).map((o) => [
-              o.type,
-              o.subtype,
-              o.how_many,
-            ])}
-          />
-        </div>
-      )}
+      <div className="flex flex-col gap-2.5">
+        <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+          Organizations
+        </p>
+        <DataTable
+          columns={["Type", "Subtype", "How many"]}
+          rows={(data.innovation_use_organizations ?? []).map((o) => [
+            o.type ?? "Not provided",
+            o.subtype ?? "Not provided",
+            o.how_many ?? "Not provided",
+          ])}
+        />
+      </div>
 
-      {hasMeasures && (
-        <div className="flex flex-col gap-[10px]">
-          <SubSectionTitle>
-            Other quantitative measures of innovation use
-          </SubSectionTitle>
-          <DataTable
-            columns={[
-              "#Unit of measure",
-              ...(data.innovation_use_measures ?? []).map((m) => m.unit_of_measure),
-            ]}
-            rows={[
-              ["Value", ...(data.innovation_use_measures ?? []).map((m) => m.value)],
-            ]}
-          />
-        </div>
-      )}
+      <div className="flex flex-col gap-2.5">
+        <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+          Other quantitative measures of innovation use
+        </p>
+        <DataTable
+          columns={[
+            "#Unit of measure",
+            ...(data.innovation_use_measures ?? []).map(
+              (m) => m.unit_of_measure
+            ),
+          ]}
+          rows={[
+            [
+              "Value",
+              ...(data.innovation_use_measures ?? []).map(
+                (m) => m.value ?? "Not provided"
+              ),
+            ],
+          ]}
+        />
+      </div>
 
-      {currentLevel !== null && !isNaN(currentLevel) && (
-        <ReadinessScale currentLevel={currentLevel} />
-      )}
+      <div className="flex items-center gap-1 mb-4">
+        <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+          Current readiness of this innovation:
+        </p>
+        <p className="text-[#393939] text-[10px] leading-[1.15]">
+          {data.readiness_level}
+        </p>
+      </div>
+
+      <Image
+        src={readinessScale}
+        alt="Innovation Use Readiness Scale"
+        width={100}
+        height={500}
+        className="w-full"
+      />
     </div>
   );
 }

@@ -12,37 +12,38 @@ export interface LinkedEvidence {
 
 export interface ContributingCenter {
   center_name: string;
-  is_primary_center: number;
+  is_primary_center: boolean;
 }
 
 export interface TocPrimaryEntry {
-  initiative_short_name: string;
-  action_area: string;
+  toc_level_name: string;
+  toc_work_package_acronym: string;
   toc_result_title: string;
-  indicator?: string;
+  toc_indicator: string;
+  toc_result_description: string;
 }
 
 export interface PrimarySubmitterData {
-  toc_url?: string;
+  toc_url: string;
+  toc_internal_id: string;
+  contributor_name: string;
+  contributor_can_match_result: boolean;
 }
 
 export interface ContributingInitiative {
   initiative_short_name: string;
 }
 
-export interface NonPooledProject {
+export interface BilateralProject {
   project_title: string;
+  is_lead_project: boolean;
 }
 
 export interface PartnerEntry {
   partner_name: string;
-  country_hq_name: string;
-  institution_type: string;
-}
-
-export interface KPField {
-  label: string;
-  value: string;
+  partner_country_hq: string;
+  partner_type: string;
+  partner_delivery_type: string;
 }
 
 export interface QAAdjustment {
@@ -62,17 +63,22 @@ export interface BundledInnovation {
 export interface InnovationInvestment {
   entity: string;
   name: string;
-  usd_investment: string;
+  budget: string;
+  is_not_determined: boolean;
 }
 
 export interface InnovationActor {
-  type: string;
-  actors: string;
+  actor_name: string;
+  women: boolean;
+  women_youth: boolean;
+  men: boolean;
+  men_youth: boolean;
 }
 
 export interface InnovationOrganization {
-  type: string;
-  subtype: string;
+  organization_name: string;
+  other_type: string;
+  organization_sub_type: string;
 }
 
 export interface InnovationDeveloper {
@@ -83,7 +89,7 @@ export interface InnovationDeveloper {
 
 export interface InnovationCollaborator {
   name: string;
-  email?: string;
+  email: string;
 }
 
 // Policy Change (rt_id=1)
@@ -95,6 +101,7 @@ export interface PolicyChangeField {
 // Innovation Use (rt_id=2)
 export interface InnovationUseActor {
   actor_type: string;
+  other_actor_type: string | null;
   subtype: string;
   women_total: number | null;
   women_youth: number | null;
@@ -103,6 +110,7 @@ export interface InnovationUseActor {
   men_youth: number | null;
   men_non_youth: number | null;
   total: number;
+  sex_and_age_disaggregation: boolean;
 }
 
 export interface InnovationUseOrganization {
@@ -128,15 +136,11 @@ export interface ImpactArea {
 export interface GeoLocation {
   geo_focus: string;
   regions: string[];
-  countries: string[];
+  countries: { name: string; code: string }[];
 }
 
-export interface TheoryOfChange {
-  program_name: string;
-  area_of_work: string;
-  toc_url?: string;
-  high_level_output?: string;
-  indicator?: string;
+export interface TheoryOfChange extends PrimarySubmitterData {
+  toc_primary: TocPrimaryEntry[];
 }
 
 export interface Evidence {
@@ -157,6 +161,7 @@ export interface PRMSResultData {
   result_level: string;
   result_description: string;
   title: string;
+  short_title: string;
 
   // Phase & dates
   phase_name: string;
@@ -184,7 +189,7 @@ export interface PRMSResultData {
   // Geographic
   geo_focus: string;
   regions: string[] | null;
-  countries: string[] | null;
+  countries: { name: string; code: string }[] | null;
   subnational: string | null;
 
   // Theory of Change
@@ -194,7 +199,7 @@ export interface PRMSResultData {
   // Contributors
   contributing_centers: ContributingCenter[];
   contributing_initiatives: ContributingInitiative[] | null;
-  non_pooled_projects: NonPooledProject[] | null;
+  bilateral_projects: BilateralProject[] | null;
 
   // Evidence
   linked_evidences: LinkedEvidence[];
@@ -203,7 +208,6 @@ export interface PRMSResultData {
   // Partners
   partners_applicable: string;
   non_kp_partner_data: PartnerEntry[] | null;
-  kp_partner_data: KPField[] | null;
 
   // QA
   qa_adjustments?: QAAdjustment[];
@@ -224,11 +228,48 @@ export interface PRMSResultData {
   innovation_actors?: InnovationActor[];
   innovation_organizations?: InnovationOrganization[];
 
+  // Knowledge Product (rt_id=6)
+  kp_handle?: string;
+  kp_cgspace_metadata?: {
+    isi?: boolean;
+    issue_date?: number;
+    open_access?: string;
+    peer_reviewed?: boolean;
+    online_date?: number;
+    doi?: string;
+  };
+  kp_wos_metadata?: {
+    issue_date?: number;
+    doi?: string;
+  };
+  kp_authors?: string;
+  kp_knowledge_product_type?: string;
+  kp_licence?: string;
+  kp_keywords?: string;
+  kp_agrovocs?: string;
+  kp_comodity?: string;
+  kp_sponsors?: string;
+  kp_altmetrics_score?: number;
+  kp_references?: string;
+  kp_fair_score?: {
+    findable?: string;
+    accessible?: string;
+    interoperable?: string;
+    reusable?: string;
+  };
+
+  // Capacity Sharing for Development (rt_id=5)
+  capdev_female_using?: string;
+  capdev_male_using?: string;
+  capdev_term?: string;
+  capdev_delivery_method_name?: string;
+  capdev_organizations?: string[];
+
   // Policy Change (rt_id=1)
   policy_type_name?: string;
   policy_amount?: string;
   policy_stage?: string;
-  policy_implementing_organizations?: string;
+  policy_implementing_organizations?: string[];
 
   // Innovation Use (rt_id=2)
   innovation_use_actors?: InnovationUseActor[];

@@ -5,10 +5,14 @@ import type {
   TheoryOfChange,
   GeoLocation,
   Evidence,
+  TocPrimaryEntry,
 } from "../types";
 import { ImpactAreaCard, OECDCriteria } from "./impact-areas";
 import { DataTable } from "./tables";
-function SearchIcon({ size, className }: { size: number; className?: string }) {
+function SearchIcon({
+  size,
+  className,
+}: Readonly<{ size: number; className?: string }>) {
   return (
     <svg
       width={size}
@@ -70,12 +74,12 @@ export function ResultDetailsSection({
   impactAreas: ImpactArea[];
 }>) {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Result details</SectionTitle>
 
       <div className="flex flex-col gap-[8px]">
-        {data.title && data.title !== data.result_name && (
-          <LabelValue label="Short title" value={data.title} />
+        {data.short_title && (
+          <LabelValue label="Short title" value={data.short_title} />
         )}
         {data.result_description && (
           <LabelValue
@@ -110,7 +114,7 @@ export function ResultDetailsSection({
             <p className="text-[#1d1d1d] text-[10px] font-bold leading-[1.15]">
               Impact Areas targeted
             </p>
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col gap-2.5">
               <div className="grid grid-cols-2 gap-2.5">
                 {impactAreas.map((area) => (
                   <ImpactAreaCard key={area.name} area={area} />
@@ -127,7 +131,10 @@ export function ResultDetailsSection({
 
 // ── Theory of Change Card ──
 
-function TheoryOfChangeCard({ toc }: Readonly<{ toc: TheoryOfChange }>) {
+function TheoryOfChangeCard({
+  tocAllDAta,
+  tocEntry,
+}: Readonly<{ tocAllDAta: TheoryOfChange; tocEntry: TocPrimaryEntry }>) {
   return (
     <div className="bg-[#e2e0df]" style={{ padding: "15px 19px" }}>
       <div className="flex items-center justify-between mb-[16px]">
@@ -143,19 +150,19 @@ function TheoryOfChangeCard({ toc }: Readonly<{ toc: TheoryOfChange }>) {
           </div>
           <div className="flex flex-col gap-[3px]">
             <p className="text-[#041b15] text-[11px] font-bold leading-[1.15]">
-              {toc.program_name}
+              {tocAllDAta.contributor_name}
             </p>
             <p
               className="text-[#02211a] text-[9.5px] leading-[1.15]"
               style={{ fontFamily: "'Noto Serif', serif" }}
             >
-              {toc.area_of_work}
+              {tocEntry.toc_work_package_acronym}
             </p>
           </div>
         </div>
-        {toc.toc_url && (
+        {tocAllDAta.toc_url && (
           <a
-            href={toc.toc_url}
+            href={tocAllDAta.toc_url}
             className="flex items-center gap-[2px] shrink-0"
           >
             <Image
@@ -172,16 +179,18 @@ function TheoryOfChangeCard({ toc }: Readonly<{ toc: TheoryOfChange }>) {
         )}
       </div>
       <div className="flex flex-col gap-[5px] text-[9px]">
-        {toc.high_level_output && (
+        {tocEntry.toc_level_name && (
           <p className="leading-[1.15]">
-            <span className="font-bold text-[#1d1d1d]">High Level Output:</span>{" "}
-            <span className="text-[#393939]">{toc.high_level_output}</span>
+            <span className="font-bold text-[#1d1d1d]">
+              {tocEntry.toc_level_name}:
+            </span>{" "}
+            <span className="text-[#393939]">{tocEntry.toc_result_title}</span>
           </p>
         )}
-        {toc.indicator && (
+        {tocEntry.toc_indicator && (
           <p style={{ lineHeight: 1.5 }}>
             <span className="font-bold text-[#1d1d1d]">Indicator:</span>{" "}
-            <span className="text-[#393939]">{toc.indicator}</span>
+            <span className="text-[#393939]">{tocEntry.toc_indicator}</span>
           </p>
         )}
       </div>
@@ -196,50 +205,54 @@ export function ContributorsSection({
   tocEntries,
 }: Readonly<{
   data: PRMSResultData;
-  tocEntries: TheoryOfChange[];
+  tocEntries: TheoryOfChange;
 }>) {
-  const hasContributingInitiatives = !!data.contributing_initiatives?.length;
-  const hasCenters = !!data.contributing_centers?.length;
-  const hasProjects = !!data.non_pooled_projects?.length;
-  const hasPartners = !!data.non_kp_partner_data?.length;
-  const hasBundled = !!data.bundled_innovations?.length;
+  const hasContributingInitiatives =
+    data.contributing_initiatives && data.contributing_initiatives.length > 0;
+  const hasCenters =
+    data.contributing_centers && data.contributing_centers.length > 0;
+  const hasBilateralProjects =
+    data.bilateral_projects && data.bilateral_projects.length > 0;
+  const hasPartners =
+    data.non_kp_partner_data && data.non_kp_partner_data.length > 0;
+  const hasBundled =
+    data.bundled_innovations && data.bundled_innovations.length > 0;
 
   const hasAnything =
-    tocEntries?.length > 0 ||
+    tocEntries.toc_primary.length > 0 ||
     hasContributingInitiatives ||
     hasCenters ||
-    hasProjects ||
+    hasBilateralProjects ||
     hasPartners ||
     hasBundled;
 
   if (!hasAnything) return null;
 
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Contributors and Partners</SectionTitle>
 
-      {tocEntries?.map((toc, i) => (
-        <div
-          key={`${toc.program_name}-${i}`}
-          className="flex flex-col gap-[10px]"
-        >
-          <SubSectionTitle>Theory of Change</SubSectionTitle>
-          <TheoryOfChangeCard toc={toc} />
-        </div>
-      ))}
+      <div className="flex flex-col gap-2.5">
+        <SubSectionTitle>Theory of Change</SubSectionTitle>
+        {tocEntries.toc_primary.map((toc, i) => (
+          <TheoryOfChangeCard
+            key={`${toc.toc_work_package_acronym}-${toc.toc_result_title}-${i}`}
+            tocAllDAta={tocEntries}
+            tocEntry={toc}
+          />
+        ))}
+      </div>
 
-      {(hasContributingInitiatives || hasCenters || hasProjects) && (
-        <div className="flex flex-col gap-[10px]">
+      {(hasContributingInitiatives || hasCenters || hasBilateralProjects) && (
+        <div className="flex flex-col gap-2.5">
           <SubSectionTitle>Contributors</SubSectionTitle>
           <div className="flex flex-col gap-[8px] text-[10px]">
-            {hasContributingInitiatives &&
-              data.contributing_initiatives?.map((init, i) => (
-                <LabelValue
-                  key={`${init.initiative_short_name}-${i}`}
-                  label="Contributing Program"
-                  value={init.initiative_short_name}
-                />
-              ))}
+            <LabelValue
+              label="Contributing Program"
+              value={data
+                .contributing_initiatives!.map((i) => i.initiative_short_name)
+                .join(", ")}
+            />
 
             {hasCenters && (
               <div>
@@ -253,7 +266,7 @@ export function ContributorsSection({
                       className="leading-normal"
                     >
                       {c.center_name}
-                      {c.is_primary_center === 1 && (
+                      {!!c.is_primary_center && (
                         <span className="text-[#065f4a] font-bold ml-[4px]">
                           (Primary)
                         </span>
@@ -264,18 +277,23 @@ export function ContributorsSection({
               </div>
             )}
 
-            {hasProjects && (
+            {hasBilateralProjects && (
               <div>
                 <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15] mb-[4px]">
                   Contributing W3 and/or bilateral projects:
                 </p>
                 <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
-                  {data.non_pooled_projects?.map((p, i) => (
+                  {data.bilateral_projects!.map((bp, i) => (
                     <li
-                      key={`${p.project_title}-${i}`}
+                      key={`${bp.project_title}-${i}`}
                       className="leading-normal"
                     >
-                      {p.project_title}
+                      {bp.project_title}
+                      {!!bp.is_lead_project && (
+                        <span className="text-[#065f4a] font-bold ml-[4px]">
+                          (Lead)
+                        </span>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -286,21 +304,21 @@ export function ContributorsSection({
       )}
 
       {hasPartners && (
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <SubSectionTitle>Partners</SubSectionTitle>
           <DataTable
             columns={["Name", "Country HQ", "Institution type"]}
             rows={(data.non_kp_partner_data ?? []).map((p) => [
               p.partner_name,
-              p.country_hq_name,
-              p.institution_type,
+              p.partner_country_hq,
+              p.partner_type,
             ])}
           />
         </div>
       )}
 
       {hasBundled && (
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <SubSectionTitle>Bundled innovations</SubSectionTitle>
           <DataTable
             columns={["Portfolio", "Phase", "Code", "Indicator", "Title"]}
@@ -375,15 +393,22 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                 Countries specified for this result:
               </p>
               <div className="flex flex-wrap gap-[6px]">
-                {geo.countries?.length > 0 ? (
-                  geo.countries?.map((c, i) => (
-                    <span
-                      key={`${c}-${i}`}
-                      className="text-[#393939] leading-normal"
+                {geo.countries.length > 0 ? (
+                  geo.countries.map((c, i) => (
+                    <div
+                      key={`${c.name}-${i}`}
+                      className="text-[#393939] leading-normal flex items-center gap-1"
                     >
-                      <span className="mr-[4px]">&bull;</span>
-                      {c}
-                    </span>
+                      <span>&bull;</span>
+                      <Image
+                        src={`https://flagsapi.com/${c.code}/flat/64.png`}
+                        alt={c.name}
+                        width={16}
+                        height={16}
+                        className="w-[16px] h-[16px] object-cover rounded-md"
+                      />
+                      {c.name}
+                    </div>
                   ))
                 ) : (
                   <p className="text-[#707070] text-[10px] leading-[1.15] italic font-normal">
@@ -395,7 +420,7 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
           </div>
         </>
       ) : (
-        <div className="flex items-center justify-center gap-[10px] py-4 mx-auto">
+        <div className="flex items-center justify-center gap-2.5 py-4 mx-auto">
           <SearchIcon size={16} className="text-[#033529] rotate-y-180" />
           <p className="text-[#393939] text-[10px] leading-[1.15] font-semibold">
             This is yet to be determined
@@ -410,7 +435,7 @@ export function GeographicSection({
   geo,
 }: Readonly<{ geo: GeoLocation | null }>) {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Geographic location</SectionTitle>
       <GeoLocationBox geo={geo} />
     </div>
@@ -422,7 +447,7 @@ export function GeographicSection({
 function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
   return (
     <div className="bg-[#e2e0df]" style={{ padding: "15px 19px" }}>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <p
           className="text-[#02211a] text-[9.5px] leading-[1.15]"
           style={{ fontFamily: "'Noto Serif', serif" }}
@@ -454,9 +479,9 @@ export function EvidenceSection({
 }: Readonly<{ evidences: Evidence[] }>) {
   if (!evidences?.length) return null;
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Evidence</SectionTitle>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         {evidences.map((ev, i) => (
           <EvidenceCard key={`${ev.label}-${i}`} evidence={ev} />
         ))}

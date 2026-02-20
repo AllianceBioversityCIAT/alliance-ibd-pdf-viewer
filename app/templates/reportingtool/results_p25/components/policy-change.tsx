@@ -2,31 +2,36 @@ import type { PRMSResultData } from "../types";
 import { SectionTitle } from "./common-sections";
 import { KeyValueTable } from "./tables";
 
-export function PolicyChangeSection({ data }: { data: PRMSResultData }) {
-  const rows: { label: string; value: string }[] = [];
-
-  if (data.policy_type_name) {
-    rows.push({ label: "Type", value: data.policy_type_name });
-  }
-  if (data.policy_amount) {
-    rows.push({ label: "USD amount", value: data.policy_amount });
-  }
-  if (data.policy_stage) {
-    rows.push({ label: "Stage", value: data.policy_stage });
-  }
-  if (data.policy_implementing_organizations) {
-    rows.push({
-      label: "Whose policy is this? (Implementing organizations)",
-      value: data.policy_implementing_organizations,
-    });
-  }
-
-  if (rows.length === 0) return null;
-
+export function PolicyChangeSection({
+  data,
+}: Readonly<{ data: PRMSResultData }>) {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <SectionTitle>Policy Change</SectionTitle>
-      <KeyValueTable rows={rows} />
+      <KeyValueTable
+        rows={[
+          {
+            label: "Type",
+            value: data.policy_type_name ?? "Not provided",
+          },
+          {
+            label: "USD Amount",
+            value: data.policy_amount ?? "Not provided",
+            hideRowIf:
+              data.policy_type_name === "Program, budget or investment",
+          },
+          {
+            label: "Stage",
+            value: data.policy_stage ?? "Not provided",
+          },
+          {
+            label: "Whose policy is this? (Implementing organizations)",
+            value:
+              data.policy_implementing_organizations?.join(", ") ??
+              "Not provided",
+          },
+        ]}
+      />
     </div>
   );
 }
