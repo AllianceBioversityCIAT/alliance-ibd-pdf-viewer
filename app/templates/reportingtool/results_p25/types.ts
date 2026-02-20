@@ -46,11 +46,6 @@ export interface PartnerEntry {
   partner_delivery_type: string;
 }
 
-export interface KPField {
-  label: string;
-  value: string;
-}
-
 export interface QAAdjustment {
   label: string;
   from_value: string;
@@ -211,7 +206,6 @@ export interface PRMSResultData {
   // Partners
   partners_applicable: string;
   non_kp_partner_data: PartnerEntry[] | null;
-  kp_partner_data: KPField[] | null;
 
   // QA
   qa_adjustments?: QAAdjustment[];
@@ -231,6 +225,36 @@ export interface PRMSResultData {
   innovation_investments?: InnovationInvestment[];
   innovation_actors?: InnovationActor[];
   innovation_organizations?: InnovationOrganization[];
+
+  // Knowledge Product (rt_id=6)
+  kp_handle?: string;
+  kp_cgspace_metadata?: {
+    isi?: boolean;
+    issue_date?: number;
+    open_access?: string;
+    peer_reviewed?: boolean;
+    online_date?: number;
+    doi?: string;
+  };
+  kp_wos_metadata?: {
+    issue_date?: number;
+    doi?: string;
+  };
+  kp_authors?: string;
+  kp_knowledge_product_type?: string;
+  kp_licence?: string;
+  kp_keywords?: string;
+  kp_agrovocs?: string;
+  kp_comodity?: string;
+  kp_sponsors?: string;
+  kp_altmetrics_score?: number;
+  kp_references?: string;
+  kp_fair_score?: {
+    findable?: string;
+    accessible?: string;
+    interoperable?: string;
+    reusable?: string;
+  };
 
   // Policy Change (rt_id=1)
   policy_type_name?: string;

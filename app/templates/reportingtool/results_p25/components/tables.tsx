@@ -53,7 +53,7 @@ export function KeyValueTable({
       className="w-full text-[9px] border-collapse"
       style={{ fontFamily: "'Inter', 'Noto Sans', sans-serif" }}
     >
-      <tbody>
+      <tbody className="border border-[#e8ebed]">
         {rows.map((row, i) => (
           <tr key={`${row.label}-${row.value}-${i}`}>
             <td
