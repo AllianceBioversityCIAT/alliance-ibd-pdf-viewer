@@ -15,7 +15,7 @@ export function DataTable({
           {columns.map((col, i) => (
             <th
               key={`${col}-${i}`}
-              className="bg-[#033529] text-white text-left border-b border-[#e5e7eb] p-2"
+              className="bg-(--theme-deep) text-white text-left border-b border-[#e5e7eb] p-2"
             >
               {col}
             </th>
@@ -60,7 +60,7 @@ export function KeyValueTable({
           return (
             <tr key={`${row.label}-${row.value}-${i}`}>
               <td
-                className="bg-[#033529] text-white font-normal border-b border-[#e8ebed]"
+                className="bg-(--theme-deep) text-white font-normal border-b border-[#e8ebed]"
                 style={{ padding: "7.5px", width: 208 }}
               >
                 {row.label}

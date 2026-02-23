@@ -38,7 +38,7 @@ function ActorsTable({ actors }: Readonly<{ actors: InnovationUseActor[] }>) {
           {["Type", "Subtype", "Women", "Men", "Total"].map((col) => (
             <th
               key={col}
-              className="bg-[#033529] text-white font-bold text-left border-b border-[#e5e7eb]"
+              className="bg-(--theme-deep) text-white font-bold text-left border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
               {col}

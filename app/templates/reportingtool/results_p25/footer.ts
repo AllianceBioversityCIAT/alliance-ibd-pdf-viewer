@@ -12,7 +12,11 @@
  *   .pageNumber  → current page number
  *   .totalPages  → total page count
  */
-export const footerHtml = `<!DOCTYPE html>
+
+import { DEFAULT_THEME, type ThemeColors } from "./color-themes";
+
+export function buildFooterHtml(theme: ThemeColors = DEFAULT_THEME): string {
+  return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -23,9 +27,12 @@ export const footerHtml = `<!DOCTYPE html>
 <body>
   <div style="font-family: Arial, Helvetica, sans-serif; font-size: 7px; margin: 0; padding: 0 43px; color: #818181;">
     <div style="border-top: 1px solid #e2e0df; padding-top: 6px; display: flex; justify-content: space-between; align-items: center;">
-      <span style="color: #065f4a; font-weight: 500;">CGIAR Results Framework</span>
+      <span style="color: ${theme.mid}; font-weight: 500;">CGIAR Results Framework</span>
       <span>Page <span class="pageNumber" style="font-weight: 500;"></span> of <span class="totalPages" style="font-weight: 500;"></span></span>
     </div>
   </div>
 </body>
 </html>`;
+}
+
+export const footerHtml = buildFooterHtml();

@@ -1,12 +1,15 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Paginator } from "./paginator";
+import { getSPLabel } from "@/app/templates/utils";
 
 interface PageShellProps {
   resultType: string;
   resultName: string;
   generationDate: string;
   phaseName: string;
+  primarySubmitterAcronym: string;
+  themeVars?: Record<string, string>;
   children: ReactNode;
 }
 
@@ -15,46 +18,73 @@ export function PageShell({
   resultName,
   generationDate,
   phaseName,
+  themeVars,
+  primarySubmitterAcronym,
   children,
 }: Readonly<PageShellProps>) {
   return (
     <div
       className="bg-white relative"
-      style={{ fontFamily: "'Noto Sans', sans-serif" }}
+      style={
+        {
+          fontFamily: "'Noto Sans', sans-serif",
+          ...themeVars,
+        } as CSSProperties
+      }
     >
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;700&family=Noto+Serif:wght@400;500&display=swap');`}</style>
 
       {/* Right sidebar decorative strip */}
       <div
         className="absolute top-0 right-0 h-full overflow-hidden"
-        style={{ width: 13, zIndex: 10 }}
-      >
-        <Image
-          src="/assets/prms/sidebar-pattern.png"
-          alt=""
-          width={13}
-          height={100}
-          className="h-full object-cover "
-        />
-      </div>
+        style={{
+          width: 13,
+          zIndex: 10,
+          backgroundImage: getSPLabel(primarySubmitterAcronym)
+            ? `url('/assets/prms/sidebar-patterns/sidebar-pattern-${primarySubmitterAcronym}.png')`
+            : "url('/assets/prms/sidebar-patterns/sidebar-pattern.png')",
+          backgroundPosition: "left",
+          backgroundRepeat: "repeat",
+          backgroundSize: "auto 850px",
+        }}
+      />
 
       {/* Header */}
-      <div className="bg-[#03211A]" style={{ padding: "42px 43px 30px" }}>
-        <Image
-          src="/assets/prms/cgiar-logo.png"
-          alt="CGIAR"
-          width={120}
-          height={44}
-          className="object-contain mb-[15px]"
-        />
+      <div
+        className="bg-(--theme-header-bg)"
+        style={{ padding: "42px 43px 30px" }}
+      >
+        <div className="flex items-center gap-[3px]">
+          <Image
+            src="/assets/prms/cgiar-logo-1.png"
+            alt="CGIAR"
+            width={44}
+            height={44}
+            className="object-contain h-11 w-11"
+          />
+          <Image
+            src="/assets/prms/cgiar-logo-2.png"
+            alt="CGIAR"
+            width={75}
+            height={44}
+            className="object-contain h-11"
+          />
+          {getSPLabel(primarySubmitterAcronym) && (
+            <div className="h-11 bg-(--theme-mid) w-max flex items-end justify-center">
+              <p className="text-[7px] p-1.5 text-[#033529] font-bold leading-[1.15]">
+                {getSPLabel(primarySubmitterAcronym)}
+              </p>
+            </div>
+          )}
+        </div>
 
         <div
-          className="flex flex-col gap-[5px] mb-[14px]"
+          className="flex flex-col gap-[5px] mb-[14px] mt-4"
           style={{ maxWidth: 509 }}
         >
           <p className="text-white text-[10px] leading-[1.15]">{resultType}</p>
           <p
-            className="text-[#11d4b3] text-[18px] font-medium leading-[1.15]"
+            className="text-(--theme-accent) text-[18px] font-medium leading-[1.15]"
             style={{ fontFamily: "'Noto Serif', serif" }}
           >
             {resultName}
@@ -78,14 +108,14 @@ export function PageShell({
             validating results under the{" "}
             <a
               href="https://storage.googleapis.com/cgiarorg/2025/06/CGIAR-Technical-Reporting-Arrangement-2025-30.pdf"
-              className="text-[#11d4b3] underline"
+              className="text-(--theme-accent) underline"
             >
               Technical Reporting Arrangement (TRA) 2025-2030
             </a>
             . Each result contributes to the{" "}
             <a
               href="https://docs.google.com/document/d/1sgDrMxZP081SV1hXgDO2Y6lKjZXfwNu7/edit"
-              className="text-[#11d4b3] underline"
+              className="text-(--theme-accent) underline"
             >
               CGIAR Results Framework
             </a>
@@ -94,7 +124,7 @@ export function PageShell({
             and these contributions are reflected in the{" "}
             <a
               href="https://www.cgiar.org/food-security-impact/results-dashboard"
-              className="text-[#11d4b3] underline"
+              className="text-(--theme-accent) underline"
             >
               CGIAR Results Dashboard.
             </a>

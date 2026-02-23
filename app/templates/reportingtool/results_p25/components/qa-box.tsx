@@ -8,7 +8,7 @@ function ArrowRight() {
       height="8"
       viewBox="0 0 11 8"
       fill="none"
-      className="text-[#033529] shrink-0"
+      className="text-(--theme-deep) shrink-0"
     >
       <path
         d="M7 1L10 4M10 4L7 7M10 4H1"
@@ -31,7 +31,7 @@ export function QABox({
   return (
     <div className="bg-[#e2e0df] flex overflow-hidden">
       <div
-        className="bg-[#033529] flex items-center justify-center shrink-0"
+        className="bg-(--theme-deep) flex items-center justify-center shrink-0"
         style={{ width: 106, padding: "8px 17px" }}
       >
         <Image
@@ -44,7 +44,7 @@ export function QABox({
       </div>
       <div className="flex flex-col gap-[12px] py-[15px] px-[22px] flex-1 min-w-0">
         <div className="flex flex-col gap-[8px]">
-          <p className="text-[#02211a] text-[11px] font-bold leading-[1.15]">
+          <p className="text-(--theme-header-bg) text-[11px] font-bold leading-[1.15]">
             Result quality assured by two assessors and subsequently reviewed by
             a senior third party
           </p>
@@ -54,7 +54,7 @@ export function QABox({
             CGIAR standard{" "}
             <a
               href="https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
-              className="text-[#065f4a] underline"
+              className="text-(--theme-mid) underline"
             >
               QA process.
             </a>
@@ -72,7 +72,7 @@ export function QABox({
                 {readinessTransition.from}
               </span>
               <ArrowRight />
-              <span className="text-[#033529] font-medium">
+              <span className="text-(--theme-deep) font-medium">
                 {readinessTransition.to}
               </span>
             </div>
@@ -94,7 +94,7 @@ export function QABox({
                     {adj.from_value}
                   </span>
                   <ArrowRight />
-                  <span className="text-[#033529] font-medium">
+                  <span className="text-(--theme-deep) font-medium">
                     {adj.to_value}
                   </span>
                 </div>
@@ -111,7 +111,7 @@ export function KPQABox() {
   return (
     <div className="bg-[#e2e0df] flex overflow-hidden">
       <div
-        className="bg-[#033529] flex items-center justify-center shrink-0"
+        className="bg-(--theme-deep) flex items-center justify-center shrink-0"
         style={{ width: 106, padding: "8px 17px" }}
       >
         <div
@@ -132,7 +132,7 @@ export function KPQABox() {
         </div>
       </div>
       <div className="flex flex-col gap-[8px] py-[15px] px-[22px] flex-1 min-w-0">
-        <p className="text-[#02211a] text-[11px] font-bold leading-[1.15]">
+        <p className="text-(--theme-header-bg) text-[11px] font-bold leading-[1.15]">
           Result quality assured by CGIAR Center knowledge manager
         </p>
         <p className="text-[#818181] text-[8px] leading-normal">

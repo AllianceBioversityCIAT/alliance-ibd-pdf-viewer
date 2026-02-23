@@ -49,14 +49,14 @@ export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
   for (const key of tagKeys) {
     const tag = data[key];
     if (!tag) continue;
-    const parsed = parseTag(tag);
-    if (!parsed) continue;
+    // const parsed = parseTag(tag.score);
+    // if (!parsed) continue;
     const mapping = IMPACT_AREA_MAP[key];
     areas.push({
       name: mapping.name,
       icon_url: mapping.icon_url,
-      score: parsed.score,
-      score_label: parsed.label,
+      score: tag.score.toString(),
+      components: tag.components,
     });
   }
 

@@ -341,7 +341,7 @@ function placeFooters(
     `;
     footer.innerHTML = `
       <div style="border-top: 1px solid #e2e0df; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <span style="color: #065f4a; font-weight: 500;">CGIAR Results Framework</span>
+        <span style="color: var(--theme-mid); font-weight: 500;">CGIAR Results Framework</span>
         <span>Page ${page + 1} of ${totalPages}</span>
       </div>
     `;

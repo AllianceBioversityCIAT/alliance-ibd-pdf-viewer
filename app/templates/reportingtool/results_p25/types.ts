@@ -128,9 +128,9 @@ export interface InnovationUseMeasure {
 
 export interface ImpactArea {
   name: string;
+  score: string;
+  components: string[];
   icon_url?: string;
-  score: number;
-  score_label: string;
 }
 
 export interface GeoLocation {
@@ -171,15 +171,16 @@ export interface PRMSResultData {
 
   // People
   primary_submitter_name: string;
+  primary_submitter_acronym: string;
   lead_contact_person: string;
   result_lead: string;
 
   // Impact tags (format: "(1) Significant")
-  nutrition_tag: string;
-  climate_tag: string;
-  poverty_tag: string;
-  gender_tag: string;
-  environmental_tag: string;
+  nutrition_tag: { name: string; score: number; components: string[] };
+  climate_tag: { name: string; score: number; components: string[] };
+  poverty_tag: { name: string; score: number; components: string[] };
+  gender_tag: { name: string; score: number; components: string[] };
+  environmental_tag: { name: string; score: number; components: string[] };
 
   // Portfolio
   portfolio_acronym: string;

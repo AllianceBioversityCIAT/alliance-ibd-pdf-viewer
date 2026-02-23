@@ -32,14 +32,14 @@ export function InnovationDevelopmentSections({
                     {dev.email && (
                       <>
                         {" "}
-                        <span className="text-[#065f4a]">(</span>
+                        <span className="text-(--theme-mid)">(</span>
                         <a
                           href={`mailto:${dev.email}`}
-                          className="text-[#065f4a] underline"
+                          className="text-(--theme-mid) underline"
                         >
                           {dev.email}
                         </a>
-                        <span className="text-[#065f4a]">)</span>
+                        <span className="text-(--theme-mid)">)</span>
                       </>
                     )}
                     {dev.institution && ` ${dev.institution}`}
@@ -114,7 +114,7 @@ export function InnovationDevelopmentSections({
                     <li key={`${m.evidence}-${i}`} className="leading-normal">
                       <a
                         href={m.evidence}
-                        className="text-[#065f4a] underline break-all"
+                        className="text-(--theme-mid) underline break-all"
                       >
                         {m.evidence}
                       </a>
@@ -145,7 +145,7 @@ export function InnovationDevelopmentSections({
               Learn more in{" "}
               <a
                 href="https://www.scalingreadiness.org"
-                className="text-[#065f4a] underline"
+                className="text-(--theme-mid) underline"
               >
                 www.scalingreadiness.org
               </a>
