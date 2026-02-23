@@ -9,6 +9,7 @@ import type {
 } from "../types";
 import { ImpactAreaCard, OECDCriteria } from "./impact-areas";
 import { DataTable } from "./tables";
+import { Link } from "lucide-react";
 function SearchIcon({
   size,
   className,
@@ -35,7 +36,7 @@ function SearchIcon({
 
 export function SectionTitle({ children }: Readonly<{ children: string }>) {
   return (
-    <p className="text-[#065f4a] text-[14px] font-bold leading-[1.15]">
+    <p className="text-(--theme-mid) text-[14px] font-bold leading-[1.15]">
       {children}
     </p>
   );
@@ -153,7 +154,7 @@ function TheoryOfChangeCard({
               {tocAllDAta.contributor_name}
             </p>
             <p
-              className="text-[#02211a] text-[9.5px] leading-[1.15]"
+              className="text-[#041b15] text-[9.5px] leading-[1.15]"
               style={{ fontFamily: "'Noto Serif', serif" }}
             >
               {tocEntry.toc_work_package_acronym}
@@ -165,14 +166,8 @@ function TheoryOfChangeCard({
             href={tocAllDAta.toc_url}
             className="flex items-center gap-[2px] shrink-0"
           >
-            <Image
-              src="/assets/prms/icon-link.svg"
-              alt=""
-              width={10}
-              height={7}
-            />
-
-            <span className="text-[#065f4a] text-[9px] font-bold">
+            <Link size={10} className="text-(--theme-deep)" />
+            <span className="text-(--theme-deep) text-[9px] font-bold">
               Access TOC diagram
             </span>
           </a>
@@ -267,7 +262,7 @@ export function ContributorsSection({
                     >
                       {c.center_name}
                       {!!c.is_primary_center && (
-                        <span className="text-[#065f4a] font-bold ml-[4px]">
+                        <span className="text-(--theme-mid) font-bold ml-[4px]">
                           (Primary)
                         </span>
                       )}
@@ -290,7 +285,7 @@ export function ContributorsSection({
                     >
                       {bp.project_title}
                       {!!bp.is_lead_project && (
-                        <span className="text-[#065f4a] font-bold ml-[4px]">
+                        <span className="text-(--theme-mid) font-bold ml-[4px]">
                           (Lead)
                         </span>
                       )}
@@ -344,7 +339,7 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
       {geo?.geo_focus ? (
         <>
           <div
-            className="bg-[#033529] flex flex-col items-center justify-center shrink-0"
+            className="bg-(--theme-deep) flex flex-col items-center justify-center shrink-0"
             style={{ width: 106, padding: "8px 17px" }}
           >
             <div
@@ -421,7 +416,7 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
         </>
       ) : (
         <div className="flex items-center justify-center gap-2.5 py-4 mx-auto">
-          <SearchIcon size={16} className="text-[#033529] rotate-y-180" />
+          <SearchIcon size={16} className="text-(--theme-deep) rotate-y-180" />
           <p className="text-[#393939] text-[10px] leading-[1.15] font-semibold">
             This is yet to be determined
           </p>
@@ -449,7 +444,7 @@ function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
     <div className="bg-[#e2e0df]" style={{ padding: "15px 19px" }}>
       <div className="flex flex-col gap-2.5">
         <p
-          className="text-[#02211a] text-[9.5px] leading-[1.15]"
+          className="text-(--theme-header-bg) text-[9.5px] leading-[1.15]"
           style={{ fontFamily: "'Noto Serif', serif" }}
         >
           {evidence.label}
@@ -458,7 +453,7 @@ function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
           <span className="font-bold text-[#1d1d1d]">Link:</span>{" "}
           <a
             href={evidence.link}
-            className="text-[#065f4a] underline break-all"
+            className="text-(--theme-mid) underline break-all"
           >
             {evidence.link}
           </a>

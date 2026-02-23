@@ -51,5 +51,40 @@ export function formatDateCET(date: Date) {
   const minute = parts.find((p) => p.type === "minute")?.value;
   const tz = parts.find((p) => p.type === "timeZoneName")?.value;
 
-  return `${dayName}, ${month} ${day}${getOrdinal(Number(day))}, ${year}, at ${hour}:${minute} ${tz}`;
+  return `${dayName}, ${month} ${day}${getOrdinal(
+    Number(day)
+  )}, ${year}, at ${hour}:${minute} ${tz}`;
+}
+
+export function getSPLabel(spCode: string) {
+  switch (spCode.toUpperCase()) {
+    case "SP01":
+      return "BREEDING FOR TOMORROW";
+    case "SP02":
+      return "SUSTAINABLE FARMING";
+    case "SP03":
+      return "SUSTAINABLE ANIMAL AND AQUATIC FOODS";
+    case "SP04":
+      return "MULTIFUNCTIONAL LANDSCAPES";
+    case "SP05":
+      return "BETTER DIETS AND NUTRITION";
+    case "SP06":
+      return "CLIMATE ACTION";
+    case "SP07":
+      return "POLICY INNOVATIONS";
+    case "SP08":
+      return "FOOD FRONTIERS AND SECURITY";
+    case "SP09":
+      return "SCALLING FOR IMPACT";
+    case "SP10":
+      return "GENDER EQUALITY AND INCLUSION";
+    case "SP11":
+      return "CAPACITY SHARING";
+    case "SP12":
+      return "DIGITAL TRANSFORMATION";
+    case "SP13":
+      return "GENEBANKS";
+    default:
+      return null;
+  }
 }

@@ -7,6 +7,7 @@ import {
   extractTocEntries,
   extractEvidences,
 } from "./transform";
+import { getThemeColors, themeVars } from "./color-themes";
 import { PageShell } from "./components/page-shell";
 import { QABox, KPQABox } from "./components/qa-box";
 import {
@@ -23,6 +24,7 @@ import CapacitySharingSections from "./components/capacity-sharing";
 
 export default function ResultsP25({ data }: Readonly<TemplateProps>) {
   const d = data as PRMSResultData | null;
+  const theme = getThemeColors(d?.primary_submitter_acronym);
 
   const impactAreas = d ? extractImpactAreas(d) : [];
   const geo = d ? extractGeoLocation(d) : null;
@@ -43,6 +45,8 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       resultName={d?.result_name ?? d?.title ?? "No title provided"}
       generationDate={formatDateCET(new Date())}
       phaseName={d?.phase_name ?? "—"}
+      themeVars={themeVars(theme)}
+      primarySubmitterAcronym={d?.primary_submitter_acronym ?? ""}
     >
       {/* QA Box — KPQABox for Knowledge Products, standard QABox otherwise */}
       {d?.rt_id === 6 ? (
@@ -75,7 +79,6 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       {d?.rt_id === 5 && <CapacitySharingSections data={d} />}
       {d?.rt_id === 7 && <InnovationDevelopmentSections data={d} />}
       {d?.rt_id === 6 && <KPDetailsSection data={d} />}
-      {/* rt_id === 5 (Capacity Sharing) — common sections only, no extra content */}
     </PageShell>
   );
 }
