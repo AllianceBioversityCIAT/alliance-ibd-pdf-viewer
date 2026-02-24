@@ -49,7 +49,7 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       primarySubmitterAcronym={d?.primary_submitter_acronym ?? ""}
     >
       {/* QA Box — KPQABox for Knowledge Products, standard QABox otherwise */}
-      {d?.rt_id === 6 ? (
+      {/* {d?.rt_id === 6 ? (
         <KPQABox />
       ) : (
         <QABox
@@ -65,7 +65,7 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
               : undefined
           }
         />
-      )}
+      )} */}
 
       {/* Common sections */}
       {d && <ResultDetailsSection data={d} impactAreas={impactAreas} />}

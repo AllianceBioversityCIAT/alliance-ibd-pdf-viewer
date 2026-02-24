@@ -78,10 +78,7 @@ export function PageShell({
           )}
         </div>
 
-        <div
-          className="flex flex-col gap-[5px] mb-[14px] mt-4"
-          style={{ maxWidth: 509 }}
-        >
+        <div className="flex flex-col gap-[5px] mb-[14px] mt-4">
           <p className="text-white text-[10px] leading-[1.15]">{resultType}</p>
           <p
             className="text-(--theme-accent) text-[18px] font-medium leading-[1.15]"
@@ -91,10 +88,7 @@ export function PageShell({
           </p>
         </div>
 
-        <div
-          className="text-[#e2e0df] text-[8px] font-light leading-[1.367]"
-          style={{ maxWidth: 509 }}
-        >
+        <div className="text-[#e2e0df] text-[8px] font-light leading-[1.367]">
           <p className="mb-[8px]">
             This report was generated from the CGIAR Performance and Results
             Management System (PRMS) on {generationDate}. Please note that the

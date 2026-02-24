@@ -17,22 +17,28 @@ export function ImpactAreaCard({ area }: Readonly<{ area: ImpactArea }>) {
             className="w-[22px] h-[22px] object-cover"
           />
         )}
-        <p
-          className="text-(--theme-header-bg) text-[9.5px] leading-[1.15]"
-          style={{ fontFamily: "'Noto Serif', serif" }}
-        >
-          {area.name}
-        </p>
+        {area.name && (
+          <p
+            className="text-(--theme-header-bg) text-[9.5px] leading-[1.15]"
+            style={{ fontFamily: "'Noto Serif', serif" }}
+          >
+            {area.name}
+          </p>
+        )}
       </div>
       <div className="flex flex-col gap-[8px]">
-        <p className="text-[9px] leading-[1.15]">
-          <span className="font-bold text-[#1d1d1d]">Score:</span>{" "}
-          <span className="text-[#393939]">{area.score}</span>
-        </p>
-        <p className="text-[9px] leading-[1.15]">
-          <span className="font-bold text-[#1d1d1d]">Components:</span>{" "}
-          <span className="text-[#393939]">{area.components.join(", ")}</span>
-        </p>
+        {area.score && (
+          <p className="text-[9px] leading-[1.15]">
+            <span className="font-bold text-[#1d1d1d]">Score:</span>{" "}
+            <span className="text-[#393939]">{area.score}</span>
+          </p>
+        )}
+        {area.components.length > 0 && (
+          <p className="text-[9px] leading-[1.15]">
+            <span className="font-bold text-[#1d1d1d]">Components:</span>{" "}
+            <span className="text-[#393939]">{area.components.join(", ")}</span>
+          </p>
+        )}
       </div>
     </div>
   );
