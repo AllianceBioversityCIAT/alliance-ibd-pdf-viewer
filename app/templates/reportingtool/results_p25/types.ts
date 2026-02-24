@@ -81,17 +81,6 @@ export interface InnovationOrganization {
   organization_sub_type: string;
 }
 
-export interface InnovationDeveloper {
-  name: string;
-  email?: string;
-  institution?: string;
-}
-
-export interface InnovationCollaborator {
-  name: string;
-  email: string;
-}
-
 // Policy Change (rt_id=1)
 export interface PolicyChangeField {
   label: string;
@@ -223,8 +212,8 @@ export interface PRMSResultData {
   innovation_nature?: string;
   innovation_type?: string;
   url_readiness?: string;
-  innovation_developers?: InnovationDeveloper[];
-  innovation_collaborators?: InnovationCollaborator[];
+  innovation_developers?: string;
+  innovation_collaborators?: string;
   innovation_investments?: InnovationInvestment[];
   innovation_actors?: InnovationActor[];
   innovation_organizations?: InnovationOrganization[];

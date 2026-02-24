@@ -120,29 +120,10 @@
       "environmental_biodiversity_related": false
     }
   ],
-  "innovation_developers": [
-    {
-      "name": "Amit Srivastava",
-      "email": "A.srivastava@cgiar.org",
-      "institution": "International Rice Research Institute (IRRI)"
-    }
-  ],
+  "innovation_developers": "Amit Srivastava (A.srivastava@cgiar.org)",
   "readiness_level": "Level 9: Proven Innovation",
   "readiness_justification": "Scaling report included to show level 9, as we are conducting uncontrolled testing right now. Launch events and several testing workshops with users were held in 2023.",
-  "innovation_collaborators": [
-    {
-      "name": "Virender Kumar",
-      "email": "virender.kumar@irri.org"
-    },
-    {
-      "name": "Prakashan Chellattan Veettil",
-      "email": "pcveettil@irri.org"
-    },
-    {
-      "name": "Balwinder Singh",
-      "email": "pcveettil@irri.org"
-    }
-  ],
+  "innovation_collaborators": "Virender Kumar (virender.kumar@irri.org)",
   "innovation_nature": "Incremental innovation (Innovations that already exist and undergo constant, steady progress, and improvement.)",
   "innovation_type": "Capacity development innovation (Innovations that strengthen capacity, including farmer, extension or investor decision-support services; accelerator/ incubator programs; manuals, training programs and curricula; online courses.)",
   "materials_evidence": [
