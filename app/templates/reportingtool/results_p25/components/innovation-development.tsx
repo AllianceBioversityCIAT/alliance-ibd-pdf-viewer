@@ -8,8 +8,8 @@ export function InnovationDevelopmentSections({
 }: Readonly<{
   data: PRMSResultData;
 }>) {
-  const hasDevelopers = !!data.innovation_developers?.length;
-  const hasCollaborators = !!data.innovation_collaborators?.length;
+  const hasDevelopers = !!data.innovation_developers;
+  const hasCollaborators = !!data.innovation_collaborators;
   const hasInvestments = !!data.innovation_investments?.length;
   const hasActors = !!data.innovation_actors?.length;
   const hasOrgs = !!data.innovation_organizations?.length;
@@ -41,31 +41,16 @@ export function InnovationDevelopmentSections({
 
         <div className="flex gap-[20px]">
           <div className="flex flex-col gap-[8px] text-[10px] flex-1 min-w-0">
-            {hasDevelopers &&
-              data.innovation_developers?.map((dev, i) => (
-                <p key={`${dev.name}-${i}`} className="leading-normal">
-                  <span className="font-bold text-[#1d1d1d]">
-                    Innovation Developer:
-                  </span>{" "}
-                  <span className="text-[#393939]">
-                    {dev.name}
-                    {dev.email && (
-                      <>
-                        {" "}
-                        <span className="text-(--theme-mid)">(</span>
-                        <a
-                          href={`mailto:${dev.email}`}
-                          className="text-(--theme-mid) underline"
-                        >
-                          {dev.email}
-                        </a>
-                        <span className="text-(--theme-mid)">)</span>
-                      </>
-                    )}
-                    {dev.institution && ` ${dev.institution}`}
-                  </span>
-                </p>
-              ))}
+            {hasDevelopers && (
+              <p className="leading-normal">
+                <span className="font-bold text-[#1d1d1d]">
+                  Innovation Developer:
+                </span>{" "}
+                <span className="text-[#393939]">
+                  {data.innovation_developers}
+                </span>
+              </p>
+            )}
 
             {data.readiness_level && (
               <p className="leading-normal">
@@ -96,12 +81,9 @@ export function InnovationDevelopmentSections({
                   Innovation collaborators:
                 </p>
                 <ul className="list-disc ml-[15px] text-[#393939]">
-                  {data.innovation_collaborators?.map((c, i) => (
-                    <li key={`${c.name}-${i}`} className="leading-normal">
-                      {c.name}
-                      {c.email && `, ${c.email}`}
-                    </li>
-                  ))}
+                  <li className="leading-normal">
+                    {data.innovation_collaborators}
+                  </li>
                 </ul>
               </div>
             )}

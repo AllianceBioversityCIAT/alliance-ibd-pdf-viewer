@@ -340,7 +340,14 @@ export function ContributorsSection({
 function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
   return (
     <div className="bg-[#e2e0df] flex overflow-hidden">
-      {geo?.geo_focus ? (
+      {geo?.geo_focus === "This is yet to be determined" ? (
+        <div className="flex items-center justify-center gap-2.5 py-4 mx-auto">
+          <SearchIcon size={16} className="text-(--theme-deep) rotate-y-180" />
+          <p className="text-[#393939] text-[10px] leading-[1.15] font-semibold">
+            This is yet to be determined
+          </p>
+        </div>
+      ) : (
         <>
           <div
             className="bg-(--theme-deep) flex flex-col items-center justify-center shrink-0"
@@ -351,11 +358,15 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
               style={{
                 width: 70,
                 height: 70,
-                WebkitMaskImage: `url(/assets/prms/${geo.geo_focus.toLowerCase()}-mask.svg)`,
+                WebkitMaskImage: `url(/assets/prms/${geo?.geo_focus
+                  .trim()
+                  .toLowerCase()}-mask.svg)`,
                 WebkitMaskSize: "contain",
                 WebkitMaskRepeat: "no-repeat",
                 WebkitMaskPosition: "center",
-                maskImage: `url(/assets/prms/${geo.geo_focus.toLowerCase()}-mask.svg)`,
+                maskImage: `url(/assets/prms/${geo?.geo_focus
+                  .trim()
+                  .toLowerCase()}-mask.svg)`,
                 maskSize: "contain",
                 maskRepeat: "no-repeat",
                 maskPosition: "center",
@@ -369,8 +380,8 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                 Regions specified for this result:
               </p>
               <div className="flex flex-wrap gap-[6px]">
-                {geo.regions?.length > 0 ? (
-                  geo.regions?.map((r, i) => (
+                {geo?.regions?.length && geo?.regions?.length > 0 ? (
+                  geo?.regions?.map((r, i) => (
                     <span
                       key={`${r}-${i}`}
                       className="text-[#393939] leading-normal"
@@ -392,8 +403,8 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                 Countries specified for this result:
               </p>
               <div className="flex flex-wrap gap-[6px]">
-                {geo.countries.length > 0 ? (
-                  geo.countries.map((c, i) => (
+                {geo?.countries?.length && geo?.countries?.length > 0 ? (
+                  geo?.countries?.map((c, i) => (
                     <div
                       key={`${c.name}-${i}`}
                       className="text-[#393939] leading-normal flex items-center gap-1"
@@ -418,13 +429,6 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
             </div>
           </div>
         </>
-      ) : (
-        <div className="flex items-center justify-center gap-2.5 py-4 mx-auto">
-          <SearchIcon size={16} className="text-(--theme-deep) rotate-y-180" />
-          <p className="text-[#393939] text-[10px] leading-[1.15] font-semibold">
-            This is yet to be determined
-          </p>
-        </div>
       )}
     </div>
   );
