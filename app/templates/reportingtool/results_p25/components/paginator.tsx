@@ -125,6 +125,12 @@ function paginate(container: HTMLElement, paperHeight: number, config: Paginatio
     filler.style.height = `${target - current}px`;
     container.appendChild(filler);
   }
+
+  // Stretch the sidebar strip to cover all pages
+  const sidebar = pageRoot.querySelector<HTMLElement>("[data-sidebar-strip]");
+  if (sidebar) {
+    sidebar.style.height = `${target}px`;
+  }
 }
 
 // ── Block collection ──
