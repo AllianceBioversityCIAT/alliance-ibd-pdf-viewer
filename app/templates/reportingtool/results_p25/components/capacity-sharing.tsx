@@ -1,11 +1,35 @@
-import React from "react";
-import { PRMSResultData } from "../types";
+import type { PRMSResultData } from "../types";
 import { SectionTitle } from "./common-sections";
 import { KeyValueTable } from "./tables";
 
 export default function CapacitySharingSections({
   data,
 }: Readonly<{ data: PRMSResultData }>) {
+  const hasCapDevData =
+    data.capdev_female_using ||
+    data.capdev_male_using ||
+    data.capdev_term ||
+    data.capdev_delivery_method_name ||
+    data.capdev_organizations?.length;
+
+  if (!hasCapDevData) return null;
+
+  const getNumberOfPeopleTrained = () => {
+    if (data.capdev_female_using && data.capdev_male_using) {
+      return `Female: ${data.capdev_female_using} | Male: ${data.capdev_male_using}`;
+    }
+
+    if (data.capdev_female_using) {
+      return `Female: ${data.capdev_female_using}`;
+    }
+
+    if (data.capdev_male_using) {
+      return `Male: ${data.capdev_male_using}`;
+    }
+
+    return null;
+  };
+
   return (
     <div className="flex flex-col gap-2.5">
       <SectionTitle>Capacity Sharing for Development</SectionTitle>
@@ -13,23 +37,23 @@ export default function CapacitySharingSections({
         rows={[
           {
             label: "Number of people trained",
-            value: `Female: ${data.capdev_female_using} | Male: ${data.capdev_male_using}`,
+            value: getNumberOfPeopleTrained() ?? "Not provided",
+            hideRowIf: !getNumberOfPeopleTrained(),
           },
           {
             label: "Length of training",
             value: data.capdev_term ?? "Not provided",
+            hideRowIf: !data.capdev_term,
           },
           {
             label: "Delivery Method",
             value: data.capdev_delivery_method_name ?? "Not provided",
+            hideRowIf: !data.capdev_delivery_method_name,
           },
           {
             label: "Were the trainees attending on behalf of an organization?",
-            value:
-              (data.capdev_organizations?.length &&
-                data.capdev_organizations.length > 0 &&
-                data.capdev_organizations?.join(", ")) ||
-              "Not provided",
+            value: data.capdev_organizations?.join(", ") ?? "Not provided",
+            hideRowIf: !data.capdev_organizations?.length,
           },
         ]}
       />

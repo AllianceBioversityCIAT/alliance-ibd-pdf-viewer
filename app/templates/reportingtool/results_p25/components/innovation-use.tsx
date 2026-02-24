@@ -112,70 +112,88 @@ function ActorsTable({ actors }: Readonly<{ actors: InnovationUseActor[] }>) {
 export function InnovationUseSections({
   data,
 }: Readonly<{ data: PRMSResultData }>) {
+  const hasInnovationUseData =
+    !!data.innovation_use_actors?.length ||
+    !!data.innovation_use_organizations?.length ||
+    !!data.innovation_use_measures?.length ||
+    data.readiness_level;
+
+  if (!hasInnovationUseData) return null;
+
   return (
     <div className="flex flex-col gap-[15px]">
       <SectionTitle>Innovation Use</SectionTitle>
 
-      <div className="flex flex-col gap-2.5">
-        <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
-          Actors - Number of people using the innovation, disaggregated by
-          gender:
-        </p>
-        <ActorsTable actors={data.innovation_use_actors ?? []} />
-      </div>
+      {!!data.innovation_use_actors?.length && (
+        <div className="flex flex-col gap-2.5">
+          <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+            Actors - Number of people using the innovation, disaggregated by
+            gender:
+          </p>
+          <ActorsTable actors={data.innovation_use_actors ?? []} />
+        </div>
+      )}
 
-      <div className="flex flex-col gap-2.5">
-        <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
-          Organizations
-        </p>
-        <DataTable
-          columns={["Type", "Subtype", "How many"]}
-          rows={(data.innovation_use_organizations ?? []).map((o) => [
-            o.type ?? "Not provided",
-            o.subtype ?? "Not provided",
-            o.how_many ?? "Not provided",
-          ])}
-        />
-      </div>
+      {!!data.innovation_use_organizations?.length && (
+        <div className="flex flex-col gap-2.5">
+          <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+            Organizations
+          </p>
+          <DataTable
+            columns={["Type", "Subtype", "How many"]}
+            rows={(data.innovation_use_organizations ?? []).map((o) => [
+              o.type ?? "Not provided",
+              o.subtype ?? "Not provided",
+              o.how_many ?? "Not provided",
+            ])}
+          />
+        </div>
+      )}
 
-      <div className="flex flex-col gap-2.5">
-        <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
-          Other quantitative measures of innovation use
-        </p>
-        <DataTable
-          columns={[
-            "#Unit of measure",
-            ...(data.innovation_use_measures ?? []).map(
-              (m) => m.unit_of_measure
-            ),
-          ]}
-          rows={[
-            [
-              "Value",
+      {!!data.innovation_use_measures?.length && (
+        <div className="flex flex-col gap-2.5">
+          <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+            Other quantitative measures of innovation use
+          </p>
+          <DataTable
+            columns={[
+              "#Unit of measure",
               ...(data.innovation_use_measures ?? []).map(
-                (m) => m.value ?? "Not provided"
+                (m) => m.unit_of_measure
               ),
-            ],
-          ]}
-        />
-      </div>
+            ]}
+            rows={[
+              [
+                "Value",
+                ...(data.innovation_use_measures ?? []).map(
+                  (m) => m.value ?? "Not provided"
+                ),
+              ],
+            ]}
+          />
+        </div>
+      )}
 
-      <div className="flex items-center gap-1 mb-4">
-        <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
-          Current readiness of this innovation:
-        </p>
-        <p className="text-[#393939] text-[10px] leading-[1.15]">
-          {data.readiness_level}
-        </p>
-      </div>
+      {data.readiness_level && (
+        <>
+          <div className="flex items-center gap-1 mb-4">
+            <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+              Current readiness of this innovation:
+            </p>
+            <p className="text-[#393939] text-[10px] leading-[1.15]">
+              {data.readiness_level}
+            </p>
+          </div>
 
-      <Image
-        src={readinessScale}
-        alt="Innovation Use Readiness Scale"
-        width={100}
-        height={500}
-        className="w-full"
-      />
+          <Image
+            src={readinessScale}
+            alt="Innovation Use Readiness Scale"
+            width={100}
+            height={500}
+            className="w-full"
+          />
+        </>
+      )}
     </div>
   );
 }

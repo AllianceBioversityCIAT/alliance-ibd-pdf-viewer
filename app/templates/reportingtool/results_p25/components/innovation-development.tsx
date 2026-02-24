@@ -13,6 +13,26 @@ export function InnovationDevelopmentSections({
   const hasInvestments = !!data.innovation_investments?.length;
   const hasActors = !!data.innovation_actors?.length;
   const hasOrgs = !!data.innovation_organizations?.length;
+  const hasMaterialsEvidence = !!data.materials_evidence?.length;
+
+  const hasInnovationDevelopmentData =
+    hasDevelopers ||
+    hasCollaborators ||
+    hasInvestments ||
+    hasActors ||
+    hasOrgs ||
+    data.readiness_level;
+
+  const hasInnoDevMainDetails =
+    hasDevelopers ||
+    data.readiness_level ||
+    data.readiness_justification ||
+    hasCollaborators ||
+    data.innovation_nature ||
+    data.innovation_type ||
+    hasMaterialsEvidence;
+
+  if (!hasInnovationDevelopmentData) return null;
 
   return (
     <>
@@ -126,31 +146,33 @@ export function InnovationDevelopmentSections({
           </div>
 
           {/* Readiness scale infographic */}
-          <div
-            className="flex flex-col items-center shrink-0"
-            style={{ width: 182 }}
-          >
-            <Image
-              src={
-                data.url_readiness ||
-                "https://prms-file-storage.s3.amazonaws.com/images/inno-scaling-readiness-not-provided.png"
-              }
-              alt="Innovation Readiness Scale"
-              className="w-full"
-              width={182}
-              height={400}
-            />
+          {hasInnoDevMainDetails && (
+            <div
+              className="flex flex-col items-center shrink-0"
+              style={{ width: 190 }}
+            >
+              <Image
+                src={
+                  data.url_readiness ||
+                  "https://prms-file-storage.s3.amazonaws.com/images/inno-scaling-readiness-not-provided.png"
+                }
+                alt="Innovation Readiness Scale"
+                className="w-full"
+                width={182}
+                height={400}
+              />
 
-            <p className="text-[#818181] text-[8px] leading-[1.367] text-center mt-[4px]">
-              Learn more in{" "}
-              <a
-                href="https://www.scalingreadiness.org"
-                className="text-(--theme-mid) underline"
-              >
-                www.scalingreadiness.org
-              </a>
-            </p>
-          </div>
+              <p className="text-[#818181] text-[8px] leading-[1.367] text-center mt-[4px]">
+                Learn more in{" "}
+                <a
+                  href="https://www.scalingreadiness.org"
+                  className="text-(--theme-mid) underline"
+                >
+                  www.scalingreadiness.org
+                </a>
+              </p>
+            </div>
+          )}
         </div>
       </div>
 

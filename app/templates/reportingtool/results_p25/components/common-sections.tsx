@@ -227,27 +227,31 @@ export function ContributorsSection({
     <div className="flex flex-col gap-2.5">
       <SectionTitle>Contributors and Partners</SectionTitle>
 
-      <div className="flex flex-col gap-2.5">
-        <SubSectionTitle>Theory of Change</SubSectionTitle>
-        {tocEntries.toc_primary.map((toc, i) => (
-          <TheoryOfChangeCard
-            key={`${toc.toc_work_package_acronym}-${toc.toc_result_title}-${i}`}
-            tocAllDAta={tocEntries}
-            tocEntry={toc}
-          />
-        ))}
-      </div>
+      {tocEntries.toc_primary.length > 0 && (
+        <div className="flex flex-col gap-2.5">
+          <SubSectionTitle>Theory of Change</SubSectionTitle>
+          {tocEntries.toc_primary.map((toc, i) => (
+            <TheoryOfChangeCard
+              key={`${toc.toc_work_package_acronym}-${toc.toc_result_title}-${i}`}
+              tocAllDAta={tocEntries}
+              tocEntry={toc}
+            />
+          ))}
+        </div>
+      )}
 
       {(hasContributingInitiatives || hasCenters || hasBilateralProjects) && (
         <div className="flex flex-col gap-2.5">
           <SubSectionTitle>Contributors</SubSectionTitle>
           <div className="flex flex-col gap-[8px] text-[10px]">
-            <LabelValue
-              label="Contributing Program"
-              value={data
-                .contributing_initiatives!.map((i) => i.initiative_short_name)
-                .join(", ")}
-            />
+            {!!data.contributing_initiatives?.length && (
+              <LabelValue
+                label="Contributing Program"
+                value={data.contributing_initiatives
+                  .map((i) => i.initiative_short_name)
+                  .join(", ")}
+              />
+            )}
 
             {hasCenters && (
               <div>
@@ -304,9 +308,9 @@ export function ContributorsSection({
           <DataTable
             columns={["Name", "Country HQ", "Institution type"]}
             rows={(data.non_kp_partner_data ?? []).map((p) => [
-              p.partner_name,
-              p.partner_country_hq,
-              p.partner_type,
+              p.partner_name ?? "Not provided",
+              p.partner_country_hq ?? "Not provided",
+              p.partner_type ?? "Not provided",
             ])}
           />
         </div>
@@ -318,11 +322,11 @@ export function ContributorsSection({
           <DataTable
             columns={["Portfolio", "Phase", "Code", "Indicator", "Title"]}
             rows={(data.bundled_innovations ?? []).map((b) => [
-              b.portfolio,
-              b.phase,
-              b.code,
-              b.indicator,
-              b.title,
+              b.portfolio ?? "Not provided",
+              b.phase ?? "Not provided",
+              b.code ?? "Not provided",
+              b.indicator ?? "Not provided",
+              b.title ?? "Not provided",
             ])}
           />
         </div>
