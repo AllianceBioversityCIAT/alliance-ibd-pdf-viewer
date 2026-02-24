@@ -36,6 +36,7 @@ export function PageShell({
 
       {/* Right sidebar decorative strip */}
       <div
+        data-sidebar-strip
         className="absolute top-0 right-0 h-full overflow-hidden"
         style={{
           width: 13,
