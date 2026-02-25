@@ -6,18 +6,30 @@ import type {
   Evidence,
 } from "./types";
 
-const IMPACT_AREA_MAP: Record<string, { name: string; icon_url?: string }> = {
+const IMPACT_AREA_MAP: Record<
+  string,
+  { name: string; icon_key?: string; icon_url?: string }
+> = {
   nutrition_tag: {
     name: "Nutrition, health & food security",
-    icon_url: "/assets/prms/icon-nutrition.png",
+    icon_key: "nutrition",
   },
   environmental_tag: {
     name: "Environment health & biodiversity",
-    icon_url: "/assets/prms/icon-environment.png",
+    icon_key: "environment",
   },
-  climate_tag: { name: "Climate change adaptation & mitigation" },
-  gender_tag: { name: "Gender equality, youth & social inclusion" },
-  poverty_tag: { name: "Poverty reduction, livelihoods & jobs" },
+  climate_tag: {
+    name: "Climate change adaptation & mitigation",
+    icon_key: "climate",
+  },
+  gender_tag: {
+    name: "Gender equality, youth & social inclusion",
+    icon_key: "gender",
+  },
+  poverty_tag: {
+    name: "Poverty reduction, livelihoods & jobs",
+    icon_key: "poverty",
+  },
 };
 
 function toArray(val: unknown): string[] {
@@ -28,12 +40,6 @@ function toArray(val: unknown): string[] {
       .map((s) => s.trim())
       .filter(Boolean);
   return [];
-}
-
-function parseTag(tag: string): { score: number; label: string } | null {
-  const match = /^\((\d+)\)\s*(.+)$/.exec(tag);
-  if (!match) return null;
-  return { score: Number.parseInt(match[1], 10), label: match[2] };
 }
 
 export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
@@ -49,11 +55,10 @@ export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
   for (const key of tagKeys) {
     const tag = data[key];
     if (!tag) continue;
-    // const parsed = parseTag(tag.score);
-    // if (!parsed) continue;
     const mapping = IMPACT_AREA_MAP[key];
     areas.push({
       name: mapping.name,
+      icon_key: mapping.icon_key,
       icon_url: mapping.icon_url,
       score: tag.score.toString(),
       components: tag.components,
