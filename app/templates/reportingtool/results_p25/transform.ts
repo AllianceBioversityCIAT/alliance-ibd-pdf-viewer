@@ -60,7 +60,7 @@ export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
       name: mapping.name,
       icon_key: mapping.icon_key,
       icon_url: mapping.icon_url,
-      score: tag.score.toString(),
+      score: tag.score?.toString(),
       components: tag.components,
     });
   }
