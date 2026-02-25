@@ -119,6 +119,7 @@ export interface ImpactArea {
   name: string;
   score: string;
   components: string[];
+  icon_key?: string;
   icon_url?: string;
 }
 

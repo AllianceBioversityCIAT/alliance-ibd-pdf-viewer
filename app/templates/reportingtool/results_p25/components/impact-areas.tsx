@@ -1,5 +1,5 @@
-import Image from "next/image";
 import type { ImpactArea } from "../types";
+import { ImpactAreaIcon } from "./impact-area-icons";
 
 export function ImpactAreaCard({ area }: Readonly<{ area: ImpactArea }>) {
   return (
@@ -8,13 +8,10 @@ export function ImpactAreaCard({ area }: Readonly<{ area: ImpactArea }>) {
       style={{ padding: "15px 19px" }}
     >
       <div className="flex items-center gap-[7px] mb-[12px]">
-        {area.icon_url && (
-          <Image
-            src={area.icon_url}
-            alt=""
-            width={22}
-            height={22}
-            className="w-[22px] h-[22px] object-cover"
+        {area.icon_key && (
+          <ImpactAreaIcon
+            iconKey={area.icon_key}
+            className="w-[22px] h-[22px] shrink-0"
           />
         )}
         {area.name && (
