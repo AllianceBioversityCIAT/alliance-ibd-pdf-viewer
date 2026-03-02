@@ -104,9 +104,7 @@ export function ResultDetailsSection({
         {data.lead_contact_person && (
           <LabelValue
             label="Lead contact person"
-            value={`${data.lead_contact_person}${
-              data.result_lead ? ` (${data.result_lead})` : ""
-            }`}
+            value={data.lead_contact_person}
           />
         )}
 
