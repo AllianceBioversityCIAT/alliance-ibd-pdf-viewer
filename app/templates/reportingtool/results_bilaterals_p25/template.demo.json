@@ -1,0 +1,72 @@
+{
+  "id": 10917,
+  "rl_id": 4,
+  "rt_id": 5,
+  "title": "In person training on Product Design Team (PDT) meetings for NARES partners in Tanzania on 16 April 2025",
+  "is_krs": "No",
+  "regions": null,
+  "krs_link": null,
+  "countries": [{ "code": "TZ", "name": "Tanzania, United Republic" }],
+  "geo_focus": "National",
+  "actor_data": null,
+  "gender_tag": { "score": null, "components": [] },
+  "phase_name": "Reporting 2025",
+  "capdev_term": "Short-term",
+  "climate_tag": { "score": null, "components": [] },
+  "poverty_tag": { "score": null, "components": [] },
+  "result_code": 8449,
+  "result_lead": null,
+  "result_type": "Capacity sharing for development",
+  "short_title": null,
+  "subnational": [
+    { "country": "Tanzania, United Republic", "subnational": "NOT provided" }
+  ],
+  "project_name": "T-PJ-004017-VACS-Breeding: Bambara",
+  "result_level": "Output",
+  "nutrition_tag": { "score": null, "components": [] },
+  "has_actor_data": "No",
+  "linked_results": [],
+  "result_type_id": 5,
+  "kp_partner_data": null,
+  "submission_data": "Not Submitted",
+  "lead_center_name": "International Institute of Tropical Agriculture",
+  "linked_evidences": [],
+  "capdev_male_using": "0",
+  "environmental_tag": { "score": null, "components": [] },
+  "portfolio_acronym": "P25",
+  "submission_status": "Pending Review",
+  "bilateral_projects": [
+    {
+      "project_title": "IITA - T-PJ-004017-VACS-Breeding: Bambara",
+      "is_lead_project": 1
+    }
+  ],
+  "lead_contact_email": null,
+  "previous_portfolio": [],
+  "result_description": "The meeting successfully brought together key national value-chain stakeholders, including breeders, agronomists, nutritionists, gender specialists, extension officers, processors, and representative farmers. The meeting focused on defining priority market segments and refining target product profiles (TPPs) that reflect farmer preferences, end-user demands, and gender and nutrition considerations. Through participatory discussions and trait-ranking exercises, stakeholders identified yield, drought tolerance, and cooking time as essential traits for short-duration Bambara groundnut varieties intended for household consumption. For long-duration varieties, yield, resistance to Fusarium wilt, and reduced cooking time were prioritized. The meeting strengthened alignment between national breeding objectives and local production and consumption realities, ensuring that future variety development in Tanzania is responsive to climate resilience needs, labor demands—particularly for women—and household nutrition outcomes. The outcomes of this meeting directly informed the finalization of market segments and TPPs for the Tanzanian BGN network.",
+  "bundled_innovations": null,
+  "capdev_female_using": "0",
+  "capdev_unkown_using": "18",
+  "lead_center_acronym": "IITA",
+  "lead_contact_person": null,
+  "non_kp_partner_data": null,
+  "partners_applicable": "Yes",
+  "contributing_centers": [
+    {
+      "center_name": "IITA - International Institute of Tropical Agriculture",
+      "is_primary_center": 1
+    }
+  ],
+  "generation_date_footer": "Monday, March 2nd, 2026 at 18:24 CET",
+  "primary_submitter_data": {
+    "contributor_name": "SP13 - Genebank",
+    "contributor_can_match_result": 1
+  },
+  "primary_submitter_name": "SP13 - Genebank",
+  "capdev_non_binary_using": "0",
+  "contributing_initiatives": [],
+  "generation_date_filename": "20260302_1824",
+  "primary_submitter_acronym": "SP13",
+  "capdev_delivery_method_name": "In person",
+  "is_attending_for_organization": "Not defined"
+}

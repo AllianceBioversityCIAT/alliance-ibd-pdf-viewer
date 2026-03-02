@@ -109,6 +109,12 @@ export function ResultDetailsSection({
             }`}
           />
         )}
+        {data.lead_center_name && (
+          <LabelValue
+            label="Submitter of result (lead center)"
+            value={`${data.lead_center_acronym} - ${data.lead_center_name}`}
+          />
+        )}
 
         {impactAreas?.length > 0 &&
           impactAreas.some((area) => !!area.score && area.score !== "") && (
