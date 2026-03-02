@@ -3,7 +3,7 @@ import type { QAInfo } from "../types";
 
 const BADGE_IMAGES: Record<string, { src: string; invert?: boolean }> = {
   kp: { src: "/assets/prms/figma-badge-kp.png", invert: true },
-  mqap: { src: "/assets/prms/figma-badge-mqap.png", invert: true },
+  mqap: { src: "/assets/prms/figma-badge-mqap.png" },
   "two-assessors": { src: "/assets/prms/badge-two-assessors.png", invert: true },
   senior: { src: "/assets/prms/shield-badge.png" },
   "in-progress": { src: "/assets/prms/badge-qa-in-progress.png" },

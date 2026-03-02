@@ -100,10 +100,9 @@
   ],
   "kp_partner_data": null,
   "qa_info": {
-    "badge": "in-progress",
-    "title": "Result quality assurance in progress",
-    "description": "This result is currently under review by QA expert assessors following the CGIAR standard",
-    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
+    "badge": "mqap",
+    "title": "Result automated quality assured using MQAP",
+    "description": "Monitoring, Evaluation, and Learning Quality Assurance Processor (M-QAP) validates the reported data based on information retrieved from Scopus and Web of Science."
   },
   "bundled_innovations": [
     {
