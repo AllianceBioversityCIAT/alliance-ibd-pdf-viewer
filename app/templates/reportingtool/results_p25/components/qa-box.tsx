@@ -6,6 +6,7 @@ const BADGE_IMAGES: Record<string, { src: string; invert?: boolean }> = {
   mqap: { src: "/assets/prms/figma-badge-mqap.png" },
   "two-assessors": { src: "/assets/prms/badge-two-assessors.png", invert: true },
   senior: { src: "/assets/prms/badge-two-assessors.png", invert: true },
+  "senior-innovation": { src: "/assets/prms/shield-badge.png" },
   "in-progress": { src: "/assets/prms/badge-qa-in-progress.png" },
 };
 
