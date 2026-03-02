@@ -78,21 +78,36 @@ export function QABox({ qaInfo }: Readonly<{ qaInfo: QAInfo }>) {
               </p>
             )}
             <div className="flex flex-col gap-[3px]">
-              {qaInfo.adjustments.map((adj, i) => (
-                <div
-                  key={`qa-adj-${adj.label}-${i}`}
-                  className="flex items-center gap-[5px] text-[9px]"
-                >
-                  <span className="text-[#393939]">
-                    <span className="font-medium">{adj.label}:</span>{" "}
-                    {adj.from_value}
-                  </span>
-                  <ArrowRight />
-                  <span className="text-[#033529] font-medium">
-                    {adj.to_value}
-                  </span>
-                </div>
-              ))}
+              {qaInfo.adjustments.map((adj, i) =>
+                adj.from_value ? (
+                  <div
+                    key={`qa-adj-${adj.label}-${i}`}
+                    className="flex items-center gap-[5px] text-[9px]"
+                  >
+                    <span className="text-[#393939]">
+                      <span className="font-medium">{adj.label}:</span>{" "}
+                      {adj.from_value}
+                    </span>
+                    <ArrowRight />
+                    <span className="text-[#033529] font-medium">
+                      {adj.to_value}
+                    </span>
+                  </div>
+                ) : (
+                  <div
+                    key={`qa-adj-${adj.label}-${i}`}
+                    className="flex items-center gap-[5px] text-[9px] text-[#393939]"
+                  >
+                    <span>•</span>
+                    <span>
+                      {adj.label}:{" "}
+                      <span className="text-[#033529] font-medium">
+                        {adj.to_value}
+                      </span>
+                    </span>
+                  </div>
+                ),
+              )}
             </div>
           </div>
         )}
