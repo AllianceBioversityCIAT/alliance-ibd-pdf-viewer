@@ -2,6 +2,8 @@ import Image from "next/image";
 import type { QAInfo } from "../types";
 
 const BADGE_IMAGES: Record<string, { src: string; invert?: boolean }> = {
+  kp: { src: "/assets/prms/figma-badge-kp.png", invert: true },
+  mqap: { src: "/assets/prms/figma-badge-mqap.png", invert: true },
   "two-assessors": { src: "/assets/prms/badge-two-assessors.png", invert: true },
   senior: { src: "/assets/prms/shield-badge.png" },
   "in-progress": { src: "/assets/prms/badge-qa-in-progress.png", invert: true },
@@ -27,27 +29,6 @@ function ArrowRight() {
   );
 }
 
-function KPBadge() {
-  return (
-    <div
-      className="flex items-center justify-center"
-      style={{
-        width: 57,
-        height: 57,
-        borderRadius: "50%",
-        border: "2.5px solid white",
-      }}
-    >
-      <span
-        className="text-white font-bold"
-        style={{ fontSize: 20, lineHeight: 1 }}
-      >
-        KP
-      </span>
-    </div>
-  );
-}
-
 function BadgeImage({ badge }: Readonly<{ badge: string }>) {
   const entry = BADGE_IMAGES[badge] ?? { src: "/assets/prms/shield-badge.png" };
   return (
@@ -63,15 +44,13 @@ function BadgeImage({ badge }: Readonly<{ badge: string }>) {
 }
 
 export function QABox({ qaInfo }: Readonly<{ qaInfo: QAInfo }>) {
-  const isKP = qaInfo.badge === "kp" || qaInfo.badge === "mqap";
-
   return (
     <div className="bg-[#e2e0df] flex overflow-hidden">
       <div
         className="bg-[#033529] flex items-center justify-center shrink-0"
         style={{ width: 106, padding: "8px 17px" }}
       >
-        {isKP ? <KPBadge /> : <BadgeImage badge={qaInfo.badge} />}
+        <BadgeImage badge={qaInfo.badge} />
       </div>
       <div className="flex flex-col gap-[12px] py-[15px] px-[22px] flex-1 min-w-0">
         <div className="flex flex-col gap-[8px]">
