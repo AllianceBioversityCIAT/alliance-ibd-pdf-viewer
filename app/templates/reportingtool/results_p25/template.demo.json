@@ -100,9 +100,10 @@
   ],
   "kp_partner_data": null,
   "qa_info": {
-    "badge": "kp",
-    "title": "Result quality assured by CGIAR Center knowledge manager",
-    "description": "Quality Assurance is provided by CGIAR Center librarians for knowledge products not processed through the QA Platform."
+    "badge": "in-progress",
+    "title": "Result quality assurance in progress",
+    "description": "This result is currently under review by QA expert assessors following the CGIAR standard",
+    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
   },
   "bundled_innovations": [
     {
