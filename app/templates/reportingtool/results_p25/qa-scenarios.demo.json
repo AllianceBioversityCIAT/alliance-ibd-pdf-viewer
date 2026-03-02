@@ -1,0 +1,67 @@
+[
+  {
+    "_comment": "Case 1 - KP Center Manager (KP sin QA Platform)",
+    "badge": "kp",
+    "title": "Result quality assured by CGIAR Center knowledge manager",
+    "description": "Quality Assurance is provided by CGIAR Center librarians for knowledge products not processed through the QA Platform."
+  },
+  {
+    "_comment": "Case 2 - KP MQAP (KP peer-reviewed)",
+    "badge": "mqap",
+    "title": "Result automated quality assured using MQAP",
+    "description": "This knowledge product was automatically quality assured using the Monitoring, Quality Assurance and Performance (MQAP) system, which checks peer-reviewed publications against established criteria."
+  },
+  {
+    "_comment": "Case 3 - Two assessors (CapSharing, PolicyChange, OtherOutput, OtherOutcome)",
+    "badge": "two-assessors",
+    "title": "Result quality assured by two independent assessors",
+    "description": "This result underwent quality assurance by two independent assessors following the CGIAR standard",
+    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
+  },
+  {
+    "_comment": "Case 4 - Senior third party (CapSharing, PolicyChange, OtherOutput, OtherOutcome)",
+    "badge": "senior",
+    "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
+    "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard",
+    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does",
+    "adjustments_title": "Core data points that were adjusted during the QA process:",
+    "adjustments": [
+      { "label": "Geo scope", "from_value": "Regional", "to_value": "National" }
+    ]
+  },
+  {
+    "_comment": "Case 4B - Innovation Development",
+    "badge": "senior",
+    "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
+    "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard",
+    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does",
+    "adjustments_title": "Core data points that were adjusted during the QA process:",
+    "adjustments": [
+      { "label": "Innovation Readiness", "from_value": "Level 5", "to_value": "Level 7" }
+    ]
+  },
+  {
+    "_comment": "Case 4C - Innovation Use",
+    "badge": "senior",
+    "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
+    "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard",
+    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does",
+    "adjustments_title": "Innovation Use:",
+    "adjustments": [
+      { "label": "Innovation Readiness", "from_value": "Level 5", "to_value": "Level 7" }
+    ]
+  },
+  {
+    "_comment": "Case 4D - Innovations confirmadas",
+    "badge": "senior",
+    "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
+    "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard. The submitted innovation readiness level was quality assured and confirmed",
+    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
+  },
+  {
+    "_comment": "QA in process",
+    "badge": "in-progress",
+    "title": "Result quality assurance in progress",
+    "description": "This result is currently undergoing the quality assurance process. The final QA status will be updated upon completion."
+  }
+]

@@ -7,7 +7,7 @@ import {
   extractEvidences,
 } from "./transform";
 import { PageShell } from "./components/page-shell";
-import { QABox, KPQABox } from "./components/qa-box";
+import { QABox } from "./components/qa-box";
 import {
   ResultDetailsSection,
   ContributorsSection,
@@ -34,24 +34,8 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       generationDate={d?.generation_date_footer ?? "—"}
       phaseName={d?.phase_name ?? "—"}
     >
-      {/* QA Box — KPQABox for Knowledge Products, standard QABox otherwise */}
-      {d?.rt_id === 6 ? (
-        <KPQABox />
-      ) : (
-        <QABox
-          adjustments={d?.qa_adjustments}
-          readinessTransition={
-            d?.rt_id === 2 &&
-            d?.innovation_readiness_from &&
-            d?.innovation_readiness_to
-              ? {
-                  from: d.innovation_readiness_from,
-                  to: d.innovation_readiness_to,
-                }
-              : undefined
-          }
-        />
-      )}
+      {/* QA Box — rendered from backend qa_info */}
+      {d?.qa_info && <QABox qaInfo={d.qa_info} />}
 
       {/* Common sections */}
       {d && <ResultDetailsSection data={d} impactAreas={impactAreas} />}

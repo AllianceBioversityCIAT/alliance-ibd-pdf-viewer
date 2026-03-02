@@ -1,5 +1,11 @@
 import Image from "next/image";
-import type { QAAdjustment } from "../types";
+import type { QAInfo } from "../types";
+
+const BADGE_IMAGES: Record<string, { src: string; invert?: boolean }> = {
+  "two-assessors": { src: "/assets/prms/badge-two-assessors.png", invert: true },
+  senior: { src: "/assets/prms/shield-badge.png" },
+  "in-progress": { src: "/assets/prms/badge-qa-in-progress.png", invert: true },
+};
 
 function ArrowRight() {
   return (
@@ -21,72 +27,80 @@ function ArrowRight() {
   );
 }
 
-export function QABox({
-  adjustments,
-  readinessTransition,
-}: Readonly<{
-  adjustments?: QAAdjustment[];
-  readinessTransition?: { from: string; to: string };
-}>) {
+function KPBadge() {
+  return (
+    <div
+      className="flex items-center justify-center"
+      style={{
+        width: 57,
+        height: 57,
+        borderRadius: "50%",
+        border: "2.5px solid white",
+      }}
+    >
+      <span
+        className="text-white font-bold"
+        style={{ fontSize: 20, lineHeight: 1 }}
+      >
+        KP
+      </span>
+    </div>
+  );
+}
+
+function BadgeImage({ badge }: Readonly<{ badge: string }>) {
+  const entry = BADGE_IMAGES[badge] ?? { src: "/assets/prms/shield-badge.png" };
+  return (
+    <Image
+      src={entry.src}
+      alt="Quality Assured"
+      width={57}
+      height={57}
+      className="w-[57px] h-[57px] object-contain"
+      style={entry.invert ? { filter: "brightness(0) invert(1)" } : undefined}
+    />
+  );
+}
+
+export function QABox({ qaInfo }: Readonly<{ qaInfo: QAInfo }>) {
+  const isKP = qaInfo.badge === "kp" || qaInfo.badge === "mqap";
+
   return (
     <div className="bg-[#e2e0df] flex overflow-hidden">
       <div
         className="bg-[#033529] flex items-center justify-center shrink-0"
         style={{ width: 106, padding: "8px 17px" }}
       >
-        <Image
-          src="/assets/prms/shield-badge.png"
-          alt="Quality Assured"
-          width={57}
-          height={57}
-          className="w-[57px] h-[57px] object-contain"
-        />
+        {isKP ? <KPBadge /> : <BadgeImage badge={qaInfo.badge} />}
       </div>
       <div className="flex flex-col gap-[12px] py-[15px] px-[22px] flex-1 min-w-0">
         <div className="flex flex-col gap-[8px]">
           <p className="text-[#02211a] text-[11px] font-bold leading-[1.15]">
-            Result quality assured by two assessors and subsequently reviewed by
-            a senior third party
+            {qaInfo.title}
           </p>
           <p className="text-[#818181] text-[8px] leading-normal">
-            This result underwent two rounds of quality assurance, including
-            review by a senior third-party subject matter expert following the
-            CGIAR standard{" "}
-            <a
-              href="https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
-              className="text-[#065f4a] underline"
-            >
-              QA process.
-            </a>
+            {qaInfo.description}
+            {qaInfo.qa_url && (
+              <>
+                {" "}
+                <a href={qaInfo.qa_url} className="text-[#065f4a] underline">
+                  QA process.
+                </a>
+              </>
+            )}
           </p>
         </div>
-        {readinessTransition && (
+        {!!qaInfo.adjustments?.length && (
           <div className="flex flex-col gap-[5px]">
-            <p className="text-[#1d1d1d] text-[9px] font-bold leading-[1.15]">
-              Innovation Use:
-            </p>
-            <div className="flex items-center gap-[5px] text-[9px]">
-              <span className="mr-[2px]">&bull;</span>
-              <span className="text-[#393939]">
-                <span className="font-medium">Innovation Readiness:</span>{" "}
-                {readinessTransition.from}
-              </span>
-              <ArrowRight />
-              <span className="text-[#033529] font-medium">
-                {readinessTransition.to}
-              </span>
-            </div>
-          </div>
-        )}
-        {!readinessTransition && adjustments && adjustments.length > 0 && (
-          <div className="flex flex-col gap-[5px]">
-            <p className="text-[#1d1d1d] text-[9px] font-bold leading-[1.15]">
-              Core data points that were adjusted during the QA process:
-            </p>
+            {qaInfo.adjustments_title && (
+              <p className="text-[#1d1d1d] text-[9px] font-bold leading-[1.15]">
+                {qaInfo.adjustments_title}
+              </p>
+            )}
             <div className="flex flex-col gap-[3px]">
-              {adjustments.map((adj, i) => (
+              {qaInfo.adjustments.map((adj, i) => (
                 <div
-                  key={`qa-adjustment-${adj.label}-${i}`}
+                  key={`qa-adj-${adj.label}-${i}`}
                   className="flex items-center gap-[5px] text-[9px]"
                 >
                   <span className="text-[#393939]">
@@ -102,43 +116,6 @@ export function QABox({
             </div>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-export function KPQABox() {
-  return (
-    <div className="bg-[#e2e0df] flex overflow-hidden">
-      <div
-        className="bg-[#033529] flex items-center justify-center shrink-0"
-        style={{ width: 106, padding: "8px 17px" }}
-      >
-        <div
-          className="flex items-center justify-center"
-          style={{
-            width: 57,
-            height: 57,
-            borderRadius: "50%",
-            border: "2.5px solid white",
-          }}
-        >
-          <span
-            className="text-white font-bold"
-            style={{ fontSize: 20, lineHeight: 1 }}
-          >
-            KP
-          </span>
-        </div>
-      </div>
-      <div className="flex flex-col gap-[8px] py-[15px] px-[22px] flex-1 min-w-0">
-        <p className="text-[#02211a] text-[11px] font-bold leading-[1.15]">
-          Result quality assured by CGIAR Center knowledge manager
-        </p>
-        <p className="text-[#818181] text-[8px] leading-normal">
-          Quality Assurance is provided by CGIAR Center librarians for knowledge
-          products not processed through the QA Platform.
-        </p>
       </div>
     </div>
   );

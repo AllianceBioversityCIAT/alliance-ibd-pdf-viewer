@@ -51,6 +51,15 @@ export interface QAAdjustment {
   to_value: string;
 }
 
+export interface QAInfo {
+  badge: string;
+  title: string;
+  description: string;
+  qa_url?: string;
+  adjustments_title?: string;
+  adjustments?: QAAdjustment[];
+}
+
 export interface BundledInnovation {
   portfolio: string;
   phase: string;
@@ -206,6 +215,7 @@ export interface PRMSResultData {
   kp_partner_data: KPField[] | null;
 
   // QA
+  qa_info?: QAInfo;
   qa_adjustments?: QAAdjustment[];
 
   // Bundled innovations

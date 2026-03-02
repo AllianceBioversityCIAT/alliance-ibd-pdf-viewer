@@ -64,13 +64,15 @@ app/templates/
 
 The unified template for all PRMS result types. Uses `rt_id` from the JSON data to switch between variant-specific sections:
 
-| rt_id | Type | QA Box | Variant Sections |
-|-------|------|--------|------------------|
-| 7 | Innovation Development | Standard QABox | Readiness details, investments, actors |
-| 6 | Knowledge Product | KPQABox (circle "KP") | KP metadata table |
-| 5 | Capacity Sharing | Standard QABox | Common sections only |
-| 1 | Policy Change | Standard QABox | Placeholder |
-| 2 | Innovation Use | Standard QABox | Placeholder |
+| rt_id | Type | Variant Sections |
+|-------|------|------------------|
+| 7 | Innovation Development | Readiness details, investments, actors |
+| 6 | Knowledge Product | KP metadata table |
+| 5 | Capacity Sharing | Common sections only |
+| 1 | Policy Change | Policy-specific fields |
+| 2 | Innovation Use | Actors, organizations, measures |
+
+**QA Box**: A single data-driven `QABox` component receives a `qa_info` object from the backend (badge type, title, description, optional QA URL, optional adjustments). The backend decides the QA scenario; the template only renders. See `qa-scenarios.demo.json` for all supported badge types: `kp`, `mqap`, `two-assessors`, `senior`, `in-progress`.
 
 **Data format**: Consumes the real PRMS API JSON (fields like `result_name`, `phase_name`, `primary_submitter_name`, `*_tag` for impact areas). The `transform.ts` layer parses complex fields (impact tags, TOC entries, evidence) into display types.
 
@@ -101,3 +103,35 @@ The unified template for all PRMS result types. Uses `rt_id` from the JSON data 
 | Muted | `#818181` | Secondary info, fine print |
 
 **Figma MCP color warning:** The Figma MCP `get_design_context` sometimes returns incorrect colors in its code output. Always visually verify colors against the `get_screenshot` result and prefer these brand tokens when the screenshot clearly matches a known token.
+
+### Defensive coding (CRITICAL)
+
+Templates receive dynamic data from external APIs where **any field can be null, undefined, a wrong type, or missing entirely**. The template must NEVER crash — it should gracefully skip missing data.
+
+| Pattern | Use | Example |
+|---------|-----|---------|
+| `!!data.X?.length` | Boolean check for arrays | `const hasActors = !!data.actors?.length` |
+| `data.X?.map(...)` | Conditional iteration | `{data.items?.map(i => <Item key={i.id} />)}` |
+| `(data.X ?? []).map(...)` | When prop requires concrete array | `rows={(data.rows ?? []).map(r => [r.a, r.b])}` |
+| `data.a?.nested?.field` | Nested access | `data.primary_submitter_data?.toc_url` |
+| `toArray(val)` | Field might be string instead of array | `toArray(data.regions)` in transform layer |
+
+**Rules:**
+- **Never** use non-null assertions (`data.X!.map()`) — always use `?.` or `?? []`
+- **Never** call `.map()`, `.filter()`, `.length` without confirming the value is an array
+- **Transform layer is the safety gate**: `transform.ts` functions must sanitize all inputs (handle null, undefined, wrong types, empty values)
+- **Components are the second defense**: still use `?.` and `?? []` even on transformed data
+- **Test with partial data**, not just full demo JSON — fields will be missing in production
+
+### Playwright screenshots
+
+When using Playwright MCP to take validation screenshots, **always** save them to `.playwright-screenshots/` (already in `.gitignore`). Never leave screenshots in the project root or any tracked directory.
+
+### Development logs (`docs/dev/`)
+
+Each feature or significant change **must** have its own `.md` file in `docs/dev/`. This provides persistent context across Claude sessions.
+
+- **One file per feature/task** — e.g., `docs/dev/qa-box-refactor.md`, `docs/dev/pagination-fix.md`
+- **Create at the start** of a development task, update as you go
+- **Contents**: summary, Figma source links, scope/decisions, what changed, validation results, open items
+- This folder is the source of truth for "what was done and why" — read it at the start of a session to recover context

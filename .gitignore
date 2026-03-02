@@ -42,3 +42,7 @@ env_vars.txt
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright
+.playwright-mcp/
+.playwright-screenshots/
