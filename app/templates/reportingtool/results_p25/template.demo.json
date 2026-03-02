@@ -100,9 +100,10 @@
   ],
   "kp_partner_data": null,
   "qa_info": {
-    "badge": "mqap",
-    "title": "Result automated quality assured using MQAP",
-    "description": "Monitoring, Evaluation, and Learning Quality Assurance Processor (M-QAP) validates the reported data based on information retrieved from Scopus and Web of Science."
+    "badge": "senior",
+    "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
+    "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard",
+    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
   },
   "bundled_innovations": [
     {
