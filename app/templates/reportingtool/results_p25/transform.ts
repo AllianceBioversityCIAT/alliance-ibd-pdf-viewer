@@ -127,7 +127,7 @@ export function extractEvidences(data: PRMSResultData): Evidence[] {
 
       evidences.push({
         label: `Evidence #${i + 1}`,
-        link: ev.evidence,
+        link: ev.link,
         is_public_file: ev.is_public_file,
         file_name: ev.file_name,
         description: ev.details ?? "",

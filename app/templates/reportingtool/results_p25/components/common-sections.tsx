@@ -527,7 +527,7 @@ function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
                 href={evidence.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-(--theme-deep) text-[9px] leading-normal font-medium break-all hover:underline"
+                className="text-(--theme-deep) text-[9px] leading-normal font-medium break-all cursor-pointer"
               >
                 {evidence.file_name ?? "Access link"}
               </a>
