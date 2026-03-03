@@ -567,29 +567,31 @@ function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
           </p>
         )}
 
-        {!!evidence.tags?.length &&
-          evidence.is_public_file &&
-          evidence.tags?.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-[9px] leading-normal font-bold text-[#1d1d1d]">
-                Impact Area related:
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {evidence.tags.map((t) => (
-                  <div
-                    key={t.icon_key}
-                    className="text-[#393939] text-[9px] flex items-center gap-1"
-                  >
-                    <ImpactAreaIcon
-                      iconKey={t.icon_key}
-                      className="w-[20px] h-[20px] shrink-0"
-                    />
-                    {t.name}
-                  </div>
-                ))}
+        {evidence.is_public_file ? (
+          <>
+            {!!evidence.tags?.length && evidence.tags?.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-[9px] leading-normal font-bold text-[#1d1d1d]">
+                  Impact Area related:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {evidence.tags.map((t) => (
+                    <div
+                      key={t.icon_key}
+                      className="text-[#393939] text-[9px] flex items-center gap-1"
+                    >
+                      <ImpactAreaIcon
+                        iconKey={t.icon_key}
+                        className="w-[20px] h-[20px] shrink-0"
+                      />
+                      {t.name}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </>
+        ) : null}
       </div>
     </div>
   );
