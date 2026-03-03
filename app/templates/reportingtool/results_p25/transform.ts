@@ -129,7 +129,7 @@ export function extractEvidences(data: PRMSResultData): Evidence[] {
         label: `Evidence #${i + 1}`,
         link: ev.link,
         is_public_file: ev.is_public_file,
-        file_name: ev.file_name,
+        file_name: ev.name,
         description: ev.details ?? "",
         tags,
       });

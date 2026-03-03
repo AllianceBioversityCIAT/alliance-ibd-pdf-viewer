@@ -4,7 +4,7 @@ export interface LinkedEvidence {
   details: string | null;
   link: string;
   is_public_file: boolean;
-  file_name: string;
+  name: string;
   gender_related: boolean;
   climate_related: boolean;
   poverty_related: boolean;
