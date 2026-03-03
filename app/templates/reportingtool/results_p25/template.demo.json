@@ -91,8 +91,8 @@
       "title": "Youth engagement in agricultural transformation"
     }
   ],
-  "geo_focus": "Global",
-  "regions": ["Eastern Africa", "Southern Africa", "Western Africa"],
+  "geo_focus": "Sub-national",
+  "regions": [],
   "countries": [
     {
       "name": "Ethiopia",
@@ -104,13 +104,10 @@
     }
   ],
   "subnational": [
+    { "country": "Afghanistan", "subnationals": ["Badakhshān", "Bādghīs"] },
     {
-      "country": "Ethiopia",
-      "subnationals": ["Badakhshān", "Bādghīs"]
-    },
-    {
-      "country": "Colombia",
-      "subnationals": ["Cali", "Bogotá"]
+      "country": "Aland Islands",
+      "subnationals": ["No sub-national levels available"]
     }
   ],
   "linked_evidences": [

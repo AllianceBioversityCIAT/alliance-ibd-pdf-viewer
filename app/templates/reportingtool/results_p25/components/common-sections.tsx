@@ -9,7 +9,7 @@ import type {
 } from "../types";
 import { ImpactAreaCard, OECDCriteria } from "./impact-areas";
 import { DataTable } from "./tables";
-import { Link } from "lucide-react";
+import { Dot, Link } from "lucide-react";
 import { ImpactAreaIcon } from "./impact-area-icons";
 
 function SearchIcon({
@@ -433,6 +433,29 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                 )}
               </div>
             </div>
+
+            {!!geo?.subnational?.length && geo?.subnational?.length > 0 && (
+              <>
+                {geo?.subnational.map((s) => (
+                  <div key={s.country}>
+                    <p className="font-bold text-[#1d1d1d] leading-[1.15]">
+                      States specified of {s.country} for this result:
+                    </p>
+                    <div className="text-[#393939] text-[10px] flex flex-wrap gap-x-2 gap-y-1 mt-1">
+                      {s.subnationals.map((sn) => (
+                        <div
+                          key={`${s.country}-${sn}`}
+                          className="leading-normal flex items-center gap-0.5"
+                        >
+                          <Dot size={15} />
+                          {sn}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </>
       )}

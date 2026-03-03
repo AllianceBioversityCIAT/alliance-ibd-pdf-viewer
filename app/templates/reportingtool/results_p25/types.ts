@@ -129,6 +129,7 @@ export interface GeoLocation {
   geo_focus: string;
   regions: string[];
   countries: { name: string; code: string }[];
+  subnational: { country: string; subnationals: string[] }[];
 }
 
 export interface TheoryOfChange extends PrimarySubmitterData {
@@ -185,7 +186,7 @@ export interface PRMSResultData {
   geo_focus: string;
   regions: string[] | null;
   countries: { name: string; code: string }[] | null;
-  subnational: string | null;
+  subnational: { country: string; subnationals: string[] }[] | null;
 
   // Theory of Change
   toc_primary: TocPrimaryEntry[] | null;

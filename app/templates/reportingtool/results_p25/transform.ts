@@ -68,7 +68,9 @@ export function extractGeoLocation(data: PRMSResultData): GeoLocation | null {
   if (!data.geo_focus) return null;
   const regions = toArray(data.regions);
   const countries = data.countries ?? [];
-  return { geo_focus: data.geo_focus, regions, countries };
+  const subnational = data.subnational ?? [];
+
+  return { geo_focus: data.geo_focus, regions, countries, subnational };
 }
 
 export function extractTocEntries(data: PRMSResultData): TheoryOfChange {
