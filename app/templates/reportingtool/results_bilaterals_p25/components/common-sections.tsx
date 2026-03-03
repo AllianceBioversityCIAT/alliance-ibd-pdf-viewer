@@ -420,11 +420,11 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                     >
                       <span>&bull;</span>
                       <Image
-                        src={`https://flagsapi.com/${c.code}/flat/64.png`}
+                        src={`https://flagcdn.com/${c.code.toLowerCase()}.svg`}
                         alt={c.name}
                         width={16}
-                        height={16}
-                        className="w-[16px] h-[16px] object-cover rounded-md"
+                        height={13}
+                        className="w-[16px] h-[13px] object-cover rounded-[2px]"
                       />
                       {c.name}
                     </div>
