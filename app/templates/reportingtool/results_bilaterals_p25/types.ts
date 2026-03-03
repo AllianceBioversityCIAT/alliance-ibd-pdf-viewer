@@ -222,7 +222,7 @@ export interface PRMSResultData {
   // Innovation Development (rt_id=7)
   readiness_level?: string;
   readiness_details?: string;
-  readiness_justification?: string;
+  readiness_level_justification?: string;
   innovation_nature?: string;
   innovation_type?: string;
   url_readiness?: string;

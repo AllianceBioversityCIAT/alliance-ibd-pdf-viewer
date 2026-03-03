@@ -26,7 +26,7 @@ export function InnovationDevelopmentSections({
   const hasInnoDevMainDetails =
     hasDevelopers ||
     data.readiness_level ||
-    data.readiness_justification ||
+    data.readiness_level_justification ||
     hasCollaborators ||
     data.innovation_nature ||
     data.innovation_type ||
@@ -64,13 +64,13 @@ export function InnovationDevelopmentSections({
               </p>
             )}
 
-            {data.readiness_justification && (
+            {data.readiness_level_justification && (
               <p className="leading-normal">
                 <span className="font-bold text-[#1d1d1d]">
                   Innovation readiness justification:
                 </span>{" "}
                 <span className="text-[#393939]">
-                  {data.readiness_justification}
+                  {data.readiness_level_justification}
                 </span>
               </p>
             )}
