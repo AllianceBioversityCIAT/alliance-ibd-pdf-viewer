@@ -384,28 +384,31 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
             />
           </div>
           <div className="flex flex-col gap-[18px] py-[15px] px-[22px] flex-1 min-w-0 text-[10px]">
-            <div className="flex flex-col gap-[5px]">
-              <p className="font-bold text-[#1d1d1d] leading-[1.15]">
-                Regions specified for this result:
-              </p>
-              <div className="flex flex-wrap gap-[6px]">
-                {geo?.regions?.length && geo?.regions?.length > 0 ? (
-                  geo?.regions?.map((r, i) => (
-                    <span
-                      key={`${r}-${i}`}
-                      className="text-[#393939] leading-normal"
-                    >
-                      <span className="mr-[4px]">&bull;</span>
-                      {r}
-                    </span>
-                  ))
-                ) : (
-                  <p className="text-[#707070] text-[10px] leading-[1.15] italic font-normal">
-                    No regions specified
+            {geo?.geo_focus !== "National" &&
+              geo?.geo_focus !== "Sub-national" && (
+                <div className="flex flex-col gap-[5px]">
+                  <p className="font-bold text-[#1d1d1d] leading-[1.15]">
+                    Regions specified for this result:
                   </p>
-                )}
-              </div>
-            </div>
+                  <div className="flex flex-wrap gap-[6px]">
+                    {geo?.regions?.length && geo?.regions?.length > 0 ? (
+                      geo?.regions?.map((r, i) => (
+                        <span
+                          key={`${r}-${i}`}
+                          className="text-[#393939] leading-normal"
+                        >
+                          <span className="mr-[4px]">&bull;</span>
+                          {r}
+                        </span>
+                      ))
+                    ) : (
+                      <p className="text-[#707070] text-[10px] leading-[1.15] italic font-normal">
+                        No regions specified
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
 
             <div className="flex flex-col gap-[5px]">
               <p className="font-bold text-[#1d1d1d] leading-[1.15]">
