@@ -2,7 +2,7 @@
 
 export interface LinkedEvidence {
   details: string | null;
-  evidence: string;
+  link: string;
   is_public_file: boolean;
   file_name: string;
   gender_related: boolean;
