@@ -71,7 +71,7 @@ export function PageShell({
             className="object-contain h-11"
           />
           {getSPLabel(primarySubmitterAcronym) && (
-            <div className="h-11 bg-(--theme-mid) w-max flex items-end justify-center">
+            <div className="h-11 bg-(--theme-mid) max-w-[90px] text-pretty flex items-end justify-start">
               <p className="text-[7px] p-1.5 text-[#033529] font-bold leading-[1.15]">
                 {getSPLabel(primarySubmitterAcronym)}
               </p>
