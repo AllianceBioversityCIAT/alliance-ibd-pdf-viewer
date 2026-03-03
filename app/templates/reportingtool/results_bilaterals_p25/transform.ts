@@ -6,10 +6,7 @@ import type {
   Evidence,
 } from "./types";
 
-const IMPACT_AREA_MAP: Record<
-  string,
-  { name: string; icon_key?: string; icon_url?: string }
-> = {
+const IMPACT_AREA_MAP: Record<string, { name: string; icon_key: string }> = {
   nutrition_tag: {
     name: "Nutrition, health & food security",
     icon_key: "nutrition",
@@ -59,7 +56,6 @@ export function extractImpactAreas(data: PRMSResultData): ImpactArea[] {
     areas.push({
       name: mapping.name,
       icon_key: mapping.icon_key,
-      icon_url: mapping.icon_url,
       score: tag.score?.toString(),
       components: tag.components,
     });
@@ -72,7 +68,9 @@ export function extractGeoLocation(data: PRMSResultData): GeoLocation | null {
   if (!data.geo_focus) return null;
   const regions = toArray(data.regions);
   const countries = data.countries ?? [];
-  return { geo_focus: data.geo_focus, regions, countries };
+  const subnational = data.subnational ?? [];
+
+  return { geo_focus: data.geo_focus, regions, countries, subnational };
 }
 
 export function extractTocEntries(data: PRMSResultData): TheoryOfChange {
@@ -100,18 +98,40 @@ export function extractEvidences(data: PRMSResultData): Evidence[] {
 
   if (data.linked_evidences) {
     data.linked_evidences.forEach((ev, i) => {
-      const tags: string[] = [];
-      if (ev.gender_related) tags.push("Gender");
-      if (ev.climate_related) tags.push("Climate");
-      if (ev.nutrition_related) tags.push("Nutrition");
-      if (ev.poverty_related) tags.push("Poverty");
-      if (ev.environmental_biodiversity_related) tags.push("Environment");
+      const tags: { name: string; icon_key: string }[] = [];
+      if (ev.gender_related)
+        tags.push({
+          name: IMPACT_AREA_MAP.gender_tag.name,
+          icon_key: IMPACT_AREA_MAP.gender_tag.icon_key,
+        });
+      if (ev.climate_related)
+        tags.push({
+          name: IMPACT_AREA_MAP.climate_tag.name,
+          icon_key: IMPACT_AREA_MAP.climate_tag.icon_key,
+        });
+      if (ev.nutrition_related)
+        tags.push({
+          name: IMPACT_AREA_MAP.nutrition_tag.name,
+          icon_key: IMPACT_AREA_MAP.nutrition_tag.icon_key,
+        });
+      if (ev.poverty_related)
+        tags.push({
+          name: IMPACT_AREA_MAP.poverty_tag.name,
+          icon_key: IMPACT_AREA_MAP.poverty_tag.icon_key,
+        });
+      if (ev.environmental_biodiversity_related)
+        tags.push({
+          name: IMPACT_AREA_MAP.environmental_tag.name,
+          icon_key: IMPACT_AREA_MAP.environmental_tag.icon_key,
+        });
 
       evidences.push({
         label: `Evidence #${i + 1}`,
         link: ev.evidence,
-        description: ev.details ?? undefined,
-        tags: tags.length > 0 ? tags : undefined,
+        is_public_file: ev.is_public_file,
+        file_name: ev.file_name,
+        description: ev.details ?? "",
+        tags,
       });
     });
   }

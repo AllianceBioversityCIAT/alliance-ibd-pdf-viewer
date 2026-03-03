@@ -9,7 +9,9 @@ import type {
 } from "../types";
 import { ImpactAreaCard, OECDCriteria } from "./impact-areas";
 import { DataTable } from "./tables";
-import { Link } from "lucide-react";
+import { Dot, Link } from "lucide-react";
+import { ImpactAreaIcon } from "./impact-area-icons";
+
 function SearchIcon({
   size,
   className,
@@ -439,6 +441,29 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                 )}
               </div>
             </div>
+
+            {!!geo?.subnational?.length && geo?.subnational?.length > 0 && (
+              <>
+                {geo?.subnational.map((s) => (
+                  <div key={s.country}>
+                    <p className="font-bold text-[#1d1d1d] leading-[1.15]">
+                      States specified of {s.country} for this result:
+                    </p>
+                    <div className="text-[#393939] text-[10px] flex flex-wrap gap-x-2 gap-y-1 mt-1">
+                      {s.subnationals.map((sn) => (
+                        <div
+                          key={`${s.country}-${sn}`}
+                          className="leading-normal flex items-center gap-0.5"
+                        >
+                          <Dot size={15} />
+                          {sn}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </>
       )}
@@ -459,31 +484,112 @@ export function GeographicSection({
 
 // ── Evidence ──
 
+function SharepointIcon({
+  size,
+  className,
+}: Readonly<{ size: number; className?: string }>) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 11 11"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <path
+        d="M5.10167 0.917814C5.27635 0.911029 5.45128 0.921156 5.62402 0.948053C6.30183 1.06022 6.90744 1.43672 7.30794 1.99493C7.6118 2.41222 7.77968 2.91301 7.78872 3.42912C7.79175 3.54525 7.79259 3.66656 7.77399 3.7811C8.01577 3.78034 8.25613 3.81803 8.48606 3.89279C9.07256 4.08703 9.55968 4.50322 9.84308 5.05222C10.1103 5.58858 10.1563 6.20836 9.97131 6.77831C9.77287 7.37146 9.34575 7.8608 8.78484 8.13758C8.38044 8.33989 7.92344 8.4124 7.47627 8.3452C7.38933 8.33296 7.29359 8.32103 7.21082 8.29325C7.09939 9.09826 6.62286 9.69944 5.85731 9.97935C5.65607 10.0732 5.25294 10.1018 5.03144 10.0792C4.49393 10.0248 3.99964 9.76036 3.65616 9.34336C3.2867 8.88779 3.16642 8.37125 3.22634 7.79645L3.22057 7.79674C2.85168 7.81233 2.42058 7.78859 2.04382 7.79821C1.9078 7.80169 1.34376 7.80496 1.24052 7.78729C1.15691 7.77354 1.0794 7.7349 1.0181 7.6764C0.922039 7.58494 0.915229 7.45037 0.914311 7.3265L0.915369 4.7498L0.915102 3.98604C0.914934 3.77696 0.874276 3.45167 1.03843 3.30516C1.19245 3.16768 1.55143 3.20391 1.7498 3.20403L2.64342 3.20466C2.67114 3.07874 2.68655 2.96018 2.71982 2.83044C2.82079 2.4422 3.01347 2.08388 3.28166 1.78556C3.76344 1.25337 4.38387 0.953586 5.10167 0.917814ZM6.07837 6.25975C6.56073 6.54807 6.84437 6.79494 7.07199 7.33569C7.12148 7.45326 7.1437 7.56562 7.18397 7.67654C7.45153 7.76604 7.59985 7.79421 7.8847 7.78846C8.39447 7.74228 8.78897 7.55416 9.12144 7.15555C9.40785 6.81064 9.54464 6.36564 9.5014 5.91941C9.46063 5.46452 9.23999 5.04471 8.88842 4.75318C8.53427 4.4611 8.16906 4.3516 7.71608 4.36571C7.2282 4.39904 6.82982 4.57032 6.50229 4.94654C6.19273 5.30116 6.03922 5.76561 6.07645 6.23486C6.07703 6.24316 6.07767 6.25146 6.07837 6.25975ZM3.31242 4.07723C2.95721 4.08952 2.53624 4.23413 2.36522 4.58825C2.30078 4.72166 2.29435 4.93371 2.32325 5.07607C2.40328 5.39351 2.66898 5.56119 2.94229 5.70877C3.15823 5.82539 3.60817 5.90566 3.6747 6.17233C3.68056 6.21385 3.64843 6.26408 3.62085 6.2939C3.53145 6.39053 3.4232 6.42129 3.29512 6.42283C2.86007 6.42806 2.66251 6.32265 2.31153 6.10059C2.30994 6.31417 2.30099 6.60291 2.31068 6.81092C2.58024 6.90901 2.84244 6.97602 3.13191 6.98365C3.49841 6.99035 3.86747 6.96399 4.14111 6.70061C4.42842 6.42409 4.42603 5.86017 4.13789 5.5878C4.03627 5.49173 3.94228 5.41981 3.81601 5.36003C3.62487 5.24264 3.00918 5.11327 2.99321 4.87332C2.99015 4.82737 3.0443 4.75446 3.08346 4.7247C3.22102 4.6202 3.46139 4.62145 3.62313 4.63567C3.85458 4.65604 4.04157 4.74366 4.24092 4.85377C4.23426 4.62824 4.24169 4.40318 4.23462 4.17839C3.8406 4.07482 3.71533 4.06037 3.31242 4.07723ZM5.50074 5.23061C5.5 5.29413 5.48867 5.42774 5.52899 5.47299C5.5916 5.46709 5.71182 5.10578 5.74996 5.03053C6.04291 4.46061 6.55951 4.03803 7.17621 3.86388C7.21337 3.72093 7.21887 3.55577 7.21554 3.40835C7.19248 2.38661 6.2556 1.46097 5.2215 1.49819C4.15967 1.51428 3.43017 2.17777 3.22971 3.2055C3.65976 3.19966 4.09124 3.20713 4.52155 3.20588C4.73456 3.20525 4.96604 3.19431 5.1764 3.21639C5.31623 3.23107 5.46476 3.36118 5.48576 3.50101C5.51126 3.69783 5.50139 3.90901 5.50131 4.10831L5.50074 5.23061ZM5.5051 6.67351C5.49384 6.92876 5.52783 7.31499 5.46983 7.5556C5.38127 7.92299 4.60552 7.76627 4.31603 7.79836C4.2162 7.80943 3.94441 7.80715 3.84884 7.8026C3.83545 7.8019 3.82206 7.80096 3.8087 7.79975C3.67385 8.60516 4.14014 9.3119 4.94301 9.48343C5.73275 9.61591 6.49229 9.11165 6.62421 8.31319C6.68449 7.93869 6.59596 7.55547 6.37752 7.24537C6.1439 6.91958 5.87273 6.78655 5.5051 6.67351Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
   return (
     <div className="bg-[#e2e0df]" style={{ padding: "15px 19px" }}>
       <div className="flex flex-col gap-2.5">
-        <p
-          className="text-(--theme-header-bg) text-[9.5px] leading-[1.15]"
-          style={{ fontFamily: "'Noto Serif', serif" }}
-        >
-          {evidence.label}
-        </p>
-        <p className="text-[9px] leading-normal">
-          <span className="font-bold text-[#1d1d1d]">Link:</span>{" "}
-          <a
-            href={evidence.link}
-            className="text-(--theme-mid) underline break-all"
+        <div className="flex items-center justify-between">
+          <p
+            className="text-[9.5px] leading-[1.15]"
+            style={{ fontFamily: "'Noto Serif', serif" }}
           >
-            {evidence.link}
-          </a>
-        </p>
-        {evidence.description && (
-          <p className="text-[9px] leading-normal">
-            <span className="font-bold text-[#1d1d1d]">Description:</span>{" "}
-            <span className="text-[#393939]">{evidence.description}</span>
+            {evidence.label}
+          </p>
+
+          <div className="flex items-center gap-0.5">
+            {evidence.file_name ? (
+              <SharepointIcon
+                size={13}
+                className={`${
+                  evidence.is_public_file
+                    ? "text-(--theme-deep)"
+                    : "text-[#393939]"
+                } w-[13px] h-[13px] object-cover`}
+              />
+            ) : (
+              <Link size={10} className="text-(--theme-deep)" />
+            )}
+            {evidence.is_public_file ? (
+              <a
+                href={evidence.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-(--theme-deep) text-[9px] leading-normal font-medium break-all hover:underline"
+              >
+                {evidence.file_name ?? "Access link"}
+              </a>
+            ) : (
+              <p className="text-[#393939] text-[9px] leading-normal font-medium break-all">
+                {evidence.file_name ?? "Access link"}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {!evidence.is_public_file && (
+          <p className="text-[#818181] text-[9px] leading-normal">
+            Evidence supporting this result is not publicly available. If you
+            would like access to the evidence, please contact{" "}
+            <a
+              href="mailto:performanceandresults@cgiar.org"
+              className="text-(--theme-deep) underline"
+            >
+              performanceandresults@cgiar.org
+            </a>
           </p>
         )}
+
+        {evidence.description && (
+          <p className="text-[9px] leading-normal">
+            <span className="font-bold">Details:</span>{" "}
+            <span className="text-[#393939]"> {evidence.description}</span>
+          </p>
+        )}
+
+        {!!evidence.tags?.length &&
+          evidence.is_public_file &&
+          evidence.tags?.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[9px] leading-normal font-bold text-[#1d1d1d]">
+                Impact Area related:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {evidence.tags.map((t) => (
+                  <div
+                    key={t.icon_key}
+                    className="text-[#393939] text-[9px] flex items-center gap-1"
+                  >
+                    <ImpactAreaIcon
+                      iconKey={t.icon_key}
+                      className="w-[20px] h-[20px] shrink-0"
+                    />
+                    {t.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
       </div>
     </div>
   );

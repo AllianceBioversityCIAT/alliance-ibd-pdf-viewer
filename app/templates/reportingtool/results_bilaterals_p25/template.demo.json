@@ -1,72 +1,231 @@
 {
-  "id": 10917,
-  "rl_id": 4,
-  "rt_id": 5,
-  "title": "In person training on Product Design Team (PDT) meetings for NARES partners in Tanzania on 16 April 2025",
-  "is_krs": "No",
-  "regions": null,
-  "krs_link": null,
-  "countries": [{ "code": "TZ", "name": "Tanzania, United Republic" }],
-  "geo_focus": "National",
-  "actor_data": null,
-  "gender_tag": { "score": null, "components": [] },
-  "phase_name": "Reporting 2025",
-  "capdev_term": "Short-term",
-  "climate_tag": { "score": null, "components": [] },
-  "poverty_tag": { "score": null, "components": [] },
-  "result_code": 8449,
-  "result_lead": null,
-  "result_type": "Capacity sharing for development",
-  "short_title": null,
-  "subnational": [
-    { "country": "Tanzania, United Republic", "subnational": "NOT provided" }
-  ],
-  "project_name": "T-PJ-004017-VACS-Breeding: Bambara",
-  "result_level": "Output",
-  "nutrition_tag": { "score": null, "components": [] },
-  "has_actor_data": "No",
-  "linked_results": [],
-  "result_type_id": 5,
-  "kp_partner_data": null,
-  "submission_data": "Not Submitted",
-  "lead_center_name": "International Institute of Tropical Agriculture",
-  "linked_evidences": [],
-  "capdev_male_using": "0",
-  "environmental_tag": { "score": null, "components": [] },
   "portfolio_acronym": "P25",
-  "submission_status": "Pending Review",
-  "bilateral_projects": [
-    {
-      "project_title": "IITA - T-PJ-004017-VACS-Breeding: Bambara",
-      "is_lead_project": 1
-    }
-  ],
-  "lead_contact_email": null,
-  "previous_portfolio": [],
-  "result_description": "The meeting successfully brought together key national value-chain stakeholders, including breeders, agronomists, nutritionists, gender specialists, extension officers, processors, and representative farmers. The meeting focused on defining priority market segments and refining target product profiles (TPPs) that reflect farmer preferences, end-user demands, and gender and nutrition considerations. Through participatory discussions and trait-ranking exercises, stakeholders identified yield, drought tolerance, and cooking time as essential traits for short-duration Bambara groundnut varieties intended for household consumption. For long-duration varieties, yield, resistance to Fusarium wilt, and reduced cooking time were prioritized. The meeting strengthened alignment between national breeding objectives and local production and consumption realities, ensuring that future variety development in Tanzania is responsive to climate resilience needs, labor demands—particularly for women—and household nutrition outcomes. The outcomes of this meeting directly informed the finalization of market segments and TPPs for the Tanzanian BGN network.",
-  "bundled_innovations": null,
-  "capdev_female_using": "0",
-  "capdev_unkown_using": "18",
-  "lead_center_acronym": "IITA",
-  "lead_contact_person": null,
-  "non_kp_partner_data": null,
-  "partners_applicable": "Yes",
-  "contributing_centers": [
-    {
-      "center_name": "IITA - International Institute of Tropical Agriculture",
-      "is_primary_center": 1
-    }
-  ],
-  "generation_date_footer": "Monday, March 2nd, 2026 at 18:24 CET",
+  "rt_id": 6,
+  "result_code": 5892,
+  "result_type": "Innovation Development",
+  "result_name": "Integrating traditional agricultural practices with modern technology for enhanced productivity",
+  "phase_name": "Reporting 2025",
+  "title": "Planting Date Advisories disseminated in Africa",
+  "short_title": "TEST",
+  "result_description": "The content of the Planting Date Advisories was developed into messages and disseminated to farmers across Bihar through the dissemination platforms of BAU, JEEViKA and IFFCO kisan. The advisories were approved and accepted by the Convergence Platform in the form of text and audio to be disseminated to farmers across the state.",
+  "primary_submitter_name": "SP01 - Breeding for Tomorrow",
+  "primary_submitter_acronym": "SP01",
+  "lead_contact_person": "Obilo Chinyere",
+  "lead_contact_email": "o.chinyere@cgiar.org",
+  "result_lead": "Bioversity International",
+  "nutrition_tag": {
+    "score": "(2) Principal",
+    "components": ["Nutrition", "Health"]
+  },
+  "climate_tag": {
+    "score": "(0) Not targeted",
+    "components": []
+  },
+  "poverty_tag": {
+    "score": "(0) Not targeted",
+    "components": []
+  },
+  "gender_tag": {
+    "score": "(1) Significant",
+    "components": ["Gender"]
+  },
+  "environmental_tag": {
+    "score": "(1) Significant",
+    "components": ["Environment"]
+  },
   "primary_submitter_data": {
-    "contributor_name": "SP13 - Genebank",
+    "toc_url": "https://toc.mel.cgiar.org/toc/dc81f773-4dbd-408e-ad02-9b8fa9e072bf",
+    "toc_internal_id": "dc81f773-4dbd-408e-ad02-9b8fa9e072bf",
+    "contributor_name": "SP01 - Breeding for Tomorrow",
     "contributor_can_match_result": 1
   },
-  "primary_submitter_name": "SP13 - Genebank",
-  "capdev_non_binary_using": "0",
-  "contributing_initiatives": [],
-  "generation_date_filename": "20260302_1824",
-  "primary_submitter_acronym": "SP13",
-  "capdev_delivery_method_name": "In person",
-  "is_attending_for_organization": "Not defined"
+  "toc_primary": [
+    {
+      "toc_level_name": "High Level Output",
+      "toc_work_package_acronym": "Area of work 01 - Climate Adaptation and Mitigation",
+      "toc_result_title": "HLO1.AOW1.IO1 Steer to impact",
+      "toc_indicator": "Number of quantified climate change-related hazards that affect agronomic systems",
+      "toc_result_description": "Market intelligence is packaged into decision-support tools to guide investment decisions in breeding and other science programs"
+    }
+  ],
+  "contributing_initiatives": [
+    {
+      "initiative_short_name": "SP01 - Breeding for Tomorrow"
+    },
+    {
+      "initiative_short_name": "SP02 - Sustainable Farming"
+    },
+    {
+      "initiative_short_name": "SP03 - Climate-Smart Agriculture"
+    }
+  ],
+  "contributing_centers": [
+    {
+      "center_name": "IFPRI - International Food Policy Research Institute",
+      "is_primary_center": true
+    },
+    {
+      "center_name": "IITA - International Institute of Tropical Agriculture",
+      "is_primary_center": false
+    }
+  ],
+  "bilateral_projects": [
+    {
+      "project_title": "Project 01 - Climate-Smart Agriculture",
+      "is_lead_project": true
+    }
+  ],
+  "non_kp_partner_data": [
+    {
+      "partner_name": "JEEVIKA - Jeevika",
+      "partner_country_hq": "India (IN)",
+      "partner_type": "NGO Local (General)"
+    }
+  ],
+  "bundled_innovations": [
+    {
+      "portfolio": "P25",
+      "phase": "2025",
+      "code": "5892",
+      "indicator": "Policy Change",
+      "title": "Youth engagement in agricultural transformation"
+    }
+  ],
+  "geo_focus": "Sub-national",
+  "regions": [],
+  "countries": [
+    {
+      "name": "Ethiopia",
+      "code": "ET"
+    },
+    {
+      "name": "South Africa",
+      "code": "ZA"
+    }
+  ],
+  "subnational": [
+    { "country": "Afghanistan", "subnationals": ["Badakhshān", "Bādghīs"] },
+    {
+      "country": "Aland Islands",
+      "subnationals": ["No sub-national levels available"]
+    }
+  ],
+  "linked_evidences": [
+    {
+      "details": "Agriculture is a transformative shift that redefines how we grow food, combining scientific knowledge, cutting-edge technology, and a long-term vision centered on sustainability.",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": true,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": true,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "Agriculture is a transformative shift that redefines how we grow food, combining scientific knowledge, cutting-edge technology, and a long-term vision centered on sustainability.",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": true,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": false,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": true,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": true,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": true,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": false,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "Agriculture is a transformative shift that redefines how we grow food, combining scientific knowledge, cutting-edge technology, and a long-term vision centered on sustainability.",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": false,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": false,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": false,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": false,
+      "environmental_biodiversity_related": false
+    }
+  ],
+  "innovation_developers": "Amit Srivastava (A.srivastava@cgiar.org)",
+  "readiness_level": "Level 9: Proven Innovation",
+  "readiness_justification": "Scaling report included to show level 9, as we are conducting uncontrolled testing right now. Launch events and several testing workshops with users were held in 2023.",
+  "innovation_collaborators": "Virender Kumar (virender.kumar@irri.org)",
+  "innovation_nature": "Incremental innovation (Innovations that already exist and undergo constant, steady progress, and improvement.)",
+  "innovation_type": "Capacity development innovation (Innovations that strengthen capacity, including farmer, extension or investor decision-support services; accelerator/ incubator programs; manuals, training programs and curricula; online courses.)",
+  "materials_evidence": [
+    {
+      "label": "Materials Evidence",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Info%20Hub.aspx"
+    }
+  ],
+  "url_readiness": "https://prms-file-storage.s3.amazonaws.com/images/inno-scaling-readiness-9.png",
+
+  "innovation_investments": [
+    {
+      "entity": "CGIAR",
+      "name": "Science Program/ Accelerator",
+      "budget": "Not provided",
+      "is_not_determined": true
+    },
+    {
+      "entity": "Partners",
+      "name": "Partners",
+      "budget": "2000",
+      "is_not_determined": false
+    },
+    {
+      "entity": "Other",
+      "name": "CGIAR W3 or bilateral projects",
+      "budget": "1200",
+      "is_not_determined": false
+    }
+  ],
+  "innovation_actors": [
+    {
+      "actor_name": "Farmers/(agro) pastoralist/herders/fishers",
+      "women": false,
+      "women_youth": true,
+      "men": true,
+      "men_youth": false
+    }
+  ],
+  "innovation_organizations": [
+    {
+      "organization_name": "Research organizations and universities",
+      "other_type": "",
+      "organization_sub_type": "Research organizations and universities International (Universities)"
+    }
+  ]
 }

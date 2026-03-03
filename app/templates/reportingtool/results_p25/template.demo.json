@@ -91,8 +91,8 @@
       "title": "Youth engagement in agricultural transformation"
     }
   ],
-  "geo_focus": "Global",
-  "regions": ["Eastern Africa", "Southern Africa", "Western Africa"],
+  "geo_focus": "Sub-national",
+  "regions": [],
   "countries": [
     {
       "name": "Ethiopia",
@@ -104,19 +104,77 @@
     }
   ],
   "subnational": [
+    { "country": "Afghanistan", "subnationals": ["Badakhshān", "Bādghīs"] },
     {
-      "country": "Ethiopia",
-      "subnational": "NOT provided"
+      "country": "Aland Islands",
+      "subnationals": ["No sub-national levels available"]
     }
   ],
   "linked_evidences": [
     {
-      "details": null,
+      "details": "Agriculture is a transformative shift that redefines how we grow food, combining scientific knowledge, cutting-edge technology, and a long-term vision centered on sustainability.",
       "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": true,
+      "file_name": "AfricaWater.PDF",
       "gender_related": false,
-      "climate_related": true,
+      "climate_related": false,
       "poverty_related": false,
       "nutrition_related": true,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "Agriculture is a transformative shift that redefines how we grow food, combining scientific knowledge, cutting-edge technology, and a long-term vision centered on sustainability.",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": true,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": false,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": true,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": true,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": true,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": false,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "Agriculture is a transformative shift that redefines how we grow food, combining scientific knowledge, cutting-edge technology, and a long-term vision centered on sustainability.",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": false,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": false,
+      "environmental_biodiversity_related": false
+    },
+    {
+      "details": "",
+      "evidence": "https://cgiar.sharepoint.com/:u:/r/sites/MyCGIAR-DEV/SitePages/C%26A%20Brand%20%26%20Message%20Hub.aspx",
+      "is_public_file": false,
+      "file_name": "AfricaWater.PDF",
+      "gender_related": false,
+      "climate_related": false,
+      "poverty_related": false,
+      "nutrition_related": false,
       "environmental_biodiversity_related": false
     }
   ],

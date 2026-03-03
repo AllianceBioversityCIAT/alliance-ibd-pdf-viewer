@@ -3,6 +3,8 @@
 export interface LinkedEvidence {
   details: string | null;
   evidence: string;
+  is_public_file: boolean;
+  file_name: string;
   gender_related: boolean;
   climate_related: boolean;
   poverty_related: boolean;
@@ -127,6 +129,7 @@ export interface GeoLocation {
   geo_focus: string;
   regions: string[];
   countries: { name: string; code: string }[];
+  subnational: { country: string; subnationals: string[] }[];
 }
 
 export interface TheoryOfChange extends PrimarySubmitterData {
@@ -136,8 +139,10 @@ export interface TheoryOfChange extends PrimarySubmitterData {
 export interface Evidence {
   label: string;
   link: string;
-  description?: string;
-  tags?: string[];
+  is_public_file: boolean;
+  file_name: string;
+  description: string;
+  tags?: { name: string; icon_key: string }[];
 }
 
 // ── Main API response ──
@@ -184,7 +189,7 @@ export interface PRMSResultData {
   geo_focus: string;
   regions: string[] | null;
   countries: { name: string; code: string }[] | null;
-  subnational: string | null;
+  subnational: { country: string; subnationals: string[] }[] | null;
 
   // Theory of Change
   toc_primary: TocPrimaryEntry[] | null;
