@@ -12,6 +12,11 @@ export interface LinkedEvidence {
   environmental_biodiversity_related: boolean;
 }
 
+export interface MaterialsEvidence {
+  label: string;
+  evidence: string;
+}
+
 export interface ContributingCenter {
   center_name: string;
   is_primary_center: boolean;
@@ -202,7 +207,7 @@ export interface PRMSResultData {
 
   // Evidence
   linked_evidences: LinkedEvidence[];
-  materials_evidence: LinkedEvidence[] | null;
+  materials_evidence: MaterialsEvidence[] | null;
 
   // Partners
   partners_applicable: string;
