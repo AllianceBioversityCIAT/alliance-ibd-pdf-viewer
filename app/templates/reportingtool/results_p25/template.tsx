@@ -9,7 +9,6 @@ import {
 } from "./transform";
 import { getThemeColors, themeVars } from "./color-themes";
 import { PageShell } from "./components/page-shell";
-import { QABox, KPQABox } from "./components/qa-box";
 import {
   ResultDetailsSection,
   ContributorsSection,
@@ -48,25 +47,6 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       themeVars={themeVars(theme)}
       primarySubmitterAcronym={d?.primary_submitter_acronym ?? ""}
     >
-      {/* QA Box — KPQABox for Knowledge Products, standard QABox otherwise */}
-      {/* {d?.rt_id === 6 ? (
-        <KPQABox />
-      ) : (
-        <QABox
-          adjustments={d?.qa_adjustments}
-          readinessTransition={
-            d?.rt_id === 2 &&
-            d?.innovation_readiness_from &&
-            d?.innovation_readiness_to
-              ? {
-                  from: d.innovation_readiness_from,
-                  to: d.innovation_readiness_to,
-                }
-              : undefined
-          }
-        />
-      )} */}
-
       {/* Common sections */}
       {d && <ResultDetailsSection data={d} impactAreas={impactAreas} />}
       {d && <ContributorsSection data={d} tocEntries={tocEntries} />}

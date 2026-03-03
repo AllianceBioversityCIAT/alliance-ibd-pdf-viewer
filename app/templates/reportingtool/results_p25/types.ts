@@ -3,6 +3,8 @@
 export interface LinkedEvidence {
   details: string | null;
   evidence: string;
+  is_public_file: boolean;
+  file_name: string;
   gender_related: boolean;
   climate_related: boolean;
   poverty_related: boolean;
@@ -136,8 +138,10 @@ export interface TheoryOfChange extends PrimarySubmitterData {
 export interface Evidence {
   label: string;
   link: string;
-  description?: string;
-  tags?: string[];
+  is_public_file: boolean;
+  file_name: string;
+  description: string;
+  tags?: { name: string; icon_key: string }[];
 }
 
 // ── Main API response ──
