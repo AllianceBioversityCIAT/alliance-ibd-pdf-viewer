@@ -37,6 +37,7 @@ export function KPDetailsSection({ data }: Readonly<{ data: PRMSResultData }>) {
             label: "Handle",
             value: data.kp_handle ?? "Not provided",
             hideRowIf: !data.kp_handle,
+            isLink: true,
           },
           {
             label: "Online date (CGSpace)",
@@ -86,6 +87,7 @@ export function KPDetailsSection({ data }: Readonly<{ data: PRMSResultData }>) {
               "Not provided",
             hideRowIf:
               !data.kp_cgspace_metadata?.doi && !data.kp_wos_metadata?.doi,
+            isLink: true,
           },
           {
             label: "Accessibility (CGSpace)",

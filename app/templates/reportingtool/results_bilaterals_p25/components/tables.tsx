@@ -46,7 +46,12 @@ export function DataTable({
 export function KeyValueTable({
   rows,
 }: Readonly<{
-  rows: { label: string; value: string; hideRowIf?: boolean }[];
+  rows: {
+    label: string;
+    value: string;
+    hideRowIf?: boolean;
+    isLink?: boolean;
+  }[];
 }>) {
   return (
     <table
@@ -69,7 +74,18 @@ export function KeyValueTable({
                 className="bg-white text-[#4b5563] border-b border-[#e5e7eb]"
                 style={{ padding: "7.5px" }}
               >
-                {row.value}
+                {row.isLink ? (
+                  <a
+                    href={row.value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-(--theme-deep) underline"
+                  >
+                    {row.value}
+                  </a>
+                ) : (
+                  row.value
+                )}
               </td>
             </tr>
           );
