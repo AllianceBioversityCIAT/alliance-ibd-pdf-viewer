@@ -75,7 +75,12 @@ export function KeyValueTable({
                 style={{ padding: "7.5px" }}
               >
                 {row.isLink ? (
-                  <a href={row.value} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={row.value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-(--theme-deep) underline"
+                  >
                     {row.value}
                   </a>
                 ) : (
