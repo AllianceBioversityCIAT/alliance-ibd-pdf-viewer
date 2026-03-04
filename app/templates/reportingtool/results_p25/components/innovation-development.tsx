@@ -13,6 +13,7 @@ export function InnovationDevelopmentSections({
   const hasInvestments = !!data.innovation_investments?.length;
   const hasActors = !!data.innovation_actors?.length;
   const hasOrgs = !!data.innovation_organizations?.length;
+  const hasMeasures = !!data.innovation_measures?.length;
   const hasMaterialsEvidence = !!data.materials_evidence?.length;
 
   const hasInnovationDevelopmentData =
@@ -213,6 +214,24 @@ export function InnovationDevelopmentSections({
                     ? `${o.organization_name}: ${o.other_type}`
                     : o.organization_name,
                   o.organization_sub_type,
+                ])}
+              />
+            </div>
+          )}
+
+          {hasMeasures && (
+            <div className="flex flex-col gap-[5px]">
+              <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+                Other quantitative measures of innovation use
+              </p>
+              <DataTable
+                columns={[
+                  "Unit of measure",
+                  "What problem / need does this innovation address?",
+                ]}
+                rows={(data.innovation_measures ?? []).map((m, i) => [
+                  m.unit_of_measure,
+                  m.addressing_demands,
                 ])}
               />
             </div>
