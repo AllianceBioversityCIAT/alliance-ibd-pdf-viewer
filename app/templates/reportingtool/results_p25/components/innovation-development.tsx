@@ -168,7 +168,11 @@ export function InnovationDevelopmentSections({
             rows={(data.innovation_investments ?? []).map((inv) => [
               inv.entity,
               inv.name,
-              inv.is_not_determined ? "Not provided" : inv.budget,
+              inv.is_not_determined
+                ? "To be determined"
+                : inv.budget != "0.00"
+                ? inv.budget ?? "Not provided"
+                : "Not provided",
             ])}
           />
         </div>
