@@ -88,6 +88,11 @@ export interface InnovationOrganization {
   organization_sub_type: string;
 }
 
+export interface InnovationMeasure {
+  unit_of_measure: string;
+  addressing_demands: string;
+}
+
 // Policy Change (rt_id=1)
 export interface PolicyChangeField {
   label: string;
@@ -231,6 +236,7 @@ export interface PRMSResultData {
   innovation_investments?: InnovationInvestment[];
   innovation_actors?: InnovationActor[];
   innovation_organizations?: InnovationOrganization[];
+  innovation_measures?: InnovationMeasure[];
 
   // Knowledge Product (rt_id=6)
   kp_handle?: string;
