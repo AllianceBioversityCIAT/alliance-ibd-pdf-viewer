@@ -144,7 +144,9 @@ export function InnovationUseSections({
           <DataTable
             columns={["Type", "Subtype", "How many"]}
             rows={(data.innovation_use_organizations ?? []).map((o) => [
-              o.type ?? "Not provided",
+              o.type === "Other"
+                ? `${o.type}: ${o.other_institution ?? "Not provided"}`
+                : o.type ?? "Not provided",
               o.subtype ?? "Not provided",
               o.how_many ?? "Not provided",
             ])}

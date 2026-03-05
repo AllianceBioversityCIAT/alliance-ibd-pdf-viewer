@@ -117,6 +117,7 @@ export interface InnovationUseActor {
 
 export interface InnovationUseOrganization {
   type: string;
+  other_institution: string | null;
   subtype: string;
   how_many: string;
 }
