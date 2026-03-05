@@ -134,16 +134,6 @@ export function InnovationDevelopmentSections({
               className="flex flex-col items-center shrink-0"
               style={{ width: 190 }}
             >
-              {/* <Image
-                src={
-                  data.url_readiness ||
-                  "https://prms-file-storage.s3.amazonaws.com/images/inno-scaling-readiness-not-provided.png"
-                }
-                alt="Innovation Readiness Scale"
-                className="w-full"
-                width={182}
-                height={400}
-              /> */}
               <img
                 src={
                   data.url_readiness
