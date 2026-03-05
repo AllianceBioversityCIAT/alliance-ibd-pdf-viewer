@@ -48,17 +48,53 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       primarySubmitterAcronym={d?.primary_submitter_acronym ?? ""}
     >
       {/* Common sections */}
-      {d && <ResultDetailsSection data={d} impactAreas={impactAreas} />}
-      {d && <ContributorsSection data={d} tocEntries={tocEntries} />}
-      {geo?.geo_focus && <GeographicSection geo={geo} />}
-      {evidences?.length > 0 && <EvidenceSection evidences={evidences} />}
+      {d && (
+        <section data-paginator-block="section">
+          <ResultDetailsSection data={d} impactAreas={impactAreas} />
+        </section>
+      )}
+      {d && (
+        <section data-paginator-block="section">
+          <ContributorsSection data={d} tocEntries={tocEntries} />
+        </section>
+      )}
+      {geo?.geo_focus && (
+        <section data-paginator-block="section">
+          <GeographicSection geo={geo} />
+        </section>
+      )}
+      {evidences?.length > 0 && (
+        <section data-paginator-block="section">
+          <EvidenceSection evidences={evidences} />
+        </section>
+      )}
 
       {/* Variant-specific sections based on rt_id */}
-      {d?.rt_id === 1 && <PolicyChangeSection data={d} />}
-      {d?.rt_id === 2 && <InnovationUseSections data={d} />}
-      {d?.rt_id === 5 && <CapacitySharingSections data={d} />}
-      {d?.rt_id === 7 && <InnovationDevelopmentSections data={d} />}
-      {d?.rt_id === 6 && <KPDetailsSection data={d} />}
+      {d?.rt_id === 1 && (
+        <section data-paginator-block="section">
+          <PolicyChangeSection data={d} />
+        </section>
+      )}
+      {d?.rt_id === 2 && (
+        <section data-paginator-block="section">
+          <InnovationUseSections data={d} />
+        </section>
+      )}
+      {d?.rt_id === 5 && (
+        <section data-paginator-block="section">
+          <CapacitySharingSections data={d} />
+        </section>
+      )}
+      {d?.rt_id === 7 && (
+        <section data-paginator-block="section">
+          <InnovationDevelopmentSections data={d} />
+        </section>
+      )}
+      {d?.rt_id === 6 && (
+        <section data-paginator-block="section">
+          <KPDetailsSection data={d} />
+        </section>
+      )}
     </PageShell>
   );
 }

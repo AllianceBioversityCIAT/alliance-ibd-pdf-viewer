@@ -73,7 +73,11 @@ export function Paginator({
 
 // ── Layout helpers ──
 
-function getContentStart(page: number, ph: number, c: PaginationConfig): number {
+function getContentStart(
+  page: number,
+  ph: number,
+  c: PaginationConfig
+): number {
   if (page === 0) return c.firstPage?.marginTop ?? c.marginTop;
   return page * ph + c.marginTop;
 }
@@ -87,15 +91,25 @@ function getFooterY(page: number, ph: number, c: PaginationConfig): number {
 }
 
 function findPageRoot(container: HTMLElement): HTMLElement {
-  return (container.closest("[style*='width']") as HTMLElement) || document.body;
+  return (
+    (container.closest("[style*='width']") as HTMLElement) || document.body
+  );
 }
 
 // ── Core pagination ──
 
-function paginate(container: HTMLElement, paperHeight: number, config: PaginationConfig) {
+function paginate(
+  container: HTMLElement,
+  paperHeight: number,
+  config: PaginationConfig
+) {
   // Cleanup previous run
-  container.querySelectorAll("[data-paginator-spacer]").forEach((el) => el.remove());
-  document.querySelectorAll("[data-paginator-footer]").forEach((el) => el.remove());
+  container
+    .querySelectorAll("[data-paginator-spacer]")
+    .forEach((el) => el.remove());
+  document
+    .querySelectorAll("[data-paginator-footer]")
+    .forEach((el) => el.remove());
   container.style.paddingBottom = "";
 
   const pageRoot = findPageRoot(container);
@@ -153,10 +167,19 @@ function collectBlocks(container: HTMLElement): HTMLElement[] {
     if (
       el.hasAttribute("data-paginator-spacer") ||
       el.hasAttribute("data-paginator-footer")
-    ) return;
+    )
+      return;
+
+    // Treat marked elements as atomic "sections" that should never
+    // be split across pages. The whole block will be pushed down
+    // if it intersects the footer zone.
+    if (el !== container && el.hasAttribute("data-paginator-block")) {
+      blocks.push(el);
+      return;
+    }
 
     const children = Array.from(el.children).filter(
-      (c): c is HTMLElement => c instanceof HTMLElement,
+      (c): c is HTMLElement => c instanceof HTMLElement
     );
 
     // No element children → leaf block
@@ -204,7 +227,7 @@ function processPass(
   container: HTMLElement,
   pageRootTop: number,
   paperHeight: number,
-  config: PaginationConfig,
+  config: PaginationConfig
 ): boolean {
   const blocks = collectBlocks(container);
   let changed = false;
@@ -231,7 +254,9 @@ function processPass(
     if (block.tagName === "TABLE") {
       const spaceAvailable = safeEnd - top;
       if (spaceAvailable > 80) {
-        if (splitTable(block, safeEnd, page, paperHeight, config, pageRootTop)) {
+        if (
+          splitTable(block, safeEnd, page, paperHeight, config, pageRootTop)
+        ) {
           changed = true;
           continue;
         }
@@ -264,11 +289,13 @@ function splitTable(
   page: number,
   paperHeight: number,
   config: PaginationConfig,
-  pageRootTop: number,
+  pageRootTop: number
 ): boolean {
   const thead = tableEl.querySelector("thead");
   const tbody = tableEl.querySelector("tbody") || tableEl;
-  const rows = Array.from(tbody.querySelectorAll(":scope > tr")) as HTMLElement[];
+  const rows = Array.from(
+    tbody.querySelectorAll(":scope > tr")
+  ) as HTMLElement[];
 
   if (rows.length < 2) return false;
 
@@ -305,7 +332,10 @@ function splitTable(
 
   const spacer = document.createElement("div");
   spacer.setAttribute("data-paginator-spacer", "table-split");
-  spacer.style.cssText = `height:${Math.max(0, spacerHeight)}px; flex-shrink:0;`;
+  spacer.style.cssText = `height:${Math.max(
+    0,
+    spacerHeight
+  )}px; flex-shrink:0;`;
 
   // Insert: table → spacer → continuation table
   tableEl.after(spacer);
@@ -320,7 +350,7 @@ function placeFooters(
   pageRoot: HTMLElement,
   totalPages: number,
   paperHeight: number,
-  config: PaginationConfig,
+  config: PaginationConfig
 ) {
   if (getComputedStyle(pageRoot).position === "static") {
     pageRoot.style.position = "relative";
@@ -361,9 +391,11 @@ function placeFooters(
 function drawDebugLines(
   container: HTMLElement,
   paperHeight: number,
-  config: PaginationConfig,
+  config: PaginationConfig
 ) {
-  document.querySelectorAll("[data-paginator-debug]").forEach((el) => el.remove());
+  document
+    .querySelectorAll("[data-paginator-debug]")
+    .forEach((el) => el.remove());
 
   const pageRoot = findPageRoot(container);
   const totalPages = Math.ceil(pageRoot.scrollHeight / paperHeight);
