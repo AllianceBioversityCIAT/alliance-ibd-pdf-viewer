@@ -53,7 +53,6 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       {geo?.geo_focus && <GeographicSection geo={geo} />}
       {evidences?.length > 0 && <EvidenceSection evidences={evidences} />}
 
-      <div style={{ breakAfter: "always" }}></div>
       {/* Variant-specific sections based on rt_id */}
       {d?.rt_id === 1 && <PolicyChangeSection data={d} />}
       {d?.rt_id === 2 && <InnovationUseSections data={d} />}
