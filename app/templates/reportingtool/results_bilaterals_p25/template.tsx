@@ -54,11 +54,31 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       {evidences?.length > 0 && <EvidenceSection evidences={evidences} />}
 
       {/* Variant-specific sections based on rt_id */}
-      {d?.rt_id === 1 && <PolicyChangeSection data={d} />}
-      {d?.rt_id === 2 && <InnovationUseSections data={d} />}
-      {d?.rt_id === 5 && <CapacitySharingSections data={d} />}
-      {d?.rt_id === 7 && <InnovationDevelopmentSections data={d} />}
-      {d?.rt_id === 6 && <KPDetailsSection data={d} />}
+      {d?.rt_id === 1 && (
+        <section data-paginator-block="section">
+          <PolicyChangeSection data={d} />
+        </section>
+      )}
+      {d?.rt_id === 2 && (
+        <section data-paginator-block="section">
+          <InnovationUseSections data={d} />
+        </section>
+      )}
+      {d?.rt_id === 5 && (
+        <section data-paginator-block="section">
+          <CapacitySharingSections data={d} />
+        </section>
+      )}
+      {d?.rt_id === 7 && (
+        <section data-paginator-block="section">
+          <InnovationDevelopmentSections data={d} />
+        </section>
+      )}
+      {d?.rt_id === 6 && (
+        <section data-paginator-block="section">
+          <KPDetailsSection data={d} />
+        </section>
+      )}
     </PageShell>
   );
 }
