@@ -119,6 +119,7 @@ export interface InnovationUseOrganization {
   type: string;
   other_institution: string | null;
   subtype: string;
+  has_subtypes: boolean;
   how_many: string;
 }
 

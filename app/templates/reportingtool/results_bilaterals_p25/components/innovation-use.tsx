@@ -147,7 +147,7 @@ export function InnovationUseSections({
               o.type === "Other"
                 ? `${o.type}: ${o.other_institution ?? "Not provided"}`
                 : o.type ?? "Not provided",
-              o.subtype ?? "Not provided",
+              o.has_subtypes ? o.subtype ?? "Not provided" : "Not applicable",
               o.how_many ?? "Not provided",
             ])}
           />
