@@ -100,7 +100,9 @@ function ActorsTable({ actors }: Readonly<{ actors: InnovationUseActor[] }>) {
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
-              {actor.total ?? "Not provided"}
+              {actor.sex_and_age_disaggregation
+                ? actor.how_many ?? "Not provided"
+                : actor.total ?? "Not provided"}
             </td>
           </tr>
         ))}

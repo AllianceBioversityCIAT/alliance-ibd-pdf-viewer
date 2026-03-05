@@ -112,6 +112,7 @@ export interface InnovationUseActor {
   men_non_youth: number | null;
   total: number;
   sex_and_age_disaggregation: boolean;
+  how_many: number | null;
 }
 
 export interface InnovationUseOrganization {
