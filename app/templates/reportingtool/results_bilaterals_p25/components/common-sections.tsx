@@ -442,28 +442,30 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
               </div>
             </div>
 
-            {!!geo?.subnational?.length && geo?.subnational?.length > 0 && (
-              <>
-                {geo?.subnational.map((s) => (
-                  <div key={s.country}>
-                    <p className="font-bold text-[#1d1d1d] leading-[1.15]">
-                      States specified of {s.country} for this result:
-                    </p>
-                    <div className="text-[#393939] text-[10px] flex flex-wrap gap-x-2 gap-y-1 mt-1">
-                      {s.subnationals.map((sn) => (
-                        <div
-                          key={`${s.country}-${sn}`}
-                          className="leading-normal flex items-center gap-0.5"
-                        >
-                          <Dot size={15} />
-                          {sn}
-                        </div>
-                      ))}
+            {geo?.geo_focus === "Sub-national" &&
+              !!geo?.subnational?.length &&
+              geo?.subnational?.length > 0 && (
+                <>
+                  {geo?.subnational.map((s) => (
+                    <div key={s.country}>
+                      <p className="font-bold text-[#1d1d1d] leading-[1.15]">
+                        States specified of {s.country} for this result:
+                      </p>
+                      <div className="text-[#393939] text-[10px] flex flex-wrap gap-x-2 gap-y-1 mt-1">
+                        {s.subnationals.map((sn) => (
+                          <div
+                            key={`${s.country}-${sn}`}
+                            className="leading-normal flex items-center gap-0.5"
+                          >
+                            <Dot size={15} />
+                            {sn}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </>
-            )}
+                  ))}
+                </>
+              )}
           </div>
         </>
       )}
@@ -535,7 +537,7 @@ function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
                 href={evidence.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-(--theme-deep) text-[9px] leading-normal font-medium break-all cursor-pointer"
+                className="text-(--theme-deep) text-[9px] leading-normal font-medium break-all cursor-pointer max-w-[200px] truncate"
               >
                 {evidence.file_name ?? "Access link"}
               </a>
