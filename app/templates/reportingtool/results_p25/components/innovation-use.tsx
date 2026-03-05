@@ -192,9 +192,9 @@ export function InnovationUseSections({
           <Image
             src={readinessScale}
             alt="Innovation Use Readiness Scale"
-            width={100}
-            height={500}
-            className="w-full"
+            width={900}
+            height={120}
+            className="w-full h-auto"
           />
         </>
       )}
