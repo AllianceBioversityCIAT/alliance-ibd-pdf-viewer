@@ -271,6 +271,8 @@ export interface PRMSResultData {
   // Capacity Sharing for Development (rt_id=5)
   capdev_female_using?: string;
   capdev_male_using?: string;
+  capdev_non_binary_using?: string;
+  capdev_unkown_using?: string;
   capdev_term?: string;
   capdev_delivery_method_name?: string;
   capdev_organizations?: string[];
