@@ -8,6 +8,8 @@ export default function CapacitySharingSections({
   const hasCapDevData =
     data.capdev_female_using ||
     data.capdev_male_using ||
+    data.capdev_non_binary_using ||
+    data.capdev_unkown_using ||
     data.capdev_term ||
     data.capdev_delivery_method_name ||
     data.capdev_organizations?.length;
@@ -15,19 +17,29 @@ export default function CapacitySharingSections({
   if (!hasCapDevData) return null;
 
   const getNumberOfPeopleTrained = () => {
-    if (data.capdev_female_using && data.capdev_male_using) {
-      return `Female: ${data.capdev_female_using} | Male: ${data.capdev_male_using}`;
-    }
+    const segments: string[] = [];
 
     if (data.capdev_female_using) {
-      return `Female: ${data.capdev_female_using}`;
+      segments.push(`Female: ${data.capdev_female_using}`);
     }
 
     if (data.capdev_male_using) {
-      return `Male: ${data.capdev_male_using}`;
+      segments.push(`Male: ${data.capdev_male_using}`);
     }
 
-    return null;
+    if (data.capdev_non_binary_using) {
+      segments.push(`Non-binary: ${data.capdev_non_binary_using}`);
+    }
+
+    if (data.capdev_unkown_using) {
+      segments.push(`Unknown: ${data.capdev_unkown_using}`);
+    }
+
+    if (!segments.length) {
+      return null;
+    }
+
+    return segments.join(" | ");
   };
 
   return (
