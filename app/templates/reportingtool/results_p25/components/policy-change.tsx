@@ -28,7 +28,7 @@ export function PolicyChangeSection({
             value: data.policy_amount ?? "Not provided",
             hideRowIf:
               !data.policy_amount ||
-              data.policy_type_name === "Program, budget or investment",
+              data.policy_type_name !== "Program, budget or investment",
           },
           {
             label: "Stage",
