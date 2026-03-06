@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { PRMSResultData } from "../types";
 import { SectionTitle, SubSectionTitle } from "./common-sections";
 import { DataTable } from "./tables";
@@ -178,7 +177,7 @@ export function InnovationDevelopmentSections({
         </div>
       )}
 
-      {(hasActors || hasOrgs) && (
+      {(hasActors || hasOrgs || hasMeasures) && (
         <div className="flex flex-col gap-[15px]">
           <SubSectionTitle>Anticipated Innovation users</SubSectionTitle>
 
@@ -229,8 +228,8 @@ export function InnovationDevelopmentSections({
                   "What problem / need does this innovation address?",
                 ]}
                 rows={(data.innovation_measures ?? []).map((m, i) => [
-                  m.unit_of_measure,
-                  m.addressing_demands,
+                  m.unit_of_measure || "Not provided",
+                  m.addressing_demands || "Not provided",
                 ])}
               />
             </div>
