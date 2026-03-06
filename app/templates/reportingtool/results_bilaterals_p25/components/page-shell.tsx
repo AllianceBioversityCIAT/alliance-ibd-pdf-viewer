@@ -72,13 +72,15 @@ export function PageShell({
             height={44}
             className="object-contain h-11"
           />
-          <img
-            src={`/assets/prms/centers-logos/${leadCenterAcronym
-              .toLowerCase()
-              .replace(" ", "-")}-logo.svg`}
-            alt={`${leadCenterAcronym} Logo`}
-            className="object-contain h-11 bg-white p-2"
-          />
+          {leadCenterAcronym && (
+            <img
+              src={`/assets/prms/centers-logos/${leadCenterAcronym
+                .toLowerCase()
+                .replace(" ", "-")}-logo.svg`}
+              alt={`${leadCenterAcronym} Logo`}
+              className="object-contain h-11 bg-white p-2"
+            />
+          )}
         </div>
 
         <div className="flex flex-col gap-[5px] mb-[14px] mt-4">
