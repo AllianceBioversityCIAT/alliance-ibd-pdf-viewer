@@ -46,6 +46,7 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       generationDate={formatDateCET(new Date())}
       themeVars={themeVars(theme)}
       primarySubmitterAcronym={d?.primary_submitter_acronym ?? ""}
+      leadCenterAcronym={d?.lead_center_acronym ?? ""}
     >
       {/* Common sections */}
       {d && <ResultDetailsSection data={d} impactAreas={impactAreas} />}
