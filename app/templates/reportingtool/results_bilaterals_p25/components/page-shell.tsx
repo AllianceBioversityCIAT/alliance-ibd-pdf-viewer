@@ -11,6 +11,7 @@ interface PageShellProps {
   primarySubmitterAcronym: string;
   themeVars?: Record<string, string>;
   children: ReactNode;
+  leadCenterAcronym: string;
 }
 
 export function PageShell({
@@ -20,6 +21,7 @@ export function PageShell({
   projectName,
   themeVars,
   primarySubmitterAcronym,
+  leadCenterAcronym,
   children,
 }: Readonly<PageShellProps>) {
   return (
@@ -70,13 +72,13 @@ export function PageShell({
             height={44}
             className="object-contain h-11"
           />
-          {getSPLabel(primarySubmitterAcronym) && (
-            <div className="h-11 bg-(--theme-mid) max-w-[90px] text-pretty flex items-end justify-start">
-              <p className="text-[7px] p-1.5 text-[#033529] font-bold leading-[1.15]">
-                {getSPLabel(primarySubmitterAcronym)}
-              </p>
-            </div>
-          )}
+          <img
+            src={`/assets/prms/centers-logos/${leadCenterAcronym
+              .toLowerCase()
+              .replace(" ", "-")}-logo.svg`}
+            alt={`${leadCenterAcronym} Logo`}
+            className="object-contain h-11 bg-white p-2"
+          />
         </div>
 
         <div className="flex flex-col gap-[5px] mb-[14px] mt-4">
