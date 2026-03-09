@@ -1,8 +1,6 @@
-import Image from "next/image";
 import type { PRMSResultData, InnovationUseActor } from "../types";
 import { SectionTitle } from "./common-sections";
 import { DataTable } from "./tables";
-import readinessScale from "../../../../../public/assets/prms/current_readiness_scale.svg";
 
 function GenderCell({
   total,
@@ -147,7 +145,11 @@ export function InnovationUseSections({
               o.type === "Other"
                 ? `${o.type}: ${o.other_institution ?? "Not provided"}`
                 : o.type ?? "Not provided",
-              o.has_subtypes ? o.subtype ?? "Not provided" : "Not applicable",
+              o.subtype
+                ? o.subtype
+                : o.has_subtypes
+                ? "Not provided"
+                : "Not applicable",
               o.how_many ?? "Not provided",
             ])}
           />
@@ -189,11 +191,9 @@ export function InnovationUseSections({
             </p>
           </div>
 
-          <Image
-            src={readinessScale}
+          <img
+            src="/assets/prms/current_readiness_scale.svg"
             alt="Innovation Use Readiness Scale"
-            width={900}
-            height={120}
             className="w-full h-auto"
           />
         </>

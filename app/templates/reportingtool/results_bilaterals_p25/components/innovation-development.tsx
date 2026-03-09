@@ -211,7 +211,11 @@ export function InnovationDevelopmentSections({
                   o.organization_name === "Other"
                     ? `${o.organization_name}: ${o.other_type}`
                     : o.organization_name,
-                  o.organization_sub_type,
+                  o.organization_sub_type
+                    ? o.organization_sub_type
+                    : o.has_subtypes
+                    ? "Not provided"
+                    : "Not applicable",
                 ])}
               />
             </div>

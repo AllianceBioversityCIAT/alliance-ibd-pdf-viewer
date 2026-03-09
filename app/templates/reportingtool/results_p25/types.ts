@@ -86,6 +86,7 @@ export interface InnovationOrganization {
   organization_name: string;
   other_type: string;
   organization_sub_type: string;
+  has_subtypes: boolean;
 }
 
 export interface InnovationMeasure {
