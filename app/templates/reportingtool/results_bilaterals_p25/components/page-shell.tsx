@@ -104,16 +104,8 @@ export function PageShell({
             made to the result metadata.
           </p>
           <p>
-            This result has undergone the CGIAR Quality Assurance (QA) process.
-            For more details on the quality assessed metadata, see{" "}
-            <a
-              href="https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
-              className="text-(--theme-accent) underline"
-            >
-              here
-            </a>
-            {""}. The result has been quality-assessed at the Center level,
-            which may apply different standards compared to the{" "}
+            The result has been quality-assessed at the Center level, which may
+            apply different standards compared to the{" "}
             <a
               href="https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
               className="text-(--theme-accent) underline"
