@@ -221,6 +221,7 @@ export interface PRMSResultData {
   // Partners
   partners_applicable: string;
   non_kp_partner_data: PartnerEntry[] | null;
+  kp_partner_data: PartnerEntry[] | null;
 
   // QA
   qa_adjustments?: QAAdjustment[];

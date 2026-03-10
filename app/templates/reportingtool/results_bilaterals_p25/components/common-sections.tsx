@@ -219,8 +219,11 @@ export function ContributorsSection({
     data.contributing_centers && data.contributing_centers.length > 0;
   const hasBilateralProjects =
     data.bilateral_projects && data.bilateral_projects.length > 0;
-  const hasPartners =
-    data.non_kp_partner_data && data.non_kp_partner_data.length > 0;
+  const allPartners = [
+    ...(data.non_kp_partner_data ?? []),
+    ...(data.kp_partner_data ?? []),
+  ];
+  const hasPartners = allPartners?.length > 0;
   const hasBundled =
     data.bundled_innovations && data.bundled_innovations.length > 0;
 
@@ -318,11 +321,13 @@ export function ContributorsSection({
           <SubSectionTitle>Partners</SubSectionTitle>
           <DataTable
             columns={["Name", "Country HQ", "Institution type"]}
-            rows={(data.non_kp_partner_data ?? []).map((p) => [
-              p.partner_name ?? "Not provided",
-              p.partner_country_hq ?? "Not provided",
-              p.partner_type ?? "Not provided",
-            ])}
+            rows={
+              allPartners?.map((p) => [
+                p.partner_name ?? "Not provided",
+                p.partner_country_hq ?? "Not provided",
+                p.partner_type ?? "Not provided",
+              ]) ?? []
+            }
           />
         </div>
       )}
