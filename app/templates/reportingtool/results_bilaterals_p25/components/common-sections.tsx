@@ -97,12 +97,7 @@ export function ResultDetailsSection({
             value={data.phase_name}
           />
         )}
-        {data.primary_submitter_name && (
-          <LabelValue
-            label="Submitter of result"
-            value={data.primary_submitter_name}
-          />
-        )}
+
         {data.lead_contact_person && (
           <LabelValue
             label="Lead contact person"
