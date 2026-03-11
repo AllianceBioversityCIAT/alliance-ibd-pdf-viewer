@@ -47,7 +47,7 @@ export interface KPField {
 
 export interface QAAdjustment {
   label: string;
-  from_value: string;
+  from_value?: string;
   to_value: string;
 }
 

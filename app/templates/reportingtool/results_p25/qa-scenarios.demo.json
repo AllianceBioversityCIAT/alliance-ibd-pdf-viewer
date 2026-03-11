@@ -30,8 +30,8 @@
     ]
   },
   {
-    "_comment": "Case 4B - Innovation Development",
-    "badge": "senior",
+    "_comment": "Case 4B - Innovation Development (gold shield, adjusted)",
+    "badge": "senior-innovation",
     "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
     "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard",
     "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does",
@@ -41,8 +41,8 @@
     ]
   },
   {
-    "_comment": "Case 4C - Innovation Use",
-    "badge": "senior",
+    "_comment": "Case 4C - Innovation Use (gold shield, adjusted)",
+    "badge": "senior-innovation",
     "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
     "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard",
     "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does",
@@ -52,11 +52,15 @@
     ]
   },
   {
-    "_comment": "Case 4D - Innovations confirmadas",
+    "_comment": "Case 4D - Innovation confirmed (medal, no from_value)",
     "badge": "senior",
     "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
-    "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard. The submitted innovation readiness level was quality assured and confirmed",
-    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
+    "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard",
+    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does",
+    "adjustments_title": "The submitted innovation readiness level was quality assured and confirmed:",
+    "adjustments": [
+      { "label": "Innovation Readiness", "to_value": "Level 3" }
+    ]
   },
   {
     "_comment": "QA in process",
