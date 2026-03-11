@@ -9,6 +9,7 @@ import {
 } from "./transform";
 import { getThemeColors, themeVars } from "./color-themes";
 import { PageShell } from "./components/page-shell";
+import { QABox } from "./components/qa-box";
 import {
   ResultDetailsSection,
   ContributorsSection,
@@ -47,6 +48,9 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       themeVars={themeVars(theme)}
       primarySubmitterAcronym={d?.primary_submitter_acronym ?? ""}
     >
+      {/* QA Box — rendered from backend qa_info */}
+      {d?.qa_info && <QABox qaInfo={d.qa_info} />}
+
       {/* Common sections */}
       {d && <ResultDetailsSection data={d} impactAreas={impactAreas} />}
       {d && <ContributorsSection data={d} tocEntries={tocEntries} />}
