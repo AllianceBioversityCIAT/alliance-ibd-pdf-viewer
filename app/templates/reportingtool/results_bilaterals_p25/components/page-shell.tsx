@@ -7,19 +7,21 @@ interface PageShellProps {
   resultType: string;
   resultName: string;
   generationDate: string;
-  phaseName: string;
+  projectName: string;
   primarySubmitterAcronym: string;
   themeVars?: Record<string, string>;
   children: ReactNode;
+  leadCenterAcronym: string;
 }
 
 export function PageShell({
   resultType,
   resultName,
   generationDate,
-  phaseName,
+  projectName,
   themeVars,
   primarySubmitterAcronym,
+  leadCenterAcronym,
   children,
 }: Readonly<PageShellProps>) {
   return (
@@ -70,12 +72,14 @@ export function PageShell({
             height={44}
             className="object-contain h-11"
           />
-          {getSPLabel(primarySubmitterAcronym) && (
-            <div className="h-11 bg-(--theme-mid) max-w-[90px] text-pretty flex items-end justify-start">
-              <p className="text-[7px] p-1.5 text-[#033529] font-bold leading-[1.15]">
-                {getSPLabel(primarySubmitterAcronym)}
-              </p>
-            </div>
+          {leadCenterAcronym && (
+            <img
+              src={`/assets/prms/centers-logos/${leadCenterAcronym
+                .toLowerCase()
+                .replace(" ", "-")}-logo.svg`}
+              alt={`${leadCenterAcronym} Logo`}
+              className="object-contain h-11 bg-white p-2"
+            />
           )}
         </div>
 
@@ -87,6 +91,9 @@ export function PageShell({
           >
             {resultName}
           </p>
+          <p className="text-white text-[11px] font-medium leading-[1.15] mt-2">
+            Bilateral Project - {projectName}
+          </p>
         </div>
 
         <div className="text-[#e2e0df] text-[8px] font-light leading-[1.367]">
@@ -97,32 +104,17 @@ export function PageShell({
             made to the result metadata.
           </p>
           <p>
-            The present result summary presents a standalone result reported for
-            the {phaseName} cycle through the CGIAR Performance and Results
-            Management System (PRMS) - the central platform for reporting and
-            validating results under the{" "}
+            The result has been quality-assessed at the Center level, which may
+            apply different standards compared to the{" "}
             <a
-              href="https://storage.googleapis.com/cgiarorg/2025/06/CGIAR-Technical-Reporting-Arrangement-2025-30.pdf"
+              href="https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does"
               className="text-(--theme-accent) underline"
             >
-              Technical Reporting Arrangement (TRA) 2025-2030
+              CGIAR QA process
             </a>
-            . Each result contributes to the{" "}
-            <a
-              href="https://docs.google.com/document/d/1sgDrMxZP081SV1hXgDO2Y6lKjZXfwNu7/edit"
-              className="text-(--theme-accent) underline"
-            >
-              CGIAR Results Framework
-            </a>
-            , linking Program and Accelerator outputs and outcomes to
-            System-level Impact Areas and Sustainable Development Goals (SDGs),
-            and these contributions are reflected in the{" "}
-            <a
-              href="https://www.cgiar.org/food-security-impact/results-dashboard"
-              className="text-(--theme-accent) underline"
-            >
-              CGIAR Results Dashboard.
-            </a>
+            {""}, and reviewed by the relevant Programs/Accelerators to ensure
+            alignment with their Theory of Change (TOC) and compliance with the
+            technical reporting minimum data standards requirements.
           </p>
         </div>
       </div>

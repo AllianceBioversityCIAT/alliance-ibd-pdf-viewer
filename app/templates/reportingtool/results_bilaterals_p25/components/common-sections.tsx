@@ -97,16 +97,19 @@ export function ResultDetailsSection({
             value={data.phase_name}
           />
         )}
-        {data.primary_submitter_name && (
-          <LabelValue
-            label="Submitter of result"
-            value={data.primary_submitter_name}
-          />
-        )}
+
         {data.lead_contact_person && (
           <LabelValue
             label="Lead contact person"
-            value={data.lead_contact_person}
+            value={`${data.lead_contact_person}${
+              data.result_lead ? ` (${data.result_lead})` : ""
+            }`}
+          />
+        )}
+        {data.lead_center_name && (
+          <LabelValue
+            label="Submitter of result (lead center)"
+            value={`${data.lead_center_acronym} - ${data.lead_center_name}`}
           />
         )}
 

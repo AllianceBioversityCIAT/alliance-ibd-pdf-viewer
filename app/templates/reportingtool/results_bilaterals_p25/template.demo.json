@@ -15,10 +15,7 @@
   "result_lead": "Bioversity International",
   "nutrition_tag": {
     "score": "(2) Principal",
-    "components": [
-      "Nutrition",
-      "Health"
-    ]
+    "components": ["Nutrition", "Health"]
   },
   "climate_tag": {
     "score": "(0) Not targeted",
@@ -30,15 +27,11 @@
   },
   "gender_tag": {
     "score": "(1) Significant",
-    "components": [
-      "Gender"
-    ]
+    "components": ["Gender"]
   },
   "environmental_tag": {
     "score": "(1) Significant",
-    "components": [
-      "Environment"
-    ]
+    "components": ["Environment"]
   },
   "primary_submitter_data": {
     "toc_url": "https://toc.mel.cgiar.org/toc/dc81f773-4dbd-408e-ad02-9b8fa9e072bf",
@@ -85,29 +78,10 @@
   "non_kp_partner_data": [
     {
       "partner_name": "JEEVIKA - Jeevika",
-      "country_hq_name": "India (IN)",
-      "institution_type": "NGO Local (General)"
-    },
-    {
-      "partner_name": "DOA - Department of Agriculture West Bengal (India)",
-      "country_hq_name": "India (IN)",
-      "institution_type": "Government (Subnational)"
+      "partner_country_hq": "India (IN)",
+      "partner_type": "NGO Local (General)"
     }
   ],
-  "kp_partner_data": null,
-  "qa_info": {
-    "badge": "senior",
-    "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
-    "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard",
-    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does",
-    "adjustments_title": "The submitted innovation readiness level was quality assured and confirmed:",
-    "adjustments": [
-      {
-        "label": "Innovation Readiness",
-        "to_value": "Level 3"
-      }
-    ]
-  },
   "bundled_innovations": [
     {
       "portfolio": "P25",
@@ -130,18 +104,10 @@
     }
   ],
   "subnational": [
-    {
-      "country": "Afghanistan",
-      "subnationals": [
-        "Badakhshān",
-        "Bādghīs"
-      ]
-    },
+    { "country": "Afghanistan", "subnationals": ["Badakhshān", "Bādghīs"] },
     {
       "country": "Aland Islands",
-      "subnationals": [
-        "No sub-national levels available"
-      ]
+      "subnationals": ["No sub-national levels available"]
     }
   ],
   "linked_evidences": [
@@ -225,6 +191,7 @@
     }
   ],
   "url_readiness": "https://prms-file-storage.s3.amazonaws.com/images/inno-scaling-readiness-9.png",
+
   "innovation_investments": [
     {
       "entity": "CGIAR",

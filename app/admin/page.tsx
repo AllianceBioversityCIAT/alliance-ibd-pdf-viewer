@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { sileo } from "sileo";
 
@@ -45,7 +46,9 @@ export default function AdminPage() {
   const [form, setForm] = useState<FormState>(defaultForm);
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [templates, setTemplates] = useState<{ name: string; hasDemo: boolean }[]>([]);
+  const [templates, setTemplates] = useState<
+    { name: string; hasDemo: boolean }[]
+  >([]);
 
   useEffect(() => {
     setSecret(loadSecret());
@@ -91,14 +94,27 @@ export default function AdminPage() {
       title: "Ready to upload?",
       description: (
         <div className="flex flex-col gap-3">
-          <span>This will save the JSON and open the &quot;{form.template}&quot; template</span>
+          <span>
+            This will save the JSON and open the &quot;{form.template}&quot;
+            template
+          </span>
           <div className="flex gap-2">
             <span
               role="button"
               tabIndex={0}
               data-sileo-button="true"
-              onClick={(e) => { e.stopPropagation(); sileo.dismiss(id); executeUpload(); }}
-              onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(id); executeUpload(); } }}
+              onClick={(e) => {
+                e.stopPropagation();
+                sileo.dismiss(id);
+                executeUpload();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.stopPropagation();
+                  sileo.dismiss(id);
+                  executeUpload();
+                }
+              }}
               style={{ background: "#fff", color: "#171717" }}
               className="flex-1 text-center text-sm font-medium py-2 rounded-lg cursor-pointer transition-colors"
             >
@@ -108,8 +124,16 @@ export default function AdminPage() {
               role="button"
               tabIndex={0}
               data-sileo-button="true"
-              onClick={(e) => { e.stopPropagation(); sileo.dismiss(id); }}
-              onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); sileo.dismiss(id); } }}
+              onClick={(e) => {
+                e.stopPropagation();
+                sileo.dismiss(id);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.stopPropagation();
+                  sileo.dismiss(id);
+                }
+              }}
               style={{ background: "#262626", color: "#a3a3a3" }}
               className="flex-1 text-center text-sm font-medium py-2 rounded-lg cursor-pointer transition-colors"
             >
@@ -148,14 +172,20 @@ export default function AdminPage() {
         paperHeight: form.paperHeight,
       });
       if (form.testMode) params.set("test", "true");
-      window.open(`/${form.template}?${params.toString()}`, "_blank");
+      window.open(`/${form.template}?${params?.toString()}`, "_blank");
       return uuid;
     })();
 
     sileo.promise(promise, {
       loading: { title: "Saving to database..." },
-      success: (uuid) => ({ title: "Record created", description: `Opening template with ID ${uuid}` }),
-      error: (err) => ({ title: "Could not upload", description: (err as Error).message }),
+      success: (uuid) => ({
+        title: "Record created",
+        description: `Opening template with ID ${uuid}`,
+      }),
+      error: (err) => ({
+        title: "Could not upload",
+        description: (err as Error).message,
+      }),
     });
 
     try {
@@ -181,8 +211,8 @@ export default function AdminPage() {
     validation.status === "empty"
       ? "border-neutral-200"
       : isValid
-        ? "border-neutral-900"
-        : "border-red-400";
+      ? "border-neutral-900"
+      : "border-red-400";
 
   const hasSession = !!secret;
 
@@ -201,18 +231,18 @@ export default function AdminPage() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <a
+              <Link
                 href="/list"
                 className="text-neutral-400 hover:text-neutral-900 text-sm transition-colors"
               >
                 Records
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/docs"
                 className="text-neutral-400 hover:text-neutral-900 text-sm transition-colors"
               >
                 Docs
-              </a>
+              </Link>
               {hasSession && (
                 <button
                   onClick={handleLogout}
@@ -239,7 +269,9 @@ export default function AdminPage() {
                 className="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2.5 text-neutral-900 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900 focus:border-transparent transition-shadow"
               >
                 {templates.map((t) => (
-                  <option key={t.name} value={t.name}>{t.name}</option>
+                  <option key={t.name} value={t.name}>
+                    {t.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -312,7 +344,9 @@ export default function AdminPage() {
               {validation.status === "invalid" && (
                 <>
                   <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                  <span className="text-red-500 text-xs">{validation.error}</span>
+                  <span className="text-red-500 text-xs">
+                    {validation.error}
+                  </span>
                 </>
               )}
             </div>
@@ -328,7 +362,9 @@ export default function AdminPage() {
             />
             <span className="text-neutral-600 text-sm">
               Test mode
-              <span className="text-neutral-400 ml-1">(keep record after loading)</span>
+              <span className="text-neutral-400 ml-1">
+                (keep record after loading)
+              </span>
             </span>
           </label>
 
@@ -348,7 +384,10 @@ export default function AdminPage() {
                     demo: "true",
                     paperWidth: form.paperWidth,
                   });
-                  window.open(`/${form.template}?${params.toString()}`, "_blank");
+                  window.open(
+                    `/${form.template}?${params?.toString()}`,
+                    "_blank"
+                  );
                 }}
                 className="bg-white hover:bg-neutral-50 border border-neutral-200 text-neutral-500 hover:text-neutral-900 text-sm px-4 py-2.5 rounded-lg transition-colors cursor-pointer"
               >

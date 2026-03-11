@@ -17,7 +17,7 @@ function ArrowRight() {
       height="8"
       viewBox="0 0 11 8"
       fill="none"
-      className="text-[#033529] shrink-0"
+      className="text-(--theme-deep) shrink-0"
     >
       <path
         d="M7 1L10 4M10 4L7 7M10 4H1"
@@ -48,7 +48,7 @@ export function QABox({ qaInfo }: Readonly<{ qaInfo: QAInfo }>) {
   return (
     <div className="bg-[#e2e0df] flex overflow-hidden">
       <div
-        className="bg-[#033529] flex items-center justify-center shrink-0"
+        className="bg-(--theme-deep) flex items-center justify-center shrink-0"
         style={{ width: 106, padding: "8px 17px" }}
       >
         <BadgeImage badge={qaInfo.badge} />

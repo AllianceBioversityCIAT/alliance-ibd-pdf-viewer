@@ -55,17 +55,8 @@ export interface PartnerEntry {
 
 export interface QAAdjustment {
   label: string;
-  from_value?: string;
+  from_value: string;
   to_value: string;
-}
-
-export interface QAInfo {
-  badge: string;
-  title: string;
-  description: string;
-  qa_url?: string;
-  adjustments_title?: string;
-  adjustments?: QAAdjustment[];
 }
 
 export interface BundledInnovation {
@@ -180,6 +171,7 @@ export interface PRMSResultData {
   result_description: string;
   title: string;
   short_title: string;
+  project_name: string;
 
   // Phase & dates
   phase_name: string;
@@ -192,6 +184,8 @@ export interface PRMSResultData {
   primary_submitter_acronym: string;
   lead_contact_person: string;
   result_lead: string;
+  lead_center_name: string;
+  lead_center_acronym: string;
 
   // Impact tags (format: "(1) Significant")
   nutrition_tag: { name: string; score: number; components: string[] };
@@ -230,7 +224,6 @@ export interface PRMSResultData {
   kp_partner_data: PartnerEntry[] | null;
 
   // QA
-  qa_info?: QAInfo;
   qa_adjustments?: QAAdjustment[];
 
   // Bundled innovations
