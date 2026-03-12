@@ -78,10 +78,68 @@ The unified template for all PRMS result types. Uses `rt_id` from the JSON data 
 
 ### Template rules
 
-- **No pagination/footers** — Gotenberg handles page breaks, headers, and footers via its own API parameters
 - **Flow layout only** — use flexbox/block layout so content grows naturally for multi-page PDFs. Never use absolute positioning that locks content to a fixed page height
-- **`paperWidth` and `paperHeight`** are passed as query params and set the outer container dimensions. Templates render as continuous HTML; Gotenberg splits into pages
+- **`paperWidth` and `paperHeight`** are passed as query params and set the outer container dimensions. Templates render as continuous HTML; the Paginator component handles page breaks client-side
 - All text and URLs must come from the `data` prop — templates should be data-driven, not hardcoded
+
+### Pagination system (`paginator.tsx`)
+
+The `Paginator` component is a **client-side pagination engine** that runs after render (500ms delay). It reads `paperHeight` from query params and manipulates the DOM to ensure content never crosses page boundaries.
+
+**Query params:**
+
+| Param | Effect |
+|-------|--------|
+| `paperHeight` | Activates pagination (page height in px). Required for pagination to run |
+| `noPaginate=true` | Disables pagination even if `paperHeight` is present |
+| `debug=true` | Draws visual debug lines: red CUT lines, orange FOOTER ZONE, green CONTENT START |
+
+**Configuration (DEFAULT_CONFIG):**
+
+| Key | Default | Purpose |
+|-----|---------|---------|
+| `footerHeight` | 40 | Space reserved at bottom for the auto-generated footer |
+| `marginTop` | 30 | Breathing room after each page cut (pages 2+) |
+| `marginBottom` | 10 | Space between content and footer zone |
+| `firstPage.marginTop` | 0 | Page 1 has no extra top margin (header provides spacing) |
+
+**How it works:**
+
+1. **`collectBlocks()`** — walks the DOM tree inside the Paginator container and collects "content blocks":
+   - Elements with `data-paginator-block` → treated as **atomic** (indivisible)
+   - "Plain wrappers" (div/section/article with no background/border/shadow) → recurses into children
+   - Styled blocks (background, border, shadow) → atomic
+   - Leaf elements (no children) → atomic
+2. **`processPass()`** — iterates blocks, checks if any extend past the "safe zone" (page bottom minus footer/margin). For overflow blocks:
+   - **Tables**: split at row boundaries, continuation has no repeated thead
+   - **Other blocks**: insert a spacer div to push the block to the next page
+   - **Orphan detection**: if the previous sibling is small (<30px, typically a heading), it gets pushed along with the block to avoid orphaned headings
+3. **Multi-pass** — runs up to 10 passes until no more DOM changes (cascading shifts)
+4. **Footer placement** — absolute-positioned footers with "CGIAR Results Framework" + page numbers
+5. **Final padding** — pads document to exact multiple of `paperHeight`
+
+**`data-paginator-block` attribute (CRITICAL):**
+
+Add this HTML attribute to any element that must be treated as an **indivisible unit** by the paginator. The paginator will never recurse into its children — the whole element is pushed to the next page if it overflows.
+
+**When to use it:**
+
+| Scenario | Example |
+|----------|---------|
+| **2D layouts (grid, flex-row)** | Impact Areas grid (`grid-cols-2`), Innovation Development 2-column flex |
+| **Heading + table pairs** | `<div data-paginator-block>` wrapping a `<p>` heading + `<DataTable>` |
+| **Any group that must stay together** | A card with title + content that shouldn't be split |
+
+**When NOT to use it:**
+- On sections with potentially **very long tables** (many rows) — the paginator can't split tables inside atomic blocks. Only use it when the section fits within a single page height.
+
+**Debugging pagination issues:**
+
+1. Add `?debug=true` to the URL to see CUT lines (red), FOOTER ZONES (orange), and CONTENT START markers (green)
+2. Check for **orphaned headings** — a heading at the bottom of a page with its content on the next. Fix: add `data-paginator-block` to the wrapper div containing both
+3. Check for **duplicate spacers** — elements in grid/flex-row layouts getting individual spacers. Fix: add `data-paginator-block` to the grid/flex container
+4. Check for **content crossing footer zone** — content that overlaps the orange FOOTER ZONE. The paginator should push it, but if the block isn't detected (e.g., inside a plain wrapper), add `data-paginator-block`
+5. Use Playwright to evaluate positions: `document.querySelectorAll('[data-paginator-spacer]')` to inspect inserted spacers
 
 ## Key conventions
 
