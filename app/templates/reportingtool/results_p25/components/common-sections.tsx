@@ -117,7 +117,7 @@ export function ResultDetailsSection({
                 Impact Areas targeted
               </p>
               <div className="flex flex-col gap-2.5">
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-2 gap-2.5" data-paginator-block>
                   {impactAreas
                     .filter((area) => !!area.score && area.score !== "")
                     .map((area) => (
@@ -309,7 +309,7 @@ export function ContributorsSection({
       )}
 
       {hasPartners && (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2.5" data-paginator-block>
           <SubSectionTitle>Partners</SubSectionTitle>
           <DataTable
             columns={["Name", "Country HQ", "Institution type"]}
@@ -325,7 +325,7 @@ export function ContributorsSection({
       )}
 
       {hasBundled && (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2.5" data-paginator-block>
           <SubSectionTitle>Bundled innovations</SubSectionTitle>
           <DataTable
             columns={["Portfolio", "Phase", "Code", "Indicator", "Title"]}

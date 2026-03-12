@@ -39,7 +39,7 @@ export function InnovationDevelopmentSections({
       <div className="flex flex-col gap-2.5">
         <SectionTitle>Innovation Development details</SectionTitle>
 
-        <div className="flex gap-[20px]">
+        <div className="flex gap-[20px]" data-paginator-block>
           <div className="flex flex-col gap-[8px] text-[10px] flex-1 min-w-0">
             {hasDevelopers && (
               <p className="leading-normal">
@@ -182,7 +182,7 @@ export function InnovationDevelopmentSections({
           <SubSectionTitle>Anticipated Innovation users</SubSectionTitle>
 
           {hasActors && (
-            <div className="flex flex-col gap-[5px]">
+            <div className="flex flex-col gap-[5px]" data-paginator-block>
               <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
                 Actors
               </p>
@@ -200,7 +200,7 @@ export function InnovationDevelopmentSections({
           )}
 
           {hasOrgs && (
-            <div className="flex flex-col gap-[5px]">
+            <div className="flex flex-col gap-[5px]" data-paginator-block>
               <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
                 Organizations
               </p>
@@ -222,7 +222,7 @@ export function InnovationDevelopmentSections({
           )}
 
           {hasMeasures && (
-            <div className="flex flex-col gap-[5px]">
+            <div className="flex flex-col gap-[5px]" data-paginator-block>
               <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
                 Other quantitative measures of innovation use
               </p>
