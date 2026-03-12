@@ -216,6 +216,17 @@ function isPlainWrapper(el: HTMLElement): boolean {
   return true;
 }
 
+// ── Helpers ──
+
+/** Walk back through siblings, skipping paginator-inserted spacers. */
+function getPreviousContentSibling(el: HTMLElement): HTMLElement | null {
+  let sibling = el.previousElementSibling;
+  while (sibling && sibling.hasAttribute("data-paginator-spacer")) {
+    sibling = sibling.previousElementSibling;
+  }
+  return sibling as HTMLElement | null;
+}
+
 // ── Single processing pass ──
 
 /**
@@ -263,17 +274,36 @@ function processPass(
       }
     }
 
+    // Determine push target — pull in a small preceding sibling (orphaned heading)
+    let pushTarget: HTMLElement = block;
+    const prevSibling = getPreviousContentSibling(block);
+    if (prevSibling && prevSibling.getBoundingClientRect().height < 30) {
+      const prevTop =
+        prevSibling.getBoundingClientRect().top +
+        window.scrollY -
+        pageRootTop;
+      const prevPage = Math.floor(prevTop / paperHeight);
+      if (prevPage === page) {
+        // Small sibling on the same page — likely a heading, push it along
+        pushTarget = prevSibling;
+      }
+    }
+
     // Push to next page
+    const pushTop =
+      pushTarget.getBoundingClientRect().top +
+      window.scrollY -
+      pageRootTop;
     const nextStart = getContentStart(page + 1, paperHeight, config);
     const parentGap =
-      parseFloat(getComputedStyle(block.parentElement!).gap) || 0;
-    const spacerHeight = nextStart - top - parentGap;
+      parseFloat(getComputedStyle(pushTarget.parentElement!).gap) || 0;
+    const spacerHeight = nextStart - pushTop - parentGap;
 
     if (spacerHeight > 0) {
       const spacer = document.createElement("div");
       spacer.setAttribute("data-paginator-spacer", "push");
       spacer.style.cssText = `height:${spacerHeight}px; flex-shrink:0;`;
-      block.parentNode?.insertBefore(spacer, block);
+      pushTarget.parentNode?.insertBefore(spacer, pushTarget);
       changed = true;
     }
   }

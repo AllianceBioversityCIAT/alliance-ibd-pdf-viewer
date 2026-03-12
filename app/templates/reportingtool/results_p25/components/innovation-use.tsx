@@ -125,7 +125,7 @@ export function InnovationUseSections({
       <SectionTitle>Innovation Use</SectionTitle>
 
       {!!data.innovation_use_actors?.length && (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2.5" data-paginator-block>
           <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
             Actors - Number of people using the innovation, disaggregated by
             gender:
@@ -135,7 +135,7 @@ export function InnovationUseSections({
       )}
 
       {!!data.innovation_use_organizations?.length && (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2.5" data-paginator-block>
           <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
             Organizations
           </p>
@@ -157,7 +157,7 @@ export function InnovationUseSections({
       )}
 
       {!!data.innovation_use_measures?.length && (
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2.5" data-paginator-block>
           <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
             Other quantitative measures of innovation use
           </p>
