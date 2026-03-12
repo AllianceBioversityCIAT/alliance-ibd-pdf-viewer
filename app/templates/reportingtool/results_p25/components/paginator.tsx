@@ -321,7 +321,6 @@ function splitTable(
   config: PaginationConfig,
   pageRootTop: number
 ): boolean {
-  const thead = tableEl.querySelector("thead");
   const tbody = tableEl.querySelector("tbody") || tableEl;
   const rows = Array.from(
     tbody.querySelectorAll(":scope > tr")
@@ -342,9 +341,8 @@ function splitTable(
 
   if (splitIndex <= 0) return false;
 
-  // Build continuation table: clone structure + thead, move overflow rows
+  // Build continuation table: clone structure (no thead), move overflow rows
   const cloneTable = tableEl.cloneNode(false) as HTMLElement;
-  if (thead) cloneTable.appendChild(thead.cloneNode(true));
   const cloneTbody = document.createElement("tbody");
 
   for (let i = rows.length - 1; i >= splitIndex; i--) {
