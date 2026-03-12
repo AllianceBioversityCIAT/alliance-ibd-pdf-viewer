@@ -20,7 +20,7 @@ interface PaginationConfig {
 
 const DEFAULT_CONFIG: PaginationConfig = {
   footerHeight: 40,
-  marginTop: 15,
+  marginTop: 30,
   marginBottom: 10,
   firstPage: {
     marginTop: 0,
