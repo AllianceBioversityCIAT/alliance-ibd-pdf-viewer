@@ -1,5 +1,5 @@
 import type { PRMSResultData, InnovationUseActor } from "../types";
-import { SectionTitle } from "./common-sections";
+import { SectionTitle } from "./section-primitives";
 import { DataTable } from "./tables";
 
 function GenderCell({

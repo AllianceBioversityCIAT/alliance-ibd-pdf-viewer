@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { QAAdjustment } from "../types";
+import type { QAAdjustment } from "../../shared/types";
 
 function ArrowRight() {
   return (

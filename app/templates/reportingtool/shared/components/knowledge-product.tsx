@@ -1,5 +1,5 @@
 import type { PRMSResultData } from "../types";
-import { SectionTitle } from "./common-sections";
+import { SectionTitle } from "./section-primitives";
 import { KeyValueTable } from "./tables";
 
 export function KPDetailsSection({ data }: Readonly<{ data: PRMSResultData }>) {

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
-import { Paginator } from "./paginator";
+import { Paginator } from "../../shared/components/paginator";
 import { getSPLabel } from "@/app/templates/utils";
 
 interface PageShellProps {
