@@ -193,6 +193,11 @@ export interface PRMSResultData {
   lead_contact_person: string;
   result_lead: string;
 
+  // Bilateral-specific (optional for non-bilateral templates)
+  project_name?: string;
+  lead_center_name?: string;
+  lead_center_acronym?: string;
+
   // Impact tags (format: "(1) Significant")
   nutrition_tag: { name: string; score: number; components: string[] };
   climate_tag: { name: string; score: number; components: string[] };
@@ -229,7 +234,7 @@ export interface PRMSResultData {
   non_kp_partner_data: PartnerEntry[] | null;
   kp_partner_data: PartnerEntry[] | null;
 
-  // QA
+  // QA (results_p25 specific, optional for bilaterals)
   qa_info?: QAInfo;
   qa_adjustments?: QAAdjustment[];
 

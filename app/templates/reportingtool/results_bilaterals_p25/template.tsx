@@ -1,13 +1,13 @@
 import type { TemplateProps } from "../..";
 import { formatDateCET } from "../../utils";
-import type { PRMSResultData } from "./types";
+import type { PRMSResultData } from "../shared/types";
 import {
   extractImpactAreas,
   extractGeoLocation,
   extractTocEntries,
   extractEvidences,
-} from "./transform";
-import { getThemeColors, themeVars } from "./color-themes";
+} from "../shared/transform";
+import { getThemeColors, themeVars } from "../shared/color-themes";
 import { PageShell } from "./components/page-shell";
 import {
   ResultDetailsSection,
@@ -15,11 +15,11 @@ import {
   GeographicSection,
   EvidenceSection,
 } from "./components/common-sections";
-import { InnovationDevelopmentSections } from "./components/innovation-development";
-import { KPDetailsSection } from "./components/knowledge-product";
-import { PolicyChangeSection } from "./components/policy-change";
-import { InnovationUseSections } from "./components/innovation-use";
-import CapacitySharingSections from "./components/capacity-sharing";
+import { InnovationDevelopmentSections } from "../shared/components/innovation-development";
+import { KPDetailsSection } from "../shared/components/knowledge-product";
+import { PolicyChangeSection } from "../shared/components/policy-change";
+import { InnovationUseSections } from "../shared/components/innovation-use";
+import CapacitySharingSections from "../shared/components/capacity-sharing";
 
 export default function ResultsP25({ data }: Readonly<TemplateProps>) {
   const d = data as PRMSResultData | null;

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { QAInfo } from "../types";
+import type { QAInfo } from "../../shared/types";
 
 const BADGE_IMAGES: Record<string, { src: string; invert?: boolean }> = {
   kp: { src: "/assets/prms/figma-badge-kp.png", invert: true },
