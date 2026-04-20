@@ -21,8 +21,7 @@ import { GeographicSection } from "../../results_p25/components/common-sections"
 function StepLabel({ children }: Readonly<{ children: string }>) {
   return (
     <p
-      className="text-[9px] leading-[1.15] tracking-[0.54px]"
-      style={{ color: "#149c7b" }}
+      className="text-[9px] leading-[1.15] tracking-[0.54px] text-(--theme-deep)"
     >
       {children}
     </p>
