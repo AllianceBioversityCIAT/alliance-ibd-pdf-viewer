@@ -4,8 +4,8 @@ import type {
   IpsrActorEntry,
   IpsrOrganizationEntry,
   IpsrMeasureEntry,
-  IpsrScalingReadinessEntry,
   IpsrInvestmentEntry,
+  IpsrComplementaryAssessment,
 } from "../types";
 import type { GeoLocation } from "../../shared/types";
 import {
@@ -306,11 +306,20 @@ function IpsrMeasuresTable({
   );
 }
 
-// ── Scaling Readiness Table ──
+// ── Evidence-based Scaling Readiness Table ──
 
-function ScalingReadinessTable({
-  entries,
-}: Readonly<{ entries: IpsrScalingReadinessEntry[] }>) {
+type ReadinessRow = {
+  type: string;
+  short_title: string;
+  innovation_readiness: string | null;
+  readiness_evidence: string | null;
+  innovation_use: string | null;
+  use_evidence: string | null;
+};
+
+function EvidenceBasedReadinessTable({
+  rows,
+}: Readonly<{ rows: ReadinessRow[] }>) {
   return (
     <table
       className="w-full text-[8.5px] border-collapse"
@@ -337,43 +346,43 @@ function ScalingReadinessTable({
         </tr>
       </thead>
       <tbody>
-        {entries.map((entry, i) => (
-          <tr key={`sr-${entry.type}-${i}`} className="bg-white">
+        {rows.map((row, i) => (
+          <tr key={`readiness-${i}`} className="bg-white">
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px", borderLeft: "0.5px solid #e8ebed" }}
             >
-              {entry.type}
+              {row.type}
             </td>
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
-              {entry.short_title}
+              {row.short_title || <span className="text-[#818181] italic">Not provided</span>}
             </td>
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
-              {entry.innovation_readiness}
+              {row.innovation_readiness ?? <span className="text-[#818181] italic">Not provided</span>}
             </td>
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
-              <EvidenceLink href={entry.innovation_readiness_evidence_link} />
+              <EvidenceLink href={row.readiness_evidence} />
             </td>
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
-              {entry.innovation_use}
+              {row.innovation_use ?? <span className="text-[#818181] italic">Not provided</span>}
             </td>
             <td
               className="text-[#4b5563] border-b border-[#e5e7eb]"
               style={{ padding: "7.5px" }}
             >
-              <EvidenceLink href={entry.innovation_use_evidence_link} />
+              <EvidenceLink href={row.use_evidence} />
             </td>
           </tr>
         ))}
@@ -419,16 +428,19 @@ export function IpsrSections({ data, geo }: Readonly<{ data: IPSRResultData; geo
   const hasScalingAmbition = !!data.scaling_ambition_statement;
   const hasTargetedActors = !!data.targeted_actors?.length;
   const hasTargetedOrgs = !!data.targeted_organizations?.length;
-  const hasAspiredOutcomes = !!data.aspired_outcomes?.length;
-  const hasWorkshopOrganized = !!data.workshop_organized;
-  const hasFacilitators = !!data.facilitators?.length;
+  const hasTargetedInnovationPartners = !!data.targeted_innnovation_partners?.length;
+  const hasAspiredOutcomes = !!data.aspired_outcomes_impact?.length;
+  const hasInnovationPackagingExperts = !!data.innovation_packaging_experts;
+  const hasFacilitators = !!data.innovation_packaging_experts?.facilitators?.length;
 
   const hasCurrentUseActors = !!data.current_use_actors?.length;
   const hasCurrentUseOrgs = !!data.current_use_organizations?.length;
   const hasCurrentUseMeasures = !!data.current_use_measures?.length;
-  const hasWorkshopAssessment = !!data.workshop_assessment;
-  const hasScalingReadiness = !!data.scaling_readiness_assessment?.length;
-  const hasReferenceDescription = !!data.reference_materials_description;
+  const hasAssessmentType = !!data.assessment_type;
+  const hasCoreEvidenceAssessment = !!data.evidence_based_assessment_core;
+  const hasComplementaryEvidenceAssessment = !!data.evidence_based_assessment_complementary?.length;
+  const hasEvidenceReadinessTable = hasCoreEvidenceAssessment || hasComplementaryEvidenceAssessment;
+  const hasEvidenceMaterialLinks = !!data.evidence_based_assessment_core?.readiness_evidence_details;
 
   const hasInvestmentPrograms = !!data.investment_programs?.length;
   const hasInvestmentBilateral = !!data.investment_bilateral?.length;
@@ -439,17 +451,17 @@ export function IpsrSections({ data, geo }: Readonly<{ data: IPSRResultData; geo
     hasScalingAmbition ||
     hasTargetedActors ||
     hasTargetedOrgs ||
+    hasTargetedInnovationPartners ||
     hasAspiredOutcomes ||
-    hasWorkshopOrganized ||
-    hasFacilitators;
+    hasInnovationPackagingExperts;
 
   const hasSteps2and3 =
     hasCurrentUseActors ||
     hasCurrentUseOrgs ||
     hasCurrentUseMeasures ||
-    hasWorkshopAssessment ||
-    hasScalingReadiness ||
-    hasReferenceDescription;
+    hasAssessmentType ||
+    hasEvidenceReadinessTable ||
+    hasEvidenceMaterialLinks;
 
   const hasStep4 =
     hasInvestmentPrograms || hasInvestmentBilateral || hasInvestmentPartners;
@@ -501,7 +513,7 @@ export function IpsrSections({ data, geo }: Readonly<{ data: IPSRResultData; geo
             </div>
           )}
 
-          {(hasTargetedActors || hasTargetedOrgs) && (
+          {(hasTargetedActors || hasTargetedOrgs || hasTargetedInnovationPartners) && (
             <div className="flex flex-col gap-[10px]">
               <SubSectionTitle>Targeted Innovation Use</SubSectionTitle>
 
@@ -524,6 +536,23 @@ export function IpsrSections({ data, geo }: Readonly<{ data: IPSRResultData; geo
                   />
                 </div>
               )}
+
+              {hasTargetedInnovationPartners && (
+                <div className="flex flex-col gap-[5px]" data-paginator-block>
+                  <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+                    Innovation partners
+                  </p>
+                  <DataTable
+                    columns={["Name", "Country HQ", "Institution type", "Delivery type"]}
+                    rows={(data.targeted_innnovation_partners ?? []).map((p) => [
+                      p.partner_name ?? "Not provided",
+                      p.partner_country_hq ?? "Not provided",
+                      p.partner_type ?? "Not provided",
+                      p.partner_delivery_type ?? "Not provided",
+                    ])}
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -533,35 +562,42 @@ export function IpsrSections({ data, geo }: Readonly<{ data: IPSRResultData; geo
                 Aspired outcomes and impact:
               </p>
               <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
-                {data.aspired_outcomes!.map((outcome, i) => (
+                {data.aspired_outcomes_impact!.map((outcome, i) => (
                   <li key={`outcome-${i}`} className="leading-normal">
-                    {outcome}
+                    {outcome.eoi_title}
+                    {!!outcome.is_contributor && (
+                      <span className="text-(--theme-mid) font-bold ml-[4px]">
+                        (Contributor)
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
             </div>
           )}
 
-          {hasWorkshopOrganized && (
-            <LabelValue
-              label="Was an Innovation Packaging and Scaling Readiness online or in-person expert workshop organized?"
-              value={data.workshop_organized!}
-              multiline
-            />
-          )}
+          {hasInnovationPackagingExperts && (
+            <div className="flex flex-col gap-[8px]">
+              <LabelValue
+                label="Was an Innovation Packaging and Scaling Readiness online or in-person expert workshop organized?"
+                value={data.innovation_packaging_experts!.was_workshop_organized}
+                multiline
+              />
 
-          {hasFacilitators && (
-            <div className="flex flex-col gap-[5px]">
-              <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
-                Facilitators:
-              </p>
-              <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
-                {data.facilitators!.map((f, i) => (
-                  <li key={`facilitator-${i}`} className="leading-normal">
-                    {f.name} ({f.email}) - {f.role}
-                  </li>
-                ))}
-              </ul>
+              {hasFacilitators && (
+                <div className="flex flex-col gap-[5px]">
+                  <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+                    Facilitators:
+                  </p>
+                  <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
+                    {data.innovation_packaging_experts!.facilitators!.map((f, i) => (
+                      <li key={`facilitator-${i}`} className="leading-normal">
+                        {f.first_name} {f.last_name} ({f.email}) - {f.role}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -613,33 +649,56 @@ export function IpsrSections({ data, geo }: Readonly<{ data: IPSRResultData; geo
             </div>
           )}
 
-          {hasWorkshopAssessment && (
+          {hasAssessmentType && (
             <LabelValue
               label="What was assessed during the expert workshop?"
-              value={data.workshop_assessment!}
+              value={data.assessment_type!}
               multiline
             />
           )}
 
-          {hasScalingReadiness && (
-            <div className="flex flex-col gap-[5px]" data-paginator-block>
-              <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
-                Evidence-based Scaling Readiness assessment
-              </p>
-              <ScalingReadinessTable
-                entries={data.scaling_readiness_assessment!}
-              />
-            </div>
-          )}
+          {hasEvidenceReadinessTable && (() => {
+            const rows: ReadinessRow[] = [];
+            if (data.evidence_based_assessment_core) {
+              const c = data.evidence_based_assessment_core;
+              rows.push({
+                type: "Core innovation",
+                short_title: c.short_name,
+                innovation_readiness: c.readiness_level,
+                readiness_evidence: c.readiness_evidence,
+                innovation_use: c.use_level,
+                use_evidence: c.use_evidence,
+              });
+            }
+            (data.evidence_based_assessment_complementary ?? []).forEach(
+              (comp: IpsrComplementaryAssessment, i: number) => {
+                rows.push({
+                  type: `Complementary innovation ${i + 1}`,
+                  short_title: comp.short_name,
+                  innovation_readiness: comp.readiness_level,
+                  readiness_evidence: comp.readiness_evidence,
+                  innovation_use: comp.use_level,
+                  use_evidence: comp.use_evidence,
+                });
+              }
+            );
+            return (
+              <div className="flex flex-col gap-[5px]" data-paginator-block>
+                <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
+                  Evidence-based Scaling Readiness assessment
+                </p>
+                <EvidenceBasedReadinessTable rows={rows} />
+              </div>
+            );
+          })()}
 
-          {hasReferenceDescription && (
+          {hasEvidenceMaterialLinks && (
             <div className="flex flex-col gap-[5px]">
               <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
-                Provide details of where evidence can be found within the
-                source link
+                Provide details of where evidence can be found within the source link
               </p>
-              <p className="text-[#393939] text-[10px] leading-normal">
-                {data.reference_materials_description}
+              <p className="text-[#393939] text-[10px] leading-[1.15]">
+                {data.evidence_based_assessment_core?.readiness_evidence_details}
               </p>
             </div>
           )}
