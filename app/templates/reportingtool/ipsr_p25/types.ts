@@ -60,19 +60,49 @@ export interface IpsrMeasureEntry {
   quantity: string;
 }
 
-export interface IpsrScalingReadinessEntry {
-  type: string;
-  short_title: string;
-  innovation_readiness: string;
-  innovation_readiness_evidence_link?: string | null;
-  innovation_use: string;
-  innovation_use_evidence_link?: string | null;
-}
-
 export interface IpsrFacilitatorEntry {
-  name: string;
+  first_name: string;
+  last_name: string;
   email: string;
   role: string;
+}
+
+export interface IpsrInnovationPackagingExperts {
+  was_workshop_organized: string;
+  facilitators: IpsrFacilitatorEntry[] | null;
+  workshop_atendees_list_link: string | null;
+}
+
+export interface IpsrAssessmentEntry {
+  innovation_data: {
+    is_core: boolean;
+    innovation_id: number;
+    innovation_code: number;
+    innovation_title: string;
+  };
+  current_readiness: string | null;
+  current_use: string | null;
+  potential_readiness: string | null;
+  potential_use: string | null;
+}
+
+export interface IpsrEvidenceAssessment {
+  short_name: string;
+  readiness_level: string | null;
+  readiness_evidence: string | null;
+  readiness_evidence_details: string | null;
+  use_level: string | null;
+  use_evidence: string | null;
+  use_evidence_details: string | null;
+}
+
+export interface IpsrComplementaryAssessment extends IpsrEvidenceAssessment {
+  innovation_data: {
+    innovation_id: number;
+    innovation_code: number;
+    innovation_title: string;
+    innovation_short_title: string | null;
+  };
 }
 
 export interface IpsrInvestmentEntry {
@@ -142,17 +172,19 @@ export interface IPSRResultData {
   scaling_ambition_statement: string | null;
   targeted_actors: IpsrActorEntry[] | null;
   targeted_organizations: IpsrOrganizationEntry[] | null;
-  aspired_outcomes: string[] | null;
-  workshop_organized: string | null;
-  facilitators: IpsrFacilitatorEntry[] | null;
+  targeted_innnovation_partners: PartnerEntry[] | null;
+  aspired_outcomes_impact: { eoi_title: string; is_contributor: boolean | number }[] | null;
+  innovation_packaging_experts: IpsrInnovationPackagingExperts | null;
 
   // Steps 2 & 3 — Package and Assess
   current_use_actors: IpsrActorEntry[] | null;
   current_use_organizations: IpsrOrganizationEntry[] | null;
   current_use_measures: IpsrMeasureEntry[] | null;
-  workshop_assessment: string | null;
-  scaling_readiness_assessment: IpsrScalingReadinessEntry[] | null;
-  reference_materials_description: string | null;
+  assessment_type: string | null;
+  assessments: IpsrAssessmentEntry[] | null;
+  evidence_based_assessment_core: IpsrEvidenceAssessment | null;
+  evidence_based_assessment_complementary: IpsrComplementaryAssessment[];
+  evidence_material_links: string[];
 
   // Step 4 — Additional Information
   investment_programs: IpsrInvestmentEntry[] | null;

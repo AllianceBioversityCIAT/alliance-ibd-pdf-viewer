@@ -1,276 +1,316 @@
 {
-  "result_code": 2378,
-  "result_type": "Innovation Package",
-  "result_name": "Integrating traditional agricultural practices with modern technology for enhanced productivity",
-  "title": "Integrating traditional agricultural practices with modern technology for enhanced productivity",
-  "short_title": "",
-  "result_description": "The content of the Planting Date Advisories was developed into messages and disseminated to farmers across Bihar through the dissemination platforms of BAU, JEEViKA and IFFCO.\nThese advisories support farmers in making more informed planting decisions based on seasonal and climate conditions.",
-  "phase_name": "Reporting 2025",
-  "primary_submitter_name": "Science Program (SP) 02 - Sustainable Farming",
-  "primary_submitter_acronym": "SP02",
-  "lead_contact_person": "Obilo Chinyere (o.chinyere@cgiar.org)",
-  "is_krs": "No",
-  "krs_link": null,
-  "nutrition_tag": {
-    "score": "(2) Principal",
-    "components": ["Nutrition", "Health"]
-  },
-  "climate_tag": {
-    "score": "(0) Not targeted",
-    "components": []
-  },
-  "poverty_tag": {
-    "score": "(0) Not targeted",
-    "components": []
-  },
-  "gender_tag": {
-    "score": "(0) Not targeted",
-    "components": []
-  },
-  "environmental_tag": {
-    "score": "(1) Significant",
-    "components": []
-  },
-  "geo_focus": "Global",
-  "regions": ["Eastern Africa", "Southern Africa", "Western Africa"],
-  "countries": [
-    { "name": "Ethiopia", "code": "ET" },
-    { "name": "South Africa", "code": "ZA" }
-  ],
-  "subnational": null,
-  "primary_submitter_data": {
-    "toc_url": "https://toc.mel.cgiar.org/toc/example-uuid",
-    "toc_internal_id": "example-uuid",
-    "contributor_name": "Science program 02 - Sustainable Farming",
-    "contributor_can_match_result": true
-  },
-  "toc_primary": [
-    {
-      "toc_level_name": "Outcome",
-      "toc_work_package_acronym": "Area of work 01 - Climate Adaptation and Mitigation",
-      "toc_result_title": "Climate hazards to priotized geographies and systems",
-      "toc_indicator": "Number of quantified climate change-related hazards that affect agronomic",
-      "toc_result_description": ""
-    }
-  ],
-  "contributing_initiatives": [
-    { "initiative_short_name": "Science Program (SP) 01 - Breeding for tomorrow" }
-  ],
-  "contributing_centers": [],
-  "bilateral_projects": [
-    {
-      "project_title": "IWMI - Implementation of conservation agriculture in Africa and Asia",
-      "is_lead_project": false
+    "id": 8135,
+    "rl_id": 3,
+    "rt_id": 10,
+    "title": "Innovation Package and Scaling Readiness assessment for drought management system for environmental and agricultural policy makers to design and implement more science-based, integrated, and practical drought interventions benefiting climate vulnerable rural communities in Afghanistan and Aland Islands",
+    "qa_info": null,
+    "regions": null,
+    "countries": [
+        {
+            "code": "AF",
+            "name": "Afghanistan"
+        },
+        {
+            "code": "AX",
+            "name": "Aland Islands"
+        }
+    ],
+    "geo_focus": "National",
+    "actor_data": null,
+    "gender_tag": {
+        "score": "(2) Principal",
+        "components": [
+            "Gender equality",
+            "Youth"
+        ]
     },
-    {
-      "project_title": "ICARDA - Farmers trained on protection against wheat disease apply CGIAR innovation in their work",
-      "is_lead_project": false
-    }
-  ],
-  "non_kp_partner_data": [
-    {
-      "partner_name": "JEEVIKA - Jeevika",
-      "partner_country_hq": "India (IN)",
-      "partner_type": "NGO Local (General)",
-      "partner_delivery_type": "Scaling"
+    "phase_name": "IPSR 2025",
+    "version_id": 31,
+    "assessments": [
+        {
+            "current_use": "1 - Project lead organization",
+            "potential_use": null,
+            "innovation_data": {
+                "is_core": "Yes",
+                "innovation_id": 4124,
+                "innovation_code": 4104,
+                "innovation_title": "Drought Management System for environmental and agricultural policy makers to design and implement more science-based, integrated, and practical drought interventions benefiting climate vulnerable rural communities"
+            },
+            "current_readiness": "3 - Proof of Concept",
+            "potential_readiness": null
+        },
+        {
+            "current_use": "8 - End-user / Beneficiaries",
+            "potential_use": null,
+            "innovation_data": {
+                "is_core": "No",
+                "innovation_id": 954,
+                "innovation_code": 936,
+                "innovation_title": "Comparing cropping patterns on-farm in Bangladesh"
+            },
+            "current_readiness": "8 - Uncontrolled Testing",
+            "potential_readiness": null
+        },
+        {
+            "current_use": "7 - Unconnected next-user",
+            "potential_use": null,
+            "innovation_data": {
+                "is_core": "No",
+                "innovation_id": 925,
+                "innovation_code": 907,
+                "innovation_title": "An Artificial Intelligence-based farmers' agricultural information demand prediction model for digital extension services in India"
+            },
+            "current_readiness": "3 - Proof of Concept",
+            "potential_readiness": null
+        }
+    ],
+    "climate_tag": {
+        "score": "(2) Principal",
+        "components": [
+            "Adaptation"
+        ]
     },
-    {
-      "partner_name": "DOA - Department of Agriculture West Bengal (India)",
-      "partner_country_hq": "India (IN)",
-      "partner_type": "Government (Subnational)",
-      "partner_delivery_type": "Scaling"
+    "poverty_tag": {
+        "score": "(1) Significant",
+        "components": []
     },
-    {
-      "partner_name": "IITA - International Institute of Tropical Agriculture",
-      "partner_country_hq": "Nigeria (NI)",
-      "partner_type": "Government (Subnational)",
-      "partner_delivery_type": "Scaling"
+    "result_code": 5829,
+    "result_name": "Innovation Package and Scaling Readiness assessment for drought management system for environmental and agricultural policy makers to design and implement more science-based, integrated, and practical drought interventions benefiting climate vulnerable rural communities in Afghanistan and Aland Islands",
+    "result_type": "Innovation Packages",
+    "short_title": null,
+    "subnational": null,
+    "toc_primary": [
+        {
+            "toc_indicator": "Number of country-led or regionally-led demand articulation processes supported by CGIAR that result in prioritization of scaling-relevant problem–solution bundles",
+            "toc_level_name": "Intermediate Outcome",
+            "toc_result_title": "I-OC 1.1: CGIAR’s alignment with regional and national priorities is clarified and increased",
+            "toc_result_description": "CGIAR and NARES scientists collaboratively assess and prioritize stakeholder demands to ensure that agricultural innovations address the most pressing and context-specific needs. This helps shift CGIAR’s approach from a predominantly research-supply model to a demand-driven one, where local actors are active participants in shaping the research and scaling agenda.",
+            "toc_work_package_acronym": "AOW01"
+        }
+    ],
+    "result_level": "Outcome",
+    "nutrition_tag": {
+        "score": "(1) Significant",
+        "components": []
     },
-    {
-      "partner_name": "UWA - University of Western Australia",
-      "partner_country_hq": "Australia (AU)",
-      "partner_type": "Government (Subnational)",
-      "partner_delivery_type": "Scaling"
-    }
-  ],
-  "linked_evidences": [],
-  "qa_info": {
-    "badge": "senior",
-    "title": "Result quality assured by two assessors and subsequently reviewed by a senior third party",
-    "description": "This result underwent two rounds of quality assurance, including review by a senior third-party subject matter expert following the CGIAR standard",
-    "qa_url": "https://www.cgiar.org/news-events/news/cgiars-quality-assurance-process-a-snapshot-of-what-it-is-and-what-is-does",
-    "adjustments_title": "Core data point that were adjusted during the QA process:",
-    "adjustments": [
-      { "label": "Innovation Use", "to_value": "Level 7" }
+    "has_actor_data": "Yes",
+    "result_type_id": 10,
+    "assessment_type": "Only Current innovation readiness and innovation use were self-assessed by the workshop experts",
+    "core_innovation": {
+        "link": "https://prtest.ciat.cgiar.org/reports/result-details/4104?phase=1",
+        "title": "Drought Management System for environmental and agricultural policy makers to design and implement more science-based, integrated, and practical drought interventions benefiting climate vulnerable rural communities",
+        "result_code": 4104
+    },
+    "submission_data": "Not Submitted",
+    "targeted_actors": [
+        {
+            "total": 33,
+            "how_many": null,
+            "men_total": 10,
+            "men_youth": 1,
+            "actor_type": "Farmers/ (agro)pastoralist/ herders/ fishers",
+            "women_total": 23,
+            "women_youth": 10,
+            "evidence_link": null,
+            "men_non_youth": 9,
+            "women_non_youth": 13,
+            "other_actor_type": null,
+            "sex_and_age_disaggregation": false
+        }
+    ],
+    "linked_evidences": [],
+    "environmental_tag": {
+        "score": "(1) Significant",
+        "components": []
+    },
+    "portfolio_acronym": "P25",
+    "primary_submitter": {
+        "name": "Scaling for Impact",
+        "acronym": "Scaling for Impact",
+        "official_code": "SP09"
+    },
+    "submission_status": "Editing",
+    "bilateral_projects": [
+        {
+            "project_title": "T-PJ-003772-TAAT Clearinghouse: Re-invest to Accelerate Innovation Adoption",
+            "is_lead_project": 0
+        }
+    ],
+    "lead_contact_email": "H.F.Tobon@CGIAR.ORG",
+    "result_description": "The Zambia Drought Management System incorporates multi-source information, namely access to real-time weather updates and open-access satellite data, that provides farmers, extension workers, agriculture and water resources authorities with all the information needed to forecast, monitor and manage drought. Specifically, it provides seasonal, sub-seasonal and seven-day weather forecasts to indicate when drought is present. The system incorporates national- to regional-level datasets drawn from multiple satellites, observed data and other sources. Therefore, the ZADMS can guide national, state and district-level authorities in the country to take timely action to prepare for drought. This has helped to cushion smallholders, many of them poor, from the worst effects of a prolonged drought situation.",
+    "investment_partners": [
+        {
+            "name": "INRAB - Institut National de Recherche Agricole du Benin",
+            "total_usd_value": null,
+            "is_not_determined": true
+        },
+        {
+            "name": "IRRI - International Rice Research Institute",
+            "total_usd_value": null,
+            "is_not_determined": true
+        }
+    ],
+    "investment_programs": [
+        {
+            "name": "Scaling for Impact - Scaling for Impact",
+            "total_usd_value": null,
+            "is_not_determined": true
+        },
+        {
+            "name": "Breeding for Tomorrow - Breeding for Tomorrow",
+            "total_usd_value": null,
+            "is_not_determined": false
+        }
+    ],
+    "lead_contact_person": "Tobon R, Hector F (Alliance Bioversity-CIAT) (H.F.Tobon@CGIAR.ORG)",
+    "non_kp_partner_data": [
+        {
+            "partner_name": "WUR - Wageningen University and Research Centre",
+            "partner_type": "Research organizations and universities National (Universities)",
+            "partner_country_hq": "Netherlands (Kingdom of the) (NL)",
+            "partner_delivery_type": "Demand, Innovation, Scaling"
+        },
+        {
+            "partner_name": "MARI - Mikocheni Agricultural Research Institute",
+            "partner_type": "Government (National)",
+            "partner_country_hq": "Tanzania, United Republic (TZ)",
+            "partner_delivery_type": "Other"
+        },
+        {
+            "partner_name": "MARTI - Mbeya Agricultural Research and Training Institute",
+            "partner_type": "Research organizations and universities National (NARS)",
+            "partner_country_hq": "Tanzania, United Republic (TZ)",
+            "partner_delivery_type": "Other"
+        }
+    ],
+    "contributing_centers": [
+        {
+            "center_name": "ABC - Alliance of Bioversity and CIAT - Headquarter (Bioversity International)",
+            "is_primary_center": 0
+        },
+        {
+            "center_name": "CIMMYT - International Maize and Wheat Improvement Center / Centro Internacional de Mejoramiento de Maíz y Trigo",
+            "is_primary_center": 0
+        },
+        {
+            "center_name": "CIP - International Potato Center / Centro Internacional de la Papa",
+            "is_primary_center": 0
+        }
+    ],
+    "current_use_measures": [
+        {
+            "type": "Other",
+            "quantity": "4",
+            "evidence_link": null,
+            "unit_of_measure": "# of hectares"
+        }
+    ],
+    "investment_bilateral": [
+        {
+            "name": "T-PJ-003772-TAAT Clearinghouse: Re-invest to Accelerate Innovation Adoption",
+            "total_usd_value": "$3,000",
+            "is_not_determined": false
+        }
+    ],
+    "generation_date_footer": "Wednesday, April 22nd, 2026 at 15:38 CET",
+    "primary_submitter_data": {
+        "toc_url": "https://toc.loc.codeobia.com/toc/2500a816-6071-4efc-b872-b30321129547?relatedFlowId=a5b6ffc9-17e6-4cba-bef9-edc4eb572a0b",
+        "contributor_name": "SP09 - Scaling for Impact",
+        "contributor_can_match_result": 1
+    },
+    "primary_submitter_name": "Scaling for Impact",
+    "targeted_organizations": [
+        {
+            "type": "NGO",
+            "subtype": "NGO International (Farmers)",
+            "how_many": "34",
+            "has_subtypes": true,
+            "evidence_link": null,
+            "other_institution": null
+        }
+    ],
+    "aspired_outcomes_impact": [
+        {
+            "eoi_title": "2030-OC 1:  All CGIAR Programs and/or 25% of new large bilateral projects adaptively manage research and scaling to align with stakeholder demand in 50% of countries where 5+ Programs operate",
+            "is_contributor": false
+        },
+        {
+            "eoi_title": "2030-OC 5: 100+ partners use science, metrics, and South-South exchanges to improve scaling",
+            "is_contributor": false
+        }
+    ],
+    "evidence_material_links": [
+        "www.google.com"
+    ],
+    "contributing_initiatives": [
+        {
+            "initiative_short_name": "Breeding for Tomorrow"
+        }
+    ],
+    "generation_date_filename": "20260422_1538",
+    "primary_submitter_acronym": "SP09",
+    "innovation_packaging_experts": {
+        "facilitators": [
+            {
+                "role": "Lead",
+                "email": "keco@ciat.com",
+                "last_name": "Llazos",
+                "first_name": "Keco"
+            }
+        ],
+        "was_workshop_organized": "Yes",
+        "workshop_atendees_list_link": "www.keco.com"
+    },
+    "targeted_innnovation_partners": [
+        {
+            "partner_name": "WUR - Wageningen University and Research Centre",
+            "partner_type": "Research organizations and universities National (Universities)",
+            "partner_country_hq": "Netherlands (Kingdom of the) (NL)",
+            "partner_delivery_type": "Scaling"
+        },
+        {
+            "partner_name": "NARO - National Agricultural Research Organisation (Uganda)",
+            "partner_type": "Research organizations and universities National (NARS)",
+            "partner_country_hq": "Uganda (UG)",
+            "partner_delivery_type": "Demand, Innovation, Scaling"
+        }
+    ],
+    "evidence_based_assessment_core": {
+        "use_level": "0 - No use",
+        "short_name": "Zambia Drought Management System (ZADMS)",
+        "use_evidence": "www.yecksiton.com",
+        "readiness_level": "4 - Controlled Testing",
+        "readiness_evidence": "www.sasaco.com",
+        "readiness_evidence_details": "Testttststtstts"
+    },
+    "evidence_based_assessment_complementary": [
+        {
+            "use_level": "9 - End-user / Beneficiaries",
+            "use_evidence": "www.yecksiton2.com",
+            "innovation_data": {
+                "innovation_id": 954,
+                "innovation_code": 936,
+                "innovation_title": "Comparing cropping patterns on-farm in Bangladesh",
+                "innovation_short_title": "Comparing cropping patterns on-farm in Bangladesh"
+            },
+            "readiness_level": "4 - Controlled Testing",
+            "readiness_evidence": "www.yecksiton1.com",
+            "use_evidence_details": "asd",
+            "readiness_evidence_details": "asdasd"
+        },
+        {
+            "use_level": "9 - End-user / Beneficiaries",
+            "use_evidence": "www.yecksiton4.com",
+            "innovation_data": {
+                "innovation_id": 925,
+                "innovation_code": 907,
+                "innovation_title": "An Artificial Intelligence-based farmers' agricultural information demand prediction model for digital extension services in India",
+                "innovation_short_title": "Artificial Intelligence-based agricultural information demand prediction model"
+            },
+            "readiness_level": "5 - Model/Early Prototype",
+            "readiness_evidence": "www.yecksiton3.com",
+            "use_evidence_details": null,
+            "readiness_evidence_details": "asd"
+        }
     ]
-  },
-  "core_innovation": {
-    "result_code": 15052,
-    "title": "Innovation development - Progress report of Aflasafe activities in Sierra Leone, highlighting key implementation milestones and ongoing efforts to expand its adoption among farmers.",
-    "link": "https://reporting.cgiar.org/reports/result-details/15052?phase=4"
-  },
-  "scaling_ambition_statement": "By 2030, the Sustainable Farming will work together with Ministry of Agriculture, Irrigation and Water Development (Malawi), National Smallholder Farmers' Association of Malawi and World Food Programme to accomplish the use of Progress report of Aflasafe activities in Sierra Leone, co funded by the World Bank Food Security Resilience Program for Sierra Leone by 800000 women (320000 youth / 480000 non-youth) & 1200000 men (480000 youth / 720000 non-youth) Farmers/(agro)pastoralist/ herders/ fishers.",
-  "targeted_actors": [
-    {
-      "actor_type": "Farmers/pastoralist/herders/fishers",
-      "other_actor_type": null,
-      "sex_and_age_disaggregation": false,
-      "women_total": 25,
-      "women_youth": 5,
-      "women_non_youth": 20,
-      "men_total": 15,
-      "men_youth": 5,
-      "men_non_youth": 10,
-      "total": 40,
-      "how_many": null,
-      "evidence_link": null
-    },
-    {
-      "actor_type": "Researchers",
-      "other_actor_type": null,
-      "sex_and_age_disaggregation": true,
-      "women_total": null,
-      "women_youth": null,
-      "women_non_youth": null,
-      "men_total": null,
-      "men_youth": null,
-      "men_non_youth": null,
-      "total": 25,
-      "how_many": 25,
-      "evidence_link": null
-    }
-  ],
-  "targeted_organizations": [
-    {
-      "type": "NGO",
-      "other_institution": null,
-      "subtype": "NGO National (General)",
-      "has_subtypes": true,
-      "how_many": "7",
-      "evidence_link": null
-    },
-    {
-      "type": "Organization (other than financial or research)",
-      "other_institution": null,
-      "subtype": "Organization (other than financial or research) International",
-      "has_subtypes": true,
-      "how_many": "5",
-      "evidence_link": null
-    }
-  ],
-  "aspired_outcomes": [
-    "PO6 - Animal and aquatic food producers, market actors and communities within animal and aquatic food systems exhibit behavior supporting gender-equitable norms.",
-    "PO3 - Communities within animal and aquatic food systems adopt innovations for increased social, economic and environmental resilience."
-  ],
-  "workshop_organized": "Yes, an expert workshop was organized.",
-  "facilitators": [
-    {
-      "name": "Paul Silva",
-      "email": "p.silva@cgiar.org",
-      "role": "Lead"
-    }
-  ],
-  "current_use_actors": [
-    {
-      "actor_type": "Farmers/pastoralist/herders/fishers",
-      "other_actor_type": null,
-      "sex_and_age_disaggregation": false,
-      "women_total": 25,
-      "women_youth": 5,
-      "women_non_youth": 20,
-      "men_total": 15,
-      "men_youth": 5,
-      "men_non_youth": 10,
-      "total": 40,
-      "how_many": null,
-      "evidence_link": "https://evidence.example.com/actors-1"
-    }
-  ],
-  "current_use_organizations": [
-    {
-      "type": "NGO",
-      "other_institution": null,
-      "subtype": "NGO National (General)",
-      "has_subtypes": true,
-      "how_many": "1",
-      "evidence_link": "https://evidence.example.com/org-1"
-    },
-    {
-      "type": "Government",
-      "other_institution": null,
-      "subtype": "Government (National)",
-      "has_subtypes": true,
-      "how_many": "1",
-      "evidence_link": "https://evidence.example.com/org-2"
-    }
-  ],
-  "current_use_measures": [
-    {
-      "type": "Other",
-      "evidence_link": null,
-      "unit_of_measure": "",
-      "quantity": ""
-    }
-  ],
-  "workshop_assessment": "Current and Potential innovation readiness and innovation use were self-assessed by workshop experts.",
-  "scaling_readiness_assessment": [
-    {
-      "type": "Core innovation",
-      "short_title": "Aflasafe development for Sierra Leone",
-      "innovation_readiness": "9 - Proven Innovation",
-      "innovation_readiness_evidence_link": "https://evidence.example.com/readiness-core",
-      "innovation_use": "4 - Connected next-user",
-      "innovation_use_evidence_link": "https://evidence.example.com/use-core"
-    },
-    {
-      "type": "Complementary innovation 1",
-      "short_title": "Aflasafe development for Sierra Leone",
-      "innovation_readiness": "3 - Proof of Concept",
-      "innovation_readiness_evidence_link": "https://evidence.example.com/readiness-comp",
-      "innovation_use": "2 - Partners",
-      "innovation_use_evidence_link": "https://evidence.example.com/use-comp"
-    }
-  ],
-  "reference_materials_description": "This information can be found on all pages of the document, ensuring consistency and easy reference throughout the report.",
-  "investment_programs": [
-    {
-      "name": "SP02 - Sustainable Farming",
-      "total_usd_value": "$4,000",
-      "is_not_determined": false
-    },
-    {
-      "name": "SP04 - Multifunctional Landscapes",
-      "total_usd_value": null,
-      "is_not_determined": true
-    },
-    {
-      "name": "SP05 - Better Diets and Nutrition",
-      "total_usd_value": null,
-      "is_not_determined": true
-    },
-    {
-      "name": "SP07 - Policy Innovations",
-      "total_usd_value": "$1,000",
-      "is_not_determined": false
-    }
-  ],
-  "investment_bilateral": [
-    {
-      "name": "T-PJ-003262-An innovative approach to agribusiness training and start-up for Nigerias young people within the Young Africa Works Program",
-      "total_usd_value": "$1,000",
-      "is_not_determined": false
-    }
-  ],
-  "investment_partners": [
-    {
-      "name": "ACODE - Advocates Coalition for Development and Environment",
-      "total_usd_value": "$2,000",
-      "is_not_determined": false
-    },
-    {
-      "name": "AUT - Aristotle University of Thessaloniki",
-      "total_usd_value": "$1,000",
-      "is_not_determined": false
-    }
-  ]
 }
