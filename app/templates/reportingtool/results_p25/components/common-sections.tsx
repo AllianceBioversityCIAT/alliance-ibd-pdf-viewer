@@ -318,6 +318,23 @@ export function ContributorsSection({
 // ── Geographic Location ──
 
 function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
+  const getDisplayText = (value: unknown): string => {
+    if (typeof value === "string") return value;
+    if (value && typeof value === "object") {
+      const candidate = value as { name?: unknown; code?: unknown; label?: unknown };
+      if (typeof candidate.name === "string" && candidate.name.trim()) {
+        return candidate.name;
+      }
+      if (typeof candidate.label === "string" && candidate.label.trim()) {
+        return candidate.label;
+      }
+      if (typeof candidate.code === "string" && candidate.code.trim()) {
+        return candidate.code;
+      }
+    }
+    return "";
+  };
+
   return (
     <div className="bg-[#e2e0df] flex overflow-hidden">
       {geo?.geo_focus === "This is yet to be determined" ? (
@@ -363,15 +380,19 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
                   </p>
                   <div className="flex flex-wrap gap-[6px]">
                     {geo?.regions?.length && geo?.regions?.length > 0 ? (
-                      geo?.regions?.map((r, i) => (
+                      geo?.regions?.map((r, i) => {
+                        const regionName = getDisplayText(r);
+                        if (!regionName) return null;
+                        return (
                         <span
-                          key={`${r}-${i}`}
+                          key={`${regionName}-${i}`}
                           className="text-[#393939] leading-normal"
                         >
                           <span className="mr-[4px]">&bull;</span>
-                          {r}
+                          {regionName}
                         </span>
-                      ))
+                        );
+                      })
                     ) : (
                       <p className="text-[#707070] text-[10px] leading-[1.15] italic font-normal">
                         No regions specified
@@ -415,24 +436,32 @@ function GeoLocationBox({ geo }: Readonly<{ geo: GeoLocation | null }>) {
               !!geo?.subnational?.length &&
               geo?.subnational?.length > 0 && (
                 <>
-                  {geo?.subnational.map((s) => (
-                    <div key={s.country}>
+                  {geo?.subnational.map((s, i) => {
+                    const countryName = getDisplayText(s.country);
+                    if (!countryName) return null;
+                    return (
+                    <div key={`${countryName}-${i}`}>
                       <p className="font-bold text-[#1d1d1d] leading-[1.15]">
-                        States specified of {s.country} for this result:
+                        States specified of {countryName} for this result:
                       </p>
                       <div className="text-[#393939] text-[10px] flex flex-wrap gap-x-2 gap-y-1 mt-1">
-                        {s.subnationals.map((sn) => (
-                          <div
-                            key={`${s.country}-${sn}`}
-                            className="leading-normal flex items-center gap-0.5"
-                          >
-                            <Dot size={15} />
-                            {sn}
-                          </div>
-                        ))}
+                        {s.subnationals.map((sn, snIndex) => {
+                          const subnationalName = getDisplayText(sn);
+                          if (!subnationalName) return null;
+                          return (
+                            <div
+                              key={`${countryName}-${subnationalName}-${snIndex}`}
+                              className="leading-normal flex items-center gap-0.5"
+                            >
+                              <Dot size={15} />
+                              {subnationalName}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-                  ))}
+                  );
+                  })}
                 </>
               )}
           </div>
