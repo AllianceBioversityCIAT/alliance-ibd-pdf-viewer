@@ -14,6 +14,7 @@ function walk(dir: string): TemplateInfo[] {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) {
+      if (entry === "shared") continue;
       // Folder-based template: directory contains template.tsx
       const templateFile = join(full, "template.tsx");
       if (existsSync(templateFile)) {
