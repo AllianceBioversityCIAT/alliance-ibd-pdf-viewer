@@ -256,16 +256,70 @@ http://localhost:3000/results_summary_v2?demo=true&paperHeight=1000&debug=true
 
 The backend never touches the viewer or Gotenberg directly. It talks to a microservice called **`reports-microservice`** (`one-cgiar-microservices/reports-microservice`, branch `001-gotenberg-url-pdf`) that orchestrates the whole pipeline.
 
+## 2.0 Before you start — ask the platform team for these
+
+You **cannot** implement the integration with just this README. You also need a handful of values that live outside this repo. Before writing any code, request them from the platform / infrastructure team and store them somewhere safe (a vault, your `.env`, etc.):
+
+| What to ask for | Why you need it | Required? |
+|---|---|---|
+| **`reports-microservice` base URL** | To call `POST /pdf/subscribe-application` (CLARISA onboarding) once, and to debug via HTTP / Swagger if needed. | ✅ Required |
+| **`RABBITMQ_URL`** | The broker URL the microservice is listening on. Your backend will connect to the same broker. | ✅ Required |
+| **`REPORT_QUEUE` name** | The exact final queue name the microservice consumes from (it is composed internally as `${QUEUE_NAME}reports_queue`; the team will give you the resolved value). | ✅ Required |
+| **CLARISA credentials for your application** (`MS_REPORTS_USER`, `MS_REPORTS_PASSWORD`) | Returned by `POST /pdf/subscribe-application` (Step 1 below). They go into the `credentials` field of every `pdf.generateUrl` payload. | ✅ Required |
+| **S3 bucket name** (`AWS_BUCKET_NAME`) | Destination bucket where the microservice will upload the generated PDFs. The team will confirm whether you reuse an existing bucket or get a new one. | ✅ Required |
+| **PDF Viewer base URL** (this repo's deployment) | Only needed for two things: (a) previewing your templates while developing, (b) emergency debugging. The runtime flow does **not** require your backend to know this URL — the microservice does. | ⚪ Optional |
+| **Gotenberg base URL** | Only relevant if you ever decide to bypass the microservice and call Gotenberg directly. Default answer: **don't bypass it**. The microservice already handles auth, S3 upload, and notifications. | ⚪ Optional |
+| **Slack webhook channel (read access)** | So you can watch success/failure notifications from the microservice while you integrate. | ⚪ Optional |
+
+> 🔒 None of these values should be hardcoded, logged, or committed. Treat them like any other production secret. Use constant-time comparisons when handling secret headers; rotate on any suspected leak.
+
+**One-line summary of what each piece does:**
+
+```
+RABBITMQ_URL          → where you connect your RMQ client
+REPORT_QUEUE          → which queue your messages land on
+MS_REPORTS_USER/PASS  → who you are (CLARISA validates this)
+AWS_BUCKET_NAME       → where the PDF will be uploaded
+templateName (payload) → which template the viewer should render
+data (payload)        → what the template will see as its `data` prop
+```
+
 ## 2.1 What does `reports-microservice` do?
 
 It exposes a RabbitMQ message pattern called **`pdf.generateUrl`**. When it receives one:
 
-1. Takes the `data` from the payload and POSTs it to `{viewer}/api/data` with the `x-api-secret` header. The viewer stores the data in DynamoDB and returns an object (typically `{ uuid: "..." }`).
-2. Builds the viewer URL: `{viewer}/{templateName}?{viewer-response-as-query-params}` → e.g. `https://viewer-host/results_p25?uuid=8f0b5a72-...`
-3. Calls Gotenberg (`{gotenberg}/forms/chromium/convert/url`) with that URL + `paperWidth` + `paperHeight` + margins.
-4. Gotenberg navigates the URL, waits for the render to settle, and captures the PDF.
-5. The microservice uploads the PDF to **S3** and answers back to the consumer with `{ data: { url: "https://bucket.s3.amazonaws.com/file.pdf" } }`.
-6. Notifies success or failure via Slack.
+1. Validates the `credentials` field against CLARISA. Rejects with `Unauthorized` if invalid.
+2. Takes the `data` from the payload and POSTs it to `{viewer}/api/data` with the `x-api-secret` header. The viewer stores the data in DynamoDB and returns an object (typically `{ uuid: "..." }`).
+3. Builds the viewer URL: `{viewer}/{templateName}?{viewer-response-as-query-params}` → e.g. `https://viewer-host/results_p25?uuid=8f0b5a72-...`
+4. Calls Gotenberg (`{gotenberg}/forms/chromium/convert/url`) with that URL + `paperWidth` + `paperHeight` + margins.
+5. Gotenberg navigates the URL, waits for the render to settle, and captures the PDF.
+6. The microservice uploads the PDF to **S3** (bucket from the payload) and answers back to the consumer with `{ data: { url: "https://bucket.s3.amazonaws.com/file.pdf" } }`.
+7. Notifies success or failure via Slack.
+
+### What's inside vs. outside your backend
+
+Everything in **light gray** below is owned by the platform team — your backend doesn't manage any of it:
+
+```
+YOUR BACKEND                                  ┊  PLATFORM-OWNED
+                                              ┊
+[ build `data` object ]                       ┊  reports-microservice
+       │                                      ┊       │
+       │  pdf.generateUrl                     ┊       ├─► viewer (POST /api/data → uuid)
+       │  { data, templateName,               ┊       ├─► viewer (GET /{template}?uuid=...)
+       │    paperWidth, paperHeight,          ┊       ├─► Gotenberg (POST /forms/chromium/convert/url)
+       │    bucketName, fileName,             ┊       ├─► S3 (PutObject)
+       │    credentials }                     ┊       └─► Slack (notification)
+       ▼                                      ┊       │
+   RabbitMQ broker  ────────────────────────► ┊  reports-microservice
+       ▲                                      ┊       │
+       │  { data: { url } }                   ┊       │
+       └────────────────────────────────────── ┊ ◄─────┘
+                                              ┊
+[ persist / return URL to caller ]            ┊
+```
+
+You only build the payload, send it, and consume the response URL. You never construct viewer URLs, never call Gotenberg, never sign S3 uploads.
 
 ## 2.2 Real example: how the **reporting** backend uses it
 
@@ -352,12 +406,18 @@ The reporting backend **knows nothing about Gotenberg, DynamoDB, or the viewer**
 
 The procedure is **identical** to reporting. Concrete steps:
 
-### Step 1. Register the consumer in CLARISA
+### Step 1. Register the consumer in CLARISA (one-time onboarding)
 
-Before anything else, START needs valid CLARISA credentials so the microservice accepts its messages. This is done **once**:
+Before anything else, START needs valid CLARISA credentials so the microservice accepts its messages. This is done **once** per environment (TEST and PROD separately).
+
+**Required input** (ask the platform team for these — see §2.0):
+- The `reports-microservice` base URL.
+- Confirmation of your application's acronym in CLARISA (e.g. `ARI` for alliance-research-indicators).
+
+**Call:**
 
 ```http
-POST {reports-microservice-url}/pdf/subscribe-application
+POST {reports-microservice-base-url}/pdf/subscribe-application
 Content-Type: application/json
 
 {
@@ -366,7 +426,9 @@ Content-Type: application/json
 }
 ```
 
-This returns a `username` / `password`. Store them as `MS_REPORTS_USER` and `MS_REPORTS_PASSWORD` in the START backend `.env`.
+**Response:** a `username` / `password` pair issued by CLARISA. Store them as `MS_REPORTS_USER` and `MS_REPORTS_PASSWORD` in your `.env` — they go into the `credentials` field of every `pdf.generateUrl` payload.
+
+> Run this once per environment. The credentials never expire automatically but can be revoked by CLARISA admins — coordinate rotations with the platform team.
 
 ### Step 2. Install packages
 
