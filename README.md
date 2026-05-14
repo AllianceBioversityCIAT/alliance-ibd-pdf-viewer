@@ -1,27 +1,27 @@
 # CGIAR PDF Generator — Tutorial
 
-Next.js (App Router) que **renderiza templates HTML** para que **Gotenberg** (headless Chrome) los capture como PDF. Los templates son componentes React `.tsx` que reciben un `data` prop.
+Next.js (App Router) service that **renders HTML templates** so **Gotenberg** (headless Chromium) can capture them as PDFs. Templates are React `.tsx` components that receive a `data` prop.
 
-Este README es un tutorial práctico con dos partes:
+This README is a hands-on tutorial in two parts:
 
-1. **Cómo y dónde se crean los templates** (en este repo).
-2. **Cómo un back consume Gotenberg para generar el PDF** — con el back de **reporting** (`onecgiar-pr-server`) como ejemplo real, y la guía para que el back de **START** (`alliance-research-indicators`) lo replique.
+1. **How and where to create templates** (in this repo).
+2. **How a backend generates a PDF using Gotenberg** — with the **reporting** backend (`onecgiar-pr-server`) as the live example, and a step-by-step guide for the **START** backend (`alliance-research-indicators`) to do the same.
 
-> Para reglas de autoría avanzada (paginación, defensive coding, brand tokens) ver [`CLAUDE.md`](./CLAUDE.md). Este README cubre el contrato público y el flujo end-to-end.
+> For advanced authoring rules (pagination engine, defensive coding, brand tokens) see [`CLAUDE.md`](./CLAUDE.md). This README covers the public contract and the end-to-end flow.
 
 ---
 
-## 0. Visión general en una imagen
+## 0. Big picture in one diagram
 
 ```
 ┌────────────────────┐  1. RabbitMQ msg                ┌──────────────────────┐
-│  Back consumidor   │  pdf.generateUrl                │  reports-microservice│
-│  (reporting,       │ ──────────────────────────────► │   (orquestador)      │
+│  Consumer backend  │  pdf.generateUrl                │  reports-microservice│
+│  (reporting,       │ ──────────────────────────────► │   (orchestrator)     │
 │   START, ...)      │ ◄────── { data: { url } } ───── │                      │
-└────────────────────┘                                 │  - valida CLARISA    │
-                                                       │  - habla con viewer  │
-                                                       │  - habla con Gotenberg│
-                                                       │  - sube a S3         │
+└────────────────────┘                                 │  - validates CLARISA │
+                                                       │  - calls the viewer  │
+                                                       │  - calls Gotenberg   │
+                                                       │  - uploads to S3     │
                                                        └──────────────────────┘
                                                           │              │
                                               2. POST     │              │ 3. POST URL
@@ -30,11 +30,11 @@ Este README es un tutorial práctico con dos partes:
                                                    │ PDF Viewer│  │  Gotenberg │
                                                    │ (Next.js) │◄─│ (headless  │
                                                    │           │  │  Chromium) │
-                                                   │ - guarda  │  │            │
-                                                   │   data    │  │ - navega   │
-                                                   │   con uuid│  │   viewer   │
-                                                   │ - render  │  │ - captura  │
-                                                   │   /{tpl}  │  │   como PDF │
+                                                   │ - stores  │  │            │
+                                                   │   data    │  │ - navigates│
+                                                   │   by uuid │  │   viewer   │
+                                                   │ - renders │  │ - captures │
+                                                   │   /{tpl}  │  │   as PDF   │
                                                    └──────────┘   └────────────┘
                                                                        │ 4. PDF binary
                                                                        ▼
@@ -43,40 +43,40 @@ Este README es un tutorial práctico con dos partes:
                                                                   └──────────┘
 ```
 
-**El back consumidor nunca habla con el viewer ni con Gotenberg directamente.** Solo manda un mensaje al `reports-microservice` indicando *qué template* usar y *qué datos* renderizar. Todo el resto es transparente.
+**The consumer backend never talks directly to the viewer or to Gotenberg.** It just sends a message to `reports-microservice` saying *which template* to use and *what data* to render. Everything else is transparent.
 
 ---
 
-# Parte 1 — Tutorial: cómo crear un template
+# Part 1 — Tutorial: how to create a template
 
-Cada template es una carpeta o un archivo `.tsx` dentro de `app/templates/{proyecto}/...`. El viewer los descubre automáticamente — **no hay registro manual**.
+Every template is a folder or a single `.tsx` file inside `app/templates/{project}/...`. The viewer discovers them automatically — **there is no manual registry**.
 
-## 1.1 Decidir el tipo de template
+## 1.1 Pick the template type
 
-| Tipo | Cuándo usarlo | Estructura |
+| Type | When to use it | Structure |
 |---|---|---|
-| **File-based** | Templates simples, una sola página, sin componentes compartidos. | `app/templates/{proyecto}/{nombre}.tsx` |
-| **Folder-based** | Templates complejos con componentes compartidos, tipos, transformaciones. | `app/templates/{proyecto}/{nombre}/template.tsx` + `types.ts`, `transform.ts`, `components/` |
+| **File-based** | Simple templates, single-page, no shared components. | `app/templates/{project}/{name}.tsx` |
+| **Folder-based** | Complex templates with shared components, types, and data transforms. | `app/templates/{project}/{name}/template.tsx` + `types.ts`, `transform.ts`, `components/` |
 
-> **Tip:** si dudas, usa folder-based. Es más fácil agregar piezas después.
+> **Tip:** when in doubt, go folder-based. It's easier to add pieces later.
 
-## 1.2 Paso a paso — template **file-based**
+## 1.2 Step by step — **file-based** template
 
-### Paso 1. Crear el archivo
+### Step 1. Create the file
 
 `app/templates/start/result-summary.tsx`
 
 ```tsx
 import type { TemplateProps } from "@/app/templates";
 
-// 1. Define la forma del JSON que tu back va a enviar
+// 1. Define the JSON shape your backend will send
 interface ResultSummaryData {
   result_name: string;
   phase_name: string;
   indicators: Array<{ id: number; name: string; value: number }>;
 }
 
-// 2. Exporta el componente por default
+// 2. Export the component as default
 export default function ResultSummary({ data }: TemplateProps) {
   const d = data as ResultSummaryData;
 
@@ -85,7 +85,7 @@ export default function ResultSummary({ data }: TemplateProps) {
       <h1>{d.result_name ?? "Untitled result"}</h1>
       <p>Phase: {d.phase_name ?? "—"}</p>
 
-      {/* Defensive: nunca asumas que un array existe */}
+      {/* Defensive: never assume an array exists */}
       {!!d.indicators?.length && (
         <table>
           <thead>
@@ -106,7 +106,7 @@ export default function ResultSummary({ data }: TemplateProps) {
 }
 ```
 
-### Paso 2. (Opcional) Crear el JSON de demo
+### Step 2. (Optional) Create a demo JSON
 
 `app/templates/start/result-summary.demo.json`
 
@@ -121,37 +121,37 @@ export default function ResultSummary({ data }: TemplateProps) {
 }
 ```
 
-### Paso 3. Verificar en el browser
+### Step 3. Verify in the browser
 
 ```bash
 npm run dev
-# Abrir: http://localhost:3000/result-summary?demo=true
+# Open: http://localhost:3000/result-summary?demo=true
 ```
 
-Si se ve bien, el template **ya está disponible** como `result-summary` para cualquier back. Aparecerá automáticamente en `GET /api/templates`.
+If it renders correctly, the template is **already available** as `result-summary` for any consumer backend. It will show up automatically in `GET /api/templates`.
 
-## 1.3 Paso a paso — template **folder-based**
+## 1.3 Step by step — **folder-based** template
 
-### Paso 1. Crear la carpeta del template
+### Step 1. Create the template folder
 
 ```
 app/templates/start/results_summary_v2/
-├── template.tsx              ← entry point (el viewer lo descubre como "results_summary_v2")
-├── types.ts                  ← interfaces TypeScript
-├── transform.ts              ← parsers / sanitizadores de la data cruda
-├── template.demo.json        ← data de prueba para ?demo=true
+├── template.tsx              ← entry point (discovered as "results_summary_v2")
+├── types.ts                  ← TypeScript interfaces
+├── transform.ts              ← parsers / sanitizers for raw data
+├── template.demo.json        ← test data for ?demo=true
 └── components/
     ├── header.tsx
     └── indicator-table.tsx
 ```
 
-### Paso 2. Definir tipos en `types.ts`
+### Step 2. Define types in `types.ts`
 
 ```ts
 export interface RawResultData {
   result_name?: string;
   phase_name?: string;
-  indicators?: unknown;       // puede venir raro desde el back
+  indicators?: unknown;       // may arrive in unexpected shapes from the backend
 }
 
 export interface DisplayResult {
@@ -161,7 +161,7 @@ export interface DisplayResult {
 }
 ```
 
-### Paso 3. Saneamiento en `transform.ts`
+### Step 3. Sanitize in `transform.ts`
 
 ```ts
 import type { RawResultData, DisplayResult } from "./types";
@@ -185,7 +185,7 @@ export function transformResult(raw: RawResultData): DisplayResult {
 }
 ```
 
-### Paso 4. Componer en `template.tsx`
+### Step 4. Compose in `template.tsx`
 
 ```tsx
 import type { TemplateProps } from "@/app/templates";
@@ -201,7 +201,7 @@ export default function ResultsSummaryV2({ data }: TemplateProps) {
     <div style={{ fontFamily: "'Noto Sans', Arial, sans-serif" }}>
       <Header title={view.resultName} subtitle={view.phaseName} />
 
-      {/* data-paginator-block: el bloque debe permanecer junto al cortar páginas */}
+      {/* data-paginator-block: this block must stay together when pages are cut */}
       <div data-paginator-block>
         <h2>Indicators</h2>
         <IndicatorTable rows={view.indicators} />
@@ -211,7 +211,7 @@ export default function ResultsSummaryV2({ data }: TemplateProps) {
 }
 ```
 
-### Paso 5. JSON demo
+### Step 5. Demo JSON
 
 `template.demo.json`
 
@@ -226,52 +226,52 @@ export default function ResultsSummaryV2({ data }: TemplateProps) {
 }
 ```
 
-### Paso 6. Verificar
+### Step 6. Verify
 
 ```
 http://localhost:3000/results_summary_v2?demo=true
 http://localhost:3000/results_summary_v2?demo=true&paperHeight=1000&debug=true
 ```
 
-## 1.4 Reglas obligatorias de los templates
+## 1.4 Mandatory template rules
 
-| Regla | Por qué |
+| Rule | Why |
 |---|---|
-| **Flow layout** (flexbox / block). Nunca `position: absolute` que fije contenido a una altura. | El contenido debe poder crecer en múltiples páginas. |
-| **Todo el texto y URLs vienen del `data` prop.** | Los templates son data-driven; no hardcodear copy. |
-| **`?.` y `?? []` en todas partes. Nunca `!` (non-null assertion).** | El JSON real puede tener campos `null`, ausentes o de tipo incorrecto. El template no debe crashear. |
-| **`transform.ts` es la primera defensa.** | Sanea inputs ahí; los componentes usan defensive coding como segunda defensa. |
-| **`data-paginator-block`** en grupos indivisibles (grids, heading + tabla, cards). | El paginador no parte estos bloques al cortar páginas. |
-| **No nombres reservados de Next** (`layout.tsx`, `page.tsx`, `loading.tsx`) dentro de `app/`. | Next los toma como rutas. |
+| **Flow layout** (flexbox / block). Never `position: absolute` that locks content to a fixed height. | Content must be free to grow across pages. |
+| **All text and URLs must come from the `data` prop.** | Templates are data-driven; never hardcode copy. |
+| **Use `?.` and `?? []` everywhere. Never `!` (non-null assertion).** | Real JSON can have `null`, missing, or wrongly typed fields. The template must not crash. |
+| **`transform.ts` is the first defense.** | Sanitize inputs there; components use defensive coding as the second defense. |
+| **`data-paginator-block`** on indivisible groups (grids, heading + table pairs, cards). | The paginator will not split these blocks across pages. |
+| **No Next.js reserved names** (`layout.tsx`, `page.tsx`, `loading.tsx`) inside `app/`. | Next will treat them as route files. |
 
-## 1.5 Cómo se "publica" un template nuevo
+## 1.5 How a new template becomes "published"
 
-1. Mergear y desplegar el viewer.
-2. Verificar que aparece en `GET /api/templates`.
-3. **Listo.** El back consumidor ya puede referenciarlo por `templateName`. No hay que tocar nada más en el viewer.
+1. Merge and deploy the viewer.
+2. Confirm it appears in `GET /api/templates`.
+3. **Done.** Any consumer backend can now reference it by `templateName`. Nothing else to touch.
 
 ---
 
-# Parte 2 — Tutorial: cómo un back genera un PDF
+# Part 2 — Tutorial: how a backend generates a PDF
 
-El back nunca toca al viewer ni a Gotenberg directamente. Habla con un microservicio llamado **`reports-microservice`** (`CIAT/one-cgiar-microservices/reports-microservice`, rama `001-gotenberg-url-pdf`) que orquesta todo.
+The backend never touches the viewer or Gotenberg directly. It talks to a microservice called **`reports-microservice`** (`one-cgiar-microservices/reports-microservice`, branch `001-gotenberg-url-pdf`) that orchestrates the whole pipeline.
 
-## 2.1 ¿Qué hace el `reports-microservice`?
+## 2.1 What does `reports-microservice` do?
 
-El microservicio expone un patrón de mensajes RabbitMQ llamado **`pdf.generateUrl`**. Cuando recibe uno:
+It exposes a RabbitMQ message pattern called **`pdf.generateUrl`**. When it receives one:
 
-1. Toma la `data` del payload y la envía a `POST {viewer}/api/data` con el header `x-api-secret`. El viewer guarda la data en DynamoDB y devuelve un objeto (típicamente `{ uuid: "..." }`).
-2. Construye la URL del viewer: `{viewer}/{templateName}?{respuesta-del-viewer-como-query-params}` → ej: `https://viewer-host/results_p25?uuid=8f0b5a72-...`
-3. Llama a Gotenberg (`{gotenberg}/forms/chromium/convert/url`) con esa URL + `paperWidth` + `paperHeight` + márgenes.
-4. Gotenberg navega la URL, espera a que el render termine, captura el PDF.
-5. El microservicio sube el PDF a **S3** y devuelve al back `{ data: { url: "https://bucket.s3.amazonaws.com/file.pdf" } }`.
-6. Notifica por Slack éxito o fallo.
+1. Takes the `data` from the payload and POSTs it to `{viewer}/api/data` with the `x-api-secret` header. The viewer stores the data in DynamoDB and returns an object (typically `{ uuid: "..." }`).
+2. Builds the viewer URL: `{viewer}/{templateName}?{viewer-response-as-query-params}` → e.g. `https://viewer-host/results_p25?uuid=8f0b5a72-...`
+3. Calls Gotenberg (`{gotenberg}/forms/chromium/convert/url`) with that URL + `paperWidth` + `paperHeight` + margins.
+4. Gotenberg navigates the URL, waits for the render to settle, and captures the PDF.
+5. The microservice uploads the PDF to **S3** and answers back to the consumer with `{ data: { url: "https://bucket.s3.amazonaws.com/file.pdf" } }`.
+6. Notifies success or failure via Slack.
 
-## 2.2 Ejemplo real: cómo lo usa el back de **reporting**
+## 2.2 Real example: how the **reporting** backend uses it
 
-Archivo: `onecgiar-pr-server/src/api/platform-report/`.
+File: `onecgiar-pr-server/src/api/platform-report/`.
 
-### A. Registrar el cliente RabbitMQ en el módulo
+### A. Register the RabbitMQ client in the module
 
 ```ts
 // platform-report.module.ts
@@ -285,7 +285,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         transport: Transport.RMQ,
         options: {
           urls: [env.RABBITMQ_URL],
-          queue: env.REPORT_QUEUE,         // queue compartida con el microservicio
+          queue: env.REPORT_QUEUE,         // queue shared with the microservice
           queueOptions: { durable: true },
         },
       },
@@ -297,10 +297,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 export class PlatformReportModule {}
 ```
 
-### B. Conectar al arrancar y enviar el mensaje
+### B. Connect on bootstrap and send the message
 
 ```ts
-// platform-report.service.ts (extracto del flow P25)
+// platform-report.service.ts (P25 flow excerpt)
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
@@ -308,7 +308,7 @@ import { firstValueFrom } from 'rxjs';
 @Injectable()
 export class PlatformReportService implements OnModuleInit {
 
-  // Credenciales del back (consumer) emitidas por CLARISA
+  // Consumer backend credentials issued by CLARISA
   private readonly credentials = JSON.stringify({
     username: env.MS_REPORTS_USER,
     password: env.MS_REPORTS_PASSWORD,
@@ -322,16 +322,16 @@ export class PlatformReportService implements OnModuleInit {
 
   async generateP25Pdf(resultData: Record<string, unknown>) {
     const payload = {
-      data: resultData,                 // lo que el template va a renderizar
-      templateName: 'results_p25',      // ← uno de los templates de ESTE viewer
+      data: resultData,                 // what the template will render
+      templateName: 'results_p25',      // ← one of the templates in THIS viewer
       paperWidth: '600px',
       paperHeight: '1000px',
       bucketName: env.AWS_BUCKET_NAME,
       fileName: 'PRMS-Result-1234_P25.pdf',
-      credentials: this.credentials,    // CLARISA valida esto en el microservicio
+      credentials: this.credentials,    // CLARISA validates this in the microservice
     };
 
-    // Patrón request/response: el microservicio responde con la URL del PDF en S3
+    // Request/response pattern: the microservice replies with the S3 URL of the PDF
     const response = await firstValueFrom(
       this.client.send<{ data: { url: string } }>('pdf.generateUrl', payload),
     );
@@ -344,42 +344,42 @@ export class PlatformReportService implements OnModuleInit {
 }
 ```
 
-### C. Eso es todo
+### C. That's it
 
-El back de reporting **no sabe nada de Gotenberg, DynamoDB, ni del viewer**. Solo manda el mensaje `pdf.generateUrl` con `data` + `templateName` + nombre/bucket. Recibe la URL del PDF lista para usar.
+The reporting backend **knows nothing about Gotenberg, DynamoDB, or the viewer**. It just sends the `pdf.generateUrl` message with `data` + `templateName` + bucket / filename. It receives the ready-to-use URL of the generated PDF.
 
-## 2.3 Cómo lo haría el back de **START** (`alliance-research-indicators`)
+## 2.3 How the **START** backend (`alliance-research-indicators`) would do it
 
-El procedimiento es **idéntico** al de reporting. Estos son los pasos concretos:
+The procedure is **identical** to reporting. Concrete steps:
 
-### Paso 1. Registrar el consumer en CLARISA
+### Step 1. Register the consumer in CLARISA
 
-Antes que nada, START necesita credenciales válidas en CLARISA para que el microservicio acepte sus mensajes. Esto se hace **una sola vez**:
+Before anything else, START needs valid CLARISA credentials so the microservice accepts its messages. This is done **once**:
 
 ```http
 POST {reports-microservice-url}/pdf/subscribe-application
 Content-Type: application/json
 
 {
-  "acronym": "ARI",      // acrónimo de alliance-research-indicators en CLARISA
+  "acronym": "ARI",      // alliance-research-indicators acronym in CLARISA
   "environment": "TEST"  // TEST | PROD
 }
 ```
 
-Esto devuelve un `username` / `password`. Guardarlos como `MS_REPORTS_USER` y `MS_REPORTS_PASSWORD` en el `.env` de START.
+This returns a `username` / `password`. Store them as `MS_REPORTS_USER` and `MS_REPORTS_PASSWORD` in the START backend `.env`.
 
-### Paso 2. Instalar paquetes
+### Step 2. Install packages
 
 ```bash
 npm install @nestjs/microservices amqplib amqp-connection-manager
 ```
 
-### Paso 3. Registrar el cliente RMQ
+### Step 3. Register the RMQ client
 
-Igual que en reporting:
+Same as reporting:
 
 ```ts
-// reports.module.ts (en alliance-research-indicators)
+// reports.module.ts (in alliance-research-indicators)
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
@@ -400,10 +400,10 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 export class ReportsModule {}
 ```
 
-### Paso 4. Inyectar el cliente y enviar el mensaje
+### Step 4. Inject the client and send the message
 
 ```ts
-// reports.service.ts (en alliance-research-indicators)
+// reports.service.ts (in alliance-research-indicators)
 @Injectable()
 export class ReportsService implements OnModuleInit {
 
@@ -419,14 +419,14 @@ export class ReportsService implements OnModuleInit {
   }
 
   async generatePdfForResult(resultId: number) {
-    // 1. Recolectar la data que el template necesita
+    // 1. Gather the data the template needs
     const data = await this.buildResultData(resultId);
 
-    // 2. Disparar la generación
+    // 2. Trigger generation
     const response = await firstValueFrom(
       this.client.send<{ data: { url: string } }>('pdf.generateUrl', {
         data,
-        templateName: 'results_summary_v2',    // ← el template que crearon en el viewer
+        templateName: 'results_summary_v2',    // ← the template you created in the viewer
         paperWidth: '600px',
         paperHeight: '1000px',
         bucketName: env.AWS_BUCKET_NAME,
@@ -440,70 +440,70 @@ export class ReportsService implements OnModuleInit {
 }
 ```
 
-### Paso 5. Variables de entorno necesarias en START
+### Step 5. Environment variables needed in START
 
 ```env
 RABBITMQ_URL=
-REPORT_QUEUE=               # debe coincidir con la del microservicio
-MS_REPORTS_USER=            # devuelto por subscribe-application
-MS_REPORTS_PASSWORD=        # devuelto por subscribe-application
-AWS_BUCKET_NAME=            # bucket S3 donde se subirá el PDF
+REPORT_QUEUE=               # must match the microservice queue
+MS_REPORTS_USER=            # returned by subscribe-application
+MS_REPORTS_PASSWORD=        # returned by subscribe-application
+AWS_BUCKET_NAME=            # S3 bucket where the PDF will be uploaded
 ```
 
-> 🔒 Nunca loguear ni commitear estos valores.
+> 🔒 Never log or commit these values.
 
-### Paso 6. Si START necesita un template nuevo
+### Step 6. If START needs a new template
 
-1. Crear el template en este repo (`alliance-ibd-pdf-viewer`) siguiendo la **Parte 1**.
-2. Mergear y desplegar.
-3. Referenciarlo por nombre en el payload (`templateName: 'mi-template-nuevo'`).
+1. Create the template in this repo (`alliance-ibd-pdf-viewer`) following **Part 1**.
+2. Merge and deploy.
+3. Reference it by name in the payload (`templateName: 'my-new-template'`).
 
-No hay que tocar el microservicio para agregar templates — el viewer y el microservicio están desacoplados.
+You don't need to touch the microservice to add templates — the viewer and the microservice are decoupled.
 
-## 2.4 Resumen de responsabilidades
+## 2.4 Responsibilities summary
 
-| Componente | Responsabilidad |
+| Component | Responsibility |
 |---|---|
-| **Back consumidor** (reporting, START, …) | Construir la `data` y mandar el mensaje `pdf.generateUrl` con `templateName`, paper size, bucket, fileName, credentials. |
-| **`reports-microservice`** | Validar CLARISA, llamar `/api/data` del viewer, construir la URL, llamar a Gotenberg, subir a S3, notificar por Slack. |
-| **PDF Viewer** (este repo) | Guardar la data en DynamoDB (`POST /api/data`), renderizar el template (`GET /{template}`). |
-| **Gotenberg** | Navegar la URL del viewer, esperar el render, devolver el PDF binario. |
-| **S3** | Almacenar el PDF final. |
+| **Consumer backend** (reporting, START, …) | Build the `data` and emit the `pdf.generateUrl` message with `templateName`, paper size, bucket, fileName, credentials. |
+| **`reports-microservice`** | Validate CLARISA, call the viewer's `/api/data`, build the URL, call Gotenberg, upload to S3, notify via Slack. |
+| **PDF Viewer** (this repo) | Store the data in DynamoDB (`POST /api/data`), render the template (`GET /{template}`). |
+| **Gotenberg** | Navigate the viewer URL, wait for the render, return the PDF binary. |
+| **S3** | Store the final PDF. |
 
 ---
 
-# Apéndice — Referencia API del viewer
+# Appendix — Viewer API reference
 
-Aunque el back **no debería** llamar al viewer directamente (todo va vía el microservicio), aquí está el contrato por completitud.
+The backend **should not** call the viewer directly (everything goes through the microservice), but here is the contract for completeness.
 
 ## Endpoints
 
-| Método | Path | Auth header | Para qué |
+| Method | Path | Auth header | Purpose |
 |---|---|---|---|
-| `POST` | `/api/data` | `x-api-secret` o `x-admin-secret` | Guarda JSON en DynamoDB. Devuelve `{ uuid }`. |
-| `GET` | `/{template}` | (pública; trae `uuid` en query) | Renderiza el template HTML para Gotenberg. |
-| `GET` | `/api/templates` | (pública) | Lista templates descubiertos. |
-| `GET` | `/api/list` | `x-admin-secret` | Lista items en DynamoDB (debug). |
-| `POST` | `/api/delete` | `x-admin-secret` | Borra item por `id`. |
+| `POST` | `/api/data` | `x-api-secret` or `x-admin-secret` | Stores a JSON payload in DynamoDB. Returns `{ uuid }`. |
+| `GET` | `/{template}` | (public; carries `uuid` in the query) | Renders the template HTML for Gotenberg. |
+| `GET` | `/api/templates` | (public) | Lists discovered templates. |
+| `GET` | `/api/list` | `x-admin-secret` | Lists items currently in DynamoDB (debug). |
+| `POST` | `/api/delete` | `x-admin-secret` | Deletes an item by `id`. |
 
-## Query params de `/{template}`
+## Query params of `/{template}`
 
-| Param | Efecto |
+| Param | Effect |
 |---|---|
-| `uuid` | UUID devuelto por `/api/data`. **One-shot**: tras renderizar exitosamente se borra. |
-| `demo=true` | Carga `template.demo.json` local (ignora `uuid`). |
-| `test=true` | Renderiza pero NO borra el item de DynamoDB. Útil para debugging. |
-| `paperWidth` | Ancho del contenedor (px). Default `600`. Clamp `[100, 5000]`. |
-| `paperHeight` | Alto del contenedor (px). **Requerido para activar paginación**. |
-| `noPaginate=true` | Desactiva el paginador aunque haya `paperHeight`. |
-| `debug=true` | Dibuja líneas de corte, footer zone, content start (rojo/naranja/verde). |
+| `uuid` | UUID returned by `/api/data`. **One-shot**: the item is deleted after a successful render. |
+| `demo=true` | Loads the local `template.demo.json` (ignores `uuid`). |
+| `test=true` | Renders but does NOT delete the DynamoDB item. Useful for debugging. |
+| `paperWidth` | Container width (px). Default `600`. Clamped to `[100, 5000]`. |
+| `paperHeight` | Container height (px). **Required to enable pagination**. |
+| `noPaginate=true` | Disables the paginator even when `paperHeight` is set. |
+| `debug=true` | Draws cut lines, footer zone, content start markers (red/orange/green). |
 
-## Variables de entorno del viewer
+## Viewer environment variables
 
 ```env
-# Auth
-API_SECRET=             # lo usa el microservicio (header x-api-secret)
-ADMIN_SECRET=           # lo usa la UI admin de este repo
+# Authentication
+API_SECRET=             # consumed by the microservice (header x-api-secret)
+ADMIN_SECRET=           # consumed by this repo's admin UI
 
 # DynamoDB
 AWS_REGION=
@@ -512,47 +512,47 @@ AWS_SECRET_ACCESS_KEY=
 DYNAMODB_TABLE_NAME=
 ```
 
-## Variables de entorno del microservicio (`reports-microservice`)
+## Microservice environment variables (`reports-microservice`)
 
-Las relevantes para el flow Gotenberg (ver `gotenberg.service.ts`):
+Gotenberg flow vars (see `gotenberg.service.ts`):
 
 ```env
-GOTENBERG_URL=                 # base de Gotenberg
-PDF_TEMPLATE_BASE_URL=         # base de ESTE viewer
-GOTENBERG_PAPER_WIDTH=600px    # default si el back no lo manda
+GOTENBERG_URL=                 # Gotenberg base URL
+PDF_TEMPLATE_BASE_URL=         # base URL of THIS viewer
+GOTENBERG_PAPER_WIDTH=600px    # default when the backend does not send one
 GOTENBERG_PAPER_HEIGHT=1000px
 GOTENBERG_MARGIN_TOP=0
 GOTENBERG_MARGIN_BOTTOM=0
 GOTENBERG_MARGIN_LEFT=0
 GOTENBERG_MARGIN_RIGHT=0
 GOTENBERG_PRINT_BACKGROUND=true
-API_SECRET=                    # debe coincidir con el del viewer
+API_SECRET=                    # must match the viewer's
 ```
 
 ---
 
-## Local development del viewer
+## Local development of the viewer
 
 ```bash
 npm install
-cp .env.example .env   # llenar con valores reales
+cp .env.example .env   # fill with real values
 npm run dev            # http://localhost:3000
 ```
 
-Útiles mientras desarrollas un template:
+Handy URLs while developing a template:
 
-| URL | Qué muestra |
+| URL | What it shows |
 |---|---|
-| `/` | Galería de templates. |
-| `/list` | Admin: items en DynamoDB. |
-| `/admin` | Admin UI (inspeccionar/borrar). |
-| `/{template}?demo=true` | Render con demo JSON local. |
-| `/{template}?uuid=...&test=true&debug=true` | Render con data real + overlays de pagination. |
-| `/api/templates` | JSON con templates descubiertos. |
+| `/` | Template gallery. |
+| `/list` | Admin: items in DynamoDB. |
+| `/admin` | Admin UI (inspect/delete). |
+| `/{template}?demo=true` | Renders with the local demo JSON. |
+| `/{template}?uuid=...&test=true&debug=true` | Renders with real data + paginator overlays. |
+| `/api/templates` | JSON list of discovered templates. |
 
 ---
 
-## Estructura del proyecto
+## Project structure
 
 ```
 alliance-ibd-pdf-viewer/
@@ -563,10 +563,10 @@ alliance-ibd-pdf-viewer/
 │   │   ├── templates/route.ts    ← GET  /api/templates
 │   │   ├── list/route.ts         ← GET  /api/list       (x-admin-secret)
 │   │   └── delete/route.ts       ← POST /api/delete     (x-admin-secret)
-│   ├── admin/                    ← UI admin
-│   ├── list/                     ← UI list admin
-│   └── templates/                ← ★ aquí van TODOS los templates (auto-discovery)
-│       ├── index.ts              ← exporta TemplateProps
+│   ├── admin/                    ← admin UI
+│   ├── list/                     ← admin list UI
+│   └── templates/                ← ★ ALL templates live here (auto-discovered)
+│       ├── index.ts              ← exports TemplateProps
 │       ├── reportingtool/
 │       │   ├── results_p25/                ← folder-based
 │       │   ├── results_bilaterals_p25/
@@ -575,22 +575,22 @@ alliance-ibd-pdf-viewer/
 │       ├── aiccra/
 │       └── starter/
 ├── lib/dynamo.ts                 ← putItem / getItem / deleteItem / scanAll
-├── docs/dev/                     ← logs por feature (contexto persistente)
-├── CLAUDE.md                     ← reglas de autoría de templates (lee esto si vas a crear uno complejo)
+├── docs/dev/                     ← per-feature dev logs (persistent context)
+├── CLAUDE.md                     ← template authoring rules (read this if writing a complex template)
 ├── Dockerfile
 └── package.json
 ```
 
 ---
 
-## Referencia rápida
+## Quick reference
 
-| Quieres… | Hacer esto |
+| You want to… | Do this |
 |---|---|
-| Crear un template nuevo | Parte 1 — file-based o folder-based en `app/templates/{proyecto}/`. |
-| Probar un template en el navegador | `/{template}?demo=true` (o `&debug=true` para overlays). |
-| Que un back genere un PDF | Parte 2 — `client.send('pdf.generateUrl', { data, templateName, ... })`. |
-| Que START se conecte por primera vez | Parte 2 — paso 1 (subscribe-application en CLARISA). |
-| Ver qué templates hay disponibles | `GET /api/templates`. |
-| Limpiar items basura en DynamoDB | `/admin` o `POST /api/delete` con `x-admin-secret`. |
-| Rotar el secret del consumer | Actualizar `API_SECRET` en viewer **y** microservicio al mismo tiempo. |
+| Create a new template | Part 1 — file-based or folder-based under `app/templates/{project}/`. |
+| Preview a template in the browser | `/{template}?demo=true` (or `&debug=true` for paginator overlays). |
+| Have a backend generate a PDF | Part 2 — `client.send('pdf.generateUrl', { data, templateName, ... })`. |
+| Onboard START for the first time | Part 2 — step 1 (subscribe-application in CLARISA). |
+| See available templates | `GET /api/templates`. |
+| Clean up stale DynamoDB items | `/admin` or `POST /api/delete` with `x-admin-secret`. |
+| Rotate the consumer secret | Update `API_SECRET` on the viewer **and** the microservice at the same time. |
