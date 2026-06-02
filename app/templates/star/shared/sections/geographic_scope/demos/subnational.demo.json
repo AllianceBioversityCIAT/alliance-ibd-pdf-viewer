@@ -1,0 +1,44 @@
+{
+  "geo_scope_id": "5",
+  "regions": [],
+  "countries": [
+    {
+      "isoAlpha2": "ET",
+      "name": "Ethiopia",
+      "result_countries_sub_nationals": [
+        {
+          "region_id": 101,
+          "sub_national_id": 1001,
+          "name": "Tigray"
+        },
+        {
+          "region_id": 102,
+          "sub_national_id": 1002,
+          "name": "Oromiya"
+        }
+      ]
+    },
+    {
+      "isoAlpha2": "ZA",
+      "name": "South Africa",
+      "result_countries_sub_nationals": [
+        {
+          "region_id": 201,
+          "sub_national_id": 2001,
+          "name": "Eastern Cape"
+        },
+        {
+          "region_id": 202,
+          "sub_national_id": 2002,
+          "name": "Western Cape"
+        },
+        {
+          "region_id": 203,
+          "sub_national_id": 2003,
+          "name": "Gauteng"
+        }
+      ]
+    }
+  ],
+  "comment_geo_scope": ""
+}
