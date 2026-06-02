@@ -16,6 +16,87 @@ interface PaginationConfig {
   firstPage?: {
     marginTop?: number;
   };
+  /** Footer layout variant. Must be a string (serializable) — no functions across server/client boundary. */
+  footerVariant?: "prms" | "star";
+  /** STAR-only: compact footer on all pages except the last */
+  starFooter?: {
+    generalHeight: number;
+    lastHeight: number;
+  };
+}
+
+const STAR_FOOTER_GENERAL = "/assets/star/footer-general.svg";
+const STAR_FOOTER_LAST = "/assets/star/footer.svg";
+
+function getFooterHeight(
+  page: number,
+  totalPages: number | undefined,
+  config: PaginationConfig,
+): number {
+  if (
+    config.footerVariant === "star" &&
+    config.starFooter &&
+    totalPages != null
+  ) {
+    return page === totalPages - 1
+      ? config.starFooter.lastHeight
+      : config.starFooter.generalHeight;
+  }
+  return config.footerHeight;
+}
+
+function buildPageFooterHtml(
+  variant: PaginationConfig["footerVariant"],
+  page: number,
+  totalPages: number,
+): string {
+  if (variant === "star") {
+    const isLastPage = page === totalPages - 1;
+
+    if (isLastPage) {
+      return `
+    <div style="width:100%;box-sizing:border-box;font-family:'Barlow','Noto Sans',Arial,sans-serif;">
+      <img
+        src="${STAR_FOOTER_LAST}"
+        alt=""
+        width="595"
+        height="111"
+        style="display:block;width:100%;height:111px;object-fit:cover;object-position:left bottom;"
+      />
+    </div>
+  `;
+    }
+
+    return `
+    <div style="width:100%;padding:0 37px;box-sizing:border-box;font-family:'Barlow','Noto Sans',Arial,sans-serif;">
+      <div style="position:relative;width:521px;max-width:100%;height:14px;">
+        <img
+          src="${STAR_FOOTER_GENERAL}"
+          alt=""
+          width="521"
+          height="14"
+          style="display:block;width:521px;height:14px;max-width:100%;"
+        />
+        <span
+          style="position:absolute;left:38px;top:2px;height:14px;background:#fff;"
+          aria-hidden="true"
+        ></span>
+        <span
+          style="position:absolute;left:62px;top:2.7px;height:14px;line-height:14px;font-size:7px;color:#7E8197;white-space:nowrap;font-weight:300;"
+        >
+          Page ${page + 1} of ${totalPages}
+        </span>
+      </div>
+    </div>
+  `;
+  }
+
+  return `
+      <div style="border-top: 1px solid #e2e0df; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <span style="color: var(--theme-mid); font-weight: 500;">CGIAR Results Framework</span>
+        <span>Page ${page + 1} of ${totalPages}</span>
+      </div>
+    `;
 }
 
 const DEFAULT_CONFIG: PaginationConfig = {
@@ -82,12 +163,22 @@ function getContentStart(
   return page * ph + c.marginTop;
 }
 
-function getSafeZoneEnd(page: number, ph: number, c: PaginationConfig): number {
-  return (page + 1) * ph - c.footerHeight - c.marginBottom;
+function getSafeZoneEnd(
+  page: number,
+  ph: number,
+  c: PaginationConfig,
+  totalPages?: number,
+): number {
+  return (page + 1) * ph - getFooterHeight(page, totalPages, c) - c.marginBottom;
 }
 
-function getFooterY(page: number, ph: number, c: PaginationConfig): number {
-  return (page + 1) * ph - c.footerHeight;
+function getFooterY(
+  page: number,
+  ph: number,
+  c: PaginationConfig,
+  totalPages?: number,
+): number {
+  return (page + 1) * ph - getFooterHeight(page, totalPages, c);
 }
 
 function findPageRoot(container: HTMLElement): HTMLElement {
@@ -126,8 +217,27 @@ function paginate(
   // Kill padding-bottom so it doesn't add space after our calculation
   container.style.paddingBottom = "0";
 
+  let totalPages = Math.ceil(pageRoot.scrollHeight / paperHeight);
+
+  if (config.footerVariant === "star" && config.starFooter) {
+    let lastPageSafety = 5;
+    while (lastPageSafety-- > 0) {
+      if (
+        !adjustLastPageForStarFooter(
+          container,
+          pageRootTop,
+          paperHeight,
+          config,
+          totalPages,
+        )
+      ) {
+        break;
+      }
+      totalPages = Math.ceil(pageRoot.scrollHeight / paperHeight);
+    }
+  }
+
   // Place absolute footers
-  const totalPages = Math.ceil(pageRoot.scrollHeight / paperHeight);
   placeFooters(pageRoot, totalPages, paperHeight, config);
 
   // Pad to exact multiple of paperHeight
@@ -372,6 +482,52 @@ function splitTable(
   return true;
 }
 
+/**
+ * After general-height pagination, push content on the final page down if the
+ * taller last-page STAR footer would overlap it.
+ */
+function adjustLastPageForStarFooter(
+  container: HTMLElement,
+  pageRootTop: number,
+  paperHeight: number,
+  config: PaginationConfig,
+  totalPages: number,
+): boolean {
+  if (totalPages <= 0 || !config.starFooter) return false;
+
+  const lastPage = totalPages - 1;
+  const safeEnd = getSafeZoneEnd(lastPage, paperHeight, config, totalPages);
+  const blocks = collectBlocks(container);
+  let changed = false;
+
+  for (const block of blocks) {
+    if (!block.isConnected) continue;
+
+    const rect = block.getBoundingClientRect();
+    const top = rect.top + window.scrollY - pageRootTop;
+    const bottom = rect.bottom + window.scrollY - pageRootTop;
+    const page = Math.floor(top / paperHeight);
+
+    if (page !== lastPage || bottom <= safeEnd) continue;
+
+    const pushTop = block.getBoundingClientRect().top + window.scrollY - pageRootTop;
+    const nextStart = getContentStart(totalPages, paperHeight, config);
+    const parentGap =
+      parseFloat(getComputedStyle(block.parentElement!).gap) || 0;
+    const spacerHeight = nextStart - pushTop - parentGap;
+
+    if (spacerHeight > 0) {
+      const spacer = document.createElement("div");
+      spacer.setAttribute("data-paginator-spacer", "push");
+      spacer.style.cssText = `height:${spacerHeight}px; flex-shrink:0;`;
+      block.parentNode?.insertBefore(spacer, block);
+      changed = true;
+    }
+  }
+
+  return changed;
+}
+
 // ── Footer placement (absolute positioned on page root) ──
 
 function placeFooters(
@@ -384,8 +540,11 @@ function placeFooters(
     pageRoot.style.position = "relative";
   }
 
+  const isStar = config.footerVariant === "star";
+
   for (let page = 0; page < totalPages; page++) {
-    const y = getFooterY(page, paperHeight, config);
+    const footerHeight = getFooterHeight(page, totalPages, config);
+    const y = getFooterY(page, paperHeight, config, totalPages);
 
     const footer = document.createElement("div");
     footer.setAttribute("data-paginator-footer", String(page + 1));
@@ -394,21 +553,16 @@ function placeFooters(
       top: ${y}px;
       left: 0;
       right: 0;
-      height: ${config.footerHeight}px;
+      height: ${footerHeight}px;
       display: flex;
       align-items: flex-end;
-      padding: 0 43px 8px;
+      padding: ${isStar ? "0" : "0 43px 8px"};
       font-family: 'Noto Sans', Arial, Helvetica, sans-serif;
       font-size: 7px;
       color: #818181;
       z-index: 100;
     `;
-    footer.innerHTML = `
-      <div style="border-top: 1px solid #e2e0df; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; width: 100%;">
-        <span style="color: var(--theme-mid); font-weight: 500;">CGIAR Results Framework</span>
-        <span>Page ${page + 1} of ${totalPages}</span>
-      </div>
-    `;
+    footer.innerHTML = buildPageFooterHtml(config.footerVariant, page, totalPages);
 
     pageRoot.appendChild(footer);
   }
