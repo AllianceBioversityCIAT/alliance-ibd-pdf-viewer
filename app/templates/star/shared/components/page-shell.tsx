@@ -60,7 +60,7 @@ export function PageShell({
       <div className="px-[37px] pt-5 pb-2.5 flex flex-col gap-2.5" data-paginator-block>
         <div className="flex flex-col gap-1">
           <h1
-            className="text-[22px] font-bold leading-none"
+            className="text-[22px] font-[600] leading-none pb-1"
             style={{ color: STAR_COLORS.lightBlue300 }}
           >
             {title}

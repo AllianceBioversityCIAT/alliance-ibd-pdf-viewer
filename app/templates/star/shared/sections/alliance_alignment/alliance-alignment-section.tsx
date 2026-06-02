@@ -219,7 +219,7 @@ export function AllianceAlignmentSection({
     shouldRenderPrimaryLevers(data) || shouldRenderContributorLevers(data);
 
   return (
-    <section className={`flex flex-col gap-4 ${CONTENT_WIDTH_CLASS}`}>
+    <section className={`flex flex-col gap-2 ${CONTENT_WIDTH_CLASS}`}>
       <SectionTitle>Alliance Alignment</SectionTitle>
 
       {shouldRenderContracts(data) && (
@@ -235,7 +235,7 @@ export function AllianceAlignmentSection({
       )}
 
       {showLevers && (
-        <div className={`flex flex-col gap-[15px] ${CONTENT_WIDTH_CLASS}`}>
+        <div className={`flex flex-col gap-2.5 ${CONTENT_WIDTH_CLASS}`}>
           <PrimaryLeversBlock data={data} />
           <ContributorLeversBlock data={data} contributorLevers={contributorLevers} />
         </div>
