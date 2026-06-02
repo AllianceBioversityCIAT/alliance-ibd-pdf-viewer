@@ -7,7 +7,6 @@ import type {
 } from "./types";
 import {
   getContractDisplayRows,
-  getContractLeverDisplay,
   getContractTitle,
   getContributorLeverSdgTargetLines,
   getContributorLeversExcludingPrimary,
@@ -18,12 +17,11 @@ import {
   shouldRenderAllianceAlignment,
   shouldRenderContracts,
   shouldRenderContributorLevers,
-  shouldRenderContractLever,
   shouldRenderLeverIcon,
   shouldRenderPrimaryLevers,
 } from "./rules";
 import { LeverIcon } from "../../components/lever-icon";
-import { SectionTitle, SubSectionLabel } from "../../components/section-title";
+import { SectionTitle, SubSectionBlock } from "../../components/section-title";
 import { InfoCard, PrimaryBadge } from "../../components/info-card";
 import { STAR_COLORS } from "../../tokens";
 
@@ -135,14 +133,13 @@ function ContractCard({
   contract,
 }: Readonly<{ payload: AllianceAlignmentPayload; contract: Contract }>) {
   const rows = getContractDisplayRows(payload, contract);
-  const leverDisplay = getContractLeverDisplay(contract);
 
   return (
     <InfoCard className={CONTENT_WIDTH_CLASS}>
       <div className="flex flex-col gap-2">
         {contract.is_primary === true && <PrimaryBadge />}
         <p
-          className="text-[12px] font-semibold leading-[1.15]"
+          className="text-[12px] font-semibold leading-[1.15] break-words m-0"
           style={{ color: STAR_COLORS.cardTitle }}
         >
           {getContractTitle(payload, contract)}
@@ -174,18 +171,15 @@ function PrimaryLeversBlock({
   if (!shouldRenderPrimaryLevers(data)) return null;
 
   return (
-    <div className={`flex flex-col gap-[10px] ${CONTENT_WIDTH_CLASS}`}>
-      <SubSectionLabel>Primary Levers</SubSectionLabel>
-      <div className="flex flex-col gap-[10px]">
-        {(data.primary_levers ?? []).map((lever) => (
-          <PrimaryLeverCard
-            key={lever.result_lever_id}
-            payload={data}
-            lever={lever}
-          />
-        ))}
-      </div>
-    </div>
+    <SubSectionBlock title="Primary Levers">
+      {(data.primary_levers ?? []).map((lever) => (
+        <PrimaryLeverCard
+          key={lever.result_lever_id}
+          payload={data}
+          lever={lever}
+        />
+      ))}
+    </SubSectionBlock>
   );
 }
 
@@ -199,18 +193,15 @@ function ContributorLeversBlock({
   if (!shouldRenderContributorLevers(data)) return null;
 
   return (
-    <div className={`flex flex-col gap-[10px] ${CONTENT_WIDTH_CLASS}`}>
-      <SubSectionLabel>Other Contributing Levers</SubSectionLabel>
-      <div className="flex flex-col gap-[10px]">
-        {contributorLevers.map((lever) => (
-          <ContributorLeverCard
-            key={lever.result_lever_id}
-            payload={data}
-            lever={lever}
-          />
-        ))}
-      </div>
-    </div>
+    <SubSectionBlock title="Other Contributing Levers">
+      {contributorLevers.map((lever) => (
+        <ContributorLeverCard
+          key={lever.result_lever_id}
+          payload={data}
+          lever={lever}
+        />
+      ))}
+    </SubSectionBlock>
   );
 }
 
@@ -228,22 +219,19 @@ export function AllianceAlignmentSection({
     shouldRenderPrimaryLevers(data) || shouldRenderContributorLevers(data);
 
   return (
-    <section className={`flex flex-col gap-5 ${CONTENT_WIDTH_CLASS}`}>
+    <section className={`flex flex-col gap-4 ${CONTENT_WIDTH_CLASS}`}>
       <SectionTitle>Alliance Alignment</SectionTitle>
 
       {shouldRenderContracts(data) && (
-        <div className={`flex flex-col gap-[10px] ${CONTENT_WIDTH_CLASS}`} data-paginator-block>
-          <SubSectionLabel>Contributing Projects</SubSectionLabel>
-          <div className="flex flex-col gap-[10px]">
-            {contracts.map((contract) => (
-              <ContractCard
-                key={contract.result_contract_id}
-                payload={data}
-                contract={contract}
-              />
-            ))}
-          </div>
-        </div>
+        <SubSectionBlock title="Contributing Projects" paginatorBlock>
+          {contracts.map((contract) => (
+            <ContractCard
+              key={contract.result_contract_id}
+              payload={data}
+              contract={contract}
+            />
+          ))}
+        </SubSectionBlock>
       )}
 
       {showLevers && (
