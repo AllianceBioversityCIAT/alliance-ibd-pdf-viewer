@@ -1,0 +1,626 @@
+{
+  "$schema": "STAR Cap Sharing PDF payload guide",
+  "template": "cap_sharing",
+  "description": "Complete payload for the STAR Capacity Sharing PDF template. Field names match alliance-research-indicators (STAR backend). Optional *_label and *_labels fields are PDF display enrichments supplied by the backend — the template never maps lookup ids to display names.",
+  "sections": {
+    "general_information": {
+      "interface": "GeneralInformation + GeneralInformationPdfContext",
+      "fields": [
+        {
+          "path": "general_information.title",
+          "type": "string",
+          "required": false,
+          "used_in": ["PageShell hero", "General Information section"],
+          "description": "Result title displayed as H1 in the page header.",
+          "example": "Merging time-tested agricultural practices with modern technologies to drive productivity"
+        },
+        {
+          "path": "general_information.description",
+          "type": "string",
+          "required": false,
+          "used_in": ["General Information section"],
+          "description": "Result description. Hidden when indicator_id === 5.",
+          "example": "The content of the Planting Date Advisories was developed..."
+        },
+        {
+          "path": "general_information.keywords",
+          "type": "string[]",
+          "required": false,
+          "used_in": ["General Information section"],
+          "description": "Multiple-value keywords rendered as chips. Shown only when length > 0.",
+          "example": ["Science", "Agroecological Transition"]
+        },
+        {
+          "path": "general_information.user_id",
+          "type": "string",
+          "required": false,
+          "used_in": ["General Information section"],
+          "description": "Fallback main contact user id when main_contact_person.user_id is empty.",
+          "example": "o.chinyere@cgiar.org"
+        },
+        {
+          "path": "general_information.year",
+          "type": "string",
+          "required": false,
+          "used_in": ["General Information section"],
+          "description": "Reporting year.",
+          "example": "2025"
+        },
+        {
+          "path": "general_information.main_contact_person.user_id",
+          "type": "string",
+          "required": false,
+          "used_in": ["General Information section"],
+          "description": "Primary source for main contact resolution.",
+          "example": "o.chinyere@cgiar.org"
+        },
+        {
+          "path": "general_information.indicator_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["General Information rules"],
+          "description": "When equal to 5, description is not rendered in the PDF.",
+          "example": 4
+        },
+        {
+          "path": "general_information.result_code",
+          "type": "string | number",
+          "required": false,
+          "used_in": ["PageShell subtitle"],
+          "description": "PDF display enrichment for result code line.",
+          "example": 8245
+        },
+        {
+          "path": "general_information.result_type",
+          "type": "string",
+          "required": false,
+          "used_in": ["PageShell subtitle"],
+          "description": "PDF display enrichment for result type label.",
+          "example": "Capacity Sharing for Development"
+        },
+        {
+          "path": "general_information.generated_at",
+          "type": "string",
+          "required": false,
+          "used_in": ["PageShell disclaimer"],
+          "description": "Pre-formatted generation timestamp for the report disclaimer.",
+          "example": "Tuesday, February 18th, 2025, at 21:18 CET"
+        },
+        {
+          "path": "general_information.main_contact_display",
+          "type": "string",
+          "required": false,
+          "used_in": ["General Information section"],
+          "description": "Optional resolved display string for main contact (name + email).",
+          "example": "Obilo Chinyere (o.chinyere@cgiar.org)"
+        }
+      ]
+    },
+    "alliance_alignment": {
+      "interface": "GetAllianceAlignment + AllianceAlignmentPdfContext",
+      "fields": [
+        {
+          "path": "alliance_alignment.contracts",
+          "type": "Contract[]",
+          "required": false,
+          "used_in": ["Alliance Alignment — Contributing Projects"],
+          "description": "Active contracts linked to the result. is_primary shows PRIMARY badge.",
+          "example": [{ "contract_id": "A1048", "is_primary": true, "is_active": true }]
+        },
+        {
+          "path": "alliance_alignment.primary_levers",
+          "type": "Lever[]",
+          "required": false,
+          "used_in": ["Alliance Alignment — Primary Levers"],
+          "description": "Primary CGIAR levers with SDG targets.",
+          "example": []
+        },
+        {
+          "path": "alliance_alignment.contributor_levers",
+          "type": "Lever[]",
+          "required": false,
+          "used_in": ["Alliance Alignment — Other Contributing Levers"],
+          "description": "Contributing levers.",
+          "example": []
+        },
+        {
+          "path": "alliance_alignment.contract_labels",
+          "type": "Record<string, string>",
+          "required": false,
+          "used_in": ["Alliance Alignment"],
+          "description": "PDF enrichment: human-readable contract titles keyed by contract_id.",
+          "example": { "A1048": "A1048 - CIFOR Hosted - HQ" }
+        }
+      ]
+    },
+    "cap_sharing": {
+      "interface": "GetCapSharing + CapSharingPdfContext",
+      "fields": [
+        {
+          "path": "cap_sharing.session_format_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Type"],
+          "description": "Training format lookup id (Individual Training vs Group Training). Which block renders is determined by payload shape: group without individual → Group Training; individual without group → Individual Training.",
+          "example": 1
+        },
+        {
+          "path": "cap_sharing.session_type_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Type"],
+          "description": "Training vs engagement lookup id.",
+          "example": 1
+        },
+        {
+          "path": "cap_sharing.session_length_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Type"],
+          "description": "1 = Short-term (below 3 months), 2 = Long-term (3 months and more). Degree renders only when session_length_id === 2.",
+          "example": 1
+        },
+        {
+          "path": "cap_sharing.group.trainee_organization_representative",
+          "type": "TraineeOrganizationRepresentative[]",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Organizations"],
+          "description": "STAR join records linking group training to attending institutions. When present with is_attending_organization affirmative, Organizations cards render before Training Details.",
+          "example": [
+            {
+              "created_at": "2026-06-01T23:10:11.530Z",
+              "updated_at": "2026-06-01T23:30:19.000Z",
+              "is_active": true,
+              "result_institution_id": 13008,
+              "result_id": 17898,
+              "institution_id": 7,
+              "institution_role_id": 2
+            }
+          ]
+        },
+        {
+          "path": "cap_sharing.individual",
+          "type": "Individual",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Individual Training"],
+          "description": "Individual trainee fields.",
+          "example": { "trainee_name": "Jane Doe" }
+        },
+        {
+          "path": "cap_sharing.training_supervisor",
+          "type": "Trainingsupervisor",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Details"],
+          "description": "Supervisor user object with name and email.",
+          "example": {}
+        },
+        {
+          "path": "cap_sharing.start_date",
+          "type": "string | Date",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Details"],
+          "description": "Training start date.",
+          "example": "25/05/2025"
+        },
+        {
+          "path": "cap_sharing.end_date",
+          "type": "string | Date",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Details"],
+          "description": "Training end date.",
+          "example": "23/06/2025"
+        },
+        {
+          "path": "cap_sharing.delivery_modality_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Details"],
+          "description": "Delivery modality lookup (in person, virtual, hybrid). Display uses delivery_modality_label from payload — not resolved from this id in the template.",
+          "example": 2
+        },
+        {
+          "path": "cap_sharing.degree_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Type (conditional)"],
+          "description": "Degree lookup id. Row renders only when session_length_id === 2. Display uses degree_label from payload.",
+          "example": 4
+        },
+        {
+          "path": "cap_sharing.session_format_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Type"],
+          "description": "PDF display enrichment. Human-readable label for session_format_id (e.g. \"Group training\"). Required for display — template does not map ids to names.",
+          "example": "Group training"
+        },
+        {
+          "path": "cap_sharing.session_type_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Type"],
+          "description": "PDF display enrichment for session_type_id (e.g. \"Training\", \"Engagement\").",
+          "example": "Engagement"
+        },
+        {
+          "path": "cap_sharing.session_length_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Type"],
+          "description": "PDF display enrichment for session_length_id (e.g. \"Long-term (3 months and more)\").",
+          "example": "Long-term (3 months and more)"
+        },
+        {
+          "path": "cap_sharing.degree_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Type (conditional)"],
+          "description": "PDF display enrichment for degree_id. Shown only when session_length_id === 2.",
+          "example": "Other"
+        },
+        {
+          "path": "cap_sharing.delivery_modality_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Training Details"],
+          "description": "PDF display enrichment for delivery_modality_id (e.g. \"Hybrid\").",
+          "example": "Hybrid"
+        },
+        {
+          "path": "cap_sharing.session_purpose_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Group Training"],
+          "description": "PDF display enrichment for group.session_purpose_id.",
+          "example": "Other"
+        },
+        {
+          "path": "cap_sharing.attending_organization_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Group Training"],
+          "description": "PDF display enrichment for group.is_attending_organization (e.g. \"Yes\", \"No\").",
+          "example": "Yes"
+        },
+        {
+          "path": "cap_sharing.organization_institutions",
+          "type": "Institution[]",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Organizations"],
+          "description": "PDF enrichment for organization cards (same display fields as results_partners.institutions). Matched to group.trainee_organization_representative by institution_id.",
+          "example": [
+            {
+              "institution_id": 7,
+              "acronym": "AfricaRice",
+              "name": "Africa Rice Center",
+              "institution_type_name": "CGIAR Center",
+              "headquarters": "Côte d'Ivoire"
+            }
+          ]
+        },
+        {
+          "path": "cap_sharing.gender_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Individual Training"],
+          "description": "PDF display enrichment for individual.gender_id.",
+          "example": "Non-binary"
+        },
+        {
+          "path": "cap_sharing.affiliation_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Individual Training"],
+          "description": "PDF display enrichment for individual.affiliation institution name.",
+          "example": "International Center for Tropical Agriculture (CIAT)"
+        },
+        {
+          "path": "cap_sharing.nationality_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Cap Sharing Details — Individual Training"],
+          "description": "PDF display enrichment for individual.nationality country name.",
+          "example": "Albania"
+        }
+      ],
+      "demos": {
+        "individual": "cap_sharing/demos/individual.demo.json",
+        "group": "cap_sharing/demos/group.demo.json"
+      }
+    },
+    "results_partners": {
+      "interface": "PatchPartners",
+      "fields": [
+        {
+          "path": "results_partners.is_partner_not_applicable",
+          "type": "boolean",
+          "required": false,
+          "used_in": ["Results Partners section"],
+          "description": "When true, hides partner cards and shows “This section is not applicable.”",
+          "example": false,
+          "not_applicable_example": {
+            "is_partner_not_applicable": true,
+            "institutions": []
+          }
+        },
+        {
+          "path": "results_partners.institutions",
+          "type": "Institution[]",
+          "required": false,
+          "used_in": ["Results Partners section"],
+          "description": "Partner institutions. Display name resolved from html_full_name, full_name, acronym + name, name, or institution_id.",
+          "example": [
+            {
+              "institution_id": 101,
+              "institution_role_id": 1,
+              "acronym": "WUR",
+              "name": "Wageningen University and Research Centre",
+              "institution_type_name": "Research organizations and universities International (Universities)",
+              "headquarters": "Netherlands"
+            }
+          ]
+        },
+        {
+          "path": "results_partners.institutions[].institution_type_name",
+          "type": "string",
+          "required": false,
+          "used_in": ["Results Partners — Institution type"],
+          "description": "Preferred institution type label. Falls back to institution_type or type.",
+          "example": "Other"
+        },
+        {
+          "path": "results_partners.institutions[].headquarters",
+          "type": "string",
+          "required": false,
+          "used_in": ["Results Partners — Headquarter"],
+          "description": "Preferred headquarter label. Falls back to headquarter, country_name, or country.",
+          "example": "Netherlands"
+        }
+      ]
+    },
+    "geographic_scope": {
+      "interface": "GetGeoLocation + GeographicScopePdfContext",
+      "fields": [
+        {
+          "path": "geographic_scope.geo_scope_id",
+          "type": "number | string",
+          "required": false,
+          "used_in": ["Geographic Location section"],
+          "description": "Geographic scope level id. Mapped in getGeoScopeVariant(): 1 Global, 2 Regional, 4 National, 5 Sub-national, 50 This is yet to be determined; default → to_be_determined.",
+          "example": 5
+        },
+        {
+          "path": "geographic_scope.regions",
+          "type": "Region[]",
+          "required": false,
+          "used_in": ["Geographic Location — Global / Regional"],
+          "description": "Regions rendered as inline bullet lists using region.name.",
+          "example": [{ "region_id": 1, "name": "Sub-Saharan Africa" }]
+        },
+        {
+          "path": "geographic_scope.countries",
+          "type": "Country[]",
+          "required": false,
+          "used_in": ["Geographic Location — Global / National / Sub-national"],
+          "description": "Countries with optional sub-nationals. PDF uses result_countries_sub_nationals only (not Angular signal field).",
+          "example": [
+            {
+              "isoAlpha2": "ET",
+              "name": "Ethiopia",
+              "result_countries_sub_nationals": [
+                { "region_id": 1, "name": "Oromia", "sub_national_id": 101 }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "geographic_scope.comment_geo_scope",
+          "type": "string",
+          "required": false,
+          "used_in": ["Geographic Location — Comments"],
+          "description": "Optional free-text comment shown with label “Comments:”.",
+          "example": "Focus on eastern districts and highland zones."
+        }
+      ],
+      "demo_files": {
+        "global": "shared/sections/geographic_scope/demos/global.demo.json",
+        "regional": "shared/sections/geographic_scope/demos/regional.demo.json",
+        "national": "shared/sections/geographic_scope/demos/national.demo.json",
+        "subnational": "shared/sections/geographic_scope/demos/subnational.demo.json",
+        "to_be_determined": "shared/sections/geographic_scope/demos/to-be-determined.demo.json"
+      },
+      "examples": {
+        "global_with_regions_and_countries": {
+          "geo_scope_id": 1,
+          "regions": [{ "region_id": 1, "name": "Sub-Saharan Africa" }],
+          "countries": [{ "isoAlpha2": "KE", "name": "Kenya", "result_countries_sub_nationals": [] }],
+          "comment_geo_scope": "East Africa focus."
+        },
+        "global_empty": {
+          "geo_scope_id": 1,
+          "regions": [],
+          "countries": [],
+          "comment_geo_scope": ""
+        },
+        "regional_with_regions": {
+          "geo_scope_id": 2,
+          "regions": [
+            { "region_id": 1, "name": "Latin America and the Caribbean" },
+            { "region_id": 2, "name": "West and Central Asia" }
+          ],
+          "countries": [],
+          "comment_geo_scope": ""
+        },
+        "national_with_countries": {
+          "geo_scope_id": 4,
+          "regions": [],
+          "countries": [
+            { "isoAlpha2": "IN", "name": "India", "result_countries_sub_nationals": [] },
+            { "isoAlpha2": "ET", "name": "Ethiopia", "result_countries_sub_nationals": [] }
+          ],
+          "comment_geo_scope": "National rollout phase."
+        },
+        "sub_national": {
+          "geo_scope_id": 5,
+          "regions": [],
+          "countries": [
+            {
+              "isoAlpha2": "ET",
+              "name": "Ethiopia",
+              "result_countries_sub_nationals": [
+                { "region_id": 1, "name": "Oromia", "sub_national_id": 101 },
+                { "region_id": 2, "name": "Amhara", "sub_national_id": 102 }
+              ]
+            }
+          ],
+          "comment_geo_scope": "Highland zones only."
+        },
+        "yet_to_be_determined": {
+          "geo_scope_id": 50,
+          "regions": [],
+          "countries": [],
+          "comment_geo_scope": "Scope pending stakeholder review."
+        }
+      }
+    },
+    "evidence": {
+      "interface": "PatchResultEvidences",
+      "fields": [
+        {
+          "path": "evidence.evidence",
+          "type": "Evidence[]",
+          "required": false,
+          "used_in": ["Evidence section cards"],
+          "description": "Each card: EVIDENCE #N, optional Access link (public only), Evidence description.",
+          "example": []
+        },
+        {
+          "path": "evidence.evidence.is_private",
+          "type": "boolean",
+          "required": false,
+          "used_in": ["Evidence card — Access link"],
+          "description": "When true, Access link is hidden.",
+          "example": false
+        },
+        {
+          "path": "evidence.evidence.evidence_url",
+          "type": "string",
+          "required": false,
+          "used_in": ["Evidence card — Access link href"],
+          "description": "Shown only when is_private is false.",
+          "example": "as.com"
+        },
+        {
+          "path": "evidence.evidence.evidence_description",
+          "type": "string",
+          "required": false,
+          "used_in": ["Evidence card — Evidence description"],
+          "description": "Rendered inline after 'Evidence description:' label.",
+          "example": "public"
+        }
+      ],
+      "demo_files": {
+        "default": "shared/sections/evidence/demo.json"
+      }
+    },
+    "ip_rights": {
+      "interface": "PatchIpOwner (GET shape — no indicator_id in response)",
+      "visibility": "Section renders only when general_information.indicator_id is 1 (Policy Change) or 2 (Innovation Development).",
+      "display_format": "Affirmative answers with descriptions render as 'Yes. description' on one line. asset_ip_owner === 4 renders as 'Other. description' when description is present.",
+      "fields": [
+        {
+          "path": "general_information.indicator_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["IP Rights — section visibility"],
+          "description": "Section visible when 1 or 2. Extra questions (private_sector_engagement_id, formal_ip_rights_application_id) only when 2.",
+          "example": 1
+        },
+        {
+          "path": "ip_rights.asset_ip_owner",
+          "type": "number",
+          "required": false,
+          "used_in": ["IP Rights — asset IP owner"],
+          "description": "Owner id (catalog: 1 CGIAR Center, 2 Alliance Bioversity & CIAT, 3 Third party, 4 Other). Description appended only when id is 4.",
+          "example": 4
+        },
+        {
+          "path": "ip_rights.asset_ip_owner_description",
+          "type": "string | null",
+          "required": false,
+          "used_in": ["IP Rights — asset IP owner (conditional)"],
+          "description": "Appended as 'Other. {description}' only when asset_ip_owner === 4.",
+          "example": "Joint ownership details."
+        },
+        {
+          "path": "ip_rights.publicity_restriction",
+          "type": "boolean | number",
+          "required": false,
+          "used_in": ["IP Rights — publicity restriction"],
+          "description": "true/1 → Yes, false/0 → No. Description appended as 'Yes. {description}' only when affirmative.",
+          "example": true
+        },
+        {
+          "path": "ip_rights.publicity_restriction_description",
+          "type": "string | null",
+          "required": false,
+          "used_in": ["IP Rights — publicity restriction (conditional)"],
+          "description": "Rendered inline after Yes when publicity_restriction is true/1.",
+          "example": "Embargo until publication."
+        },
+        {
+          "path": "ip_rights.potential_asset",
+          "type": "boolean | number",
+          "required": false,
+          "used_in": ["IP Rights — potential asset"],
+          "description": "Yes/No flag. Description appended only when affirmative.",
+          "example": true
+        },
+        {
+          "path": "ip_rights.potential_asset_description",
+          "type": "string | null",
+          "required": false,
+          "used_in": ["IP Rights — potential asset (conditional)"],
+          "description": "Rendered inline after Yes when potential_asset is true/1.",
+          "example": "Commercial licensing potential."
+        },
+        {
+          "path": "ip_rights.requires_futher_development",
+          "type": "boolean | number",
+          "required": false,
+          "used_in": ["IP Rights — further development"],
+          "description": "STAR spelling preserved. Yes/No flag. Description appended only when affirmative.",
+          "example": true
+        },
+        {
+          "path": "ip_rights.requires_futher_development_description",
+          "type": "string | null",
+          "required": false,
+          "used_in": ["IP Rights — further development (conditional)"],
+          "description": "Rendered inline after Yes when requires_futher_development is true/1.",
+          "example": "Additional validation required."
+        },
+        {
+          "path": "ip_rights.private_sector_engagement_id",
+          "type": "number | null",
+          "required": false,
+          "used_in": ["IP Rights — private sector (indicator_id === 2 only)"],
+          "description": "1 Yes, 2 No, 3 Not sure. Shown only when indicator_id is 2 and id is not null.",
+          "example": 1
+        },
+        {
+          "path": "ip_rights.formal_ip_rights_application_id",
+          "type": "number | null",
+          "required": false,
+          "used_in": ["IP Rights — formal IP rights (indicator_id === 2 only)"],
+          "description": "1 Yes, 2 No, 3 Not sure. Shown only when indicator_id is 2 and id is not null.",
+          "example": 1
+        }
+      ],
+      "demo_files": {
+        "policy_change": "shared/sections/ip_rights/demo.json",
+        "innovation_development": "shared/sections/ip_rights/demos/indicator-2.demo.json"
+      }
+    }
+  }
+}
