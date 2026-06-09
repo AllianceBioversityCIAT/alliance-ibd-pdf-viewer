@@ -7,7 +7,7 @@ import { STAR_COLORS, STAR_FONT_IMPORT, STAR_FONTS } from "../tokens";
 export const STAR_HEADER_IMAGE = "/assets/star/header.svg";
 /** Compact footer on pages 1…N-1 (521×14) */
 export const STAR_FOOTER_GENERAL_IMAGE = "/assets/star/footer-general.svg";
-/** Full footer on the last page only (595×111) */
+/** Full footer on the last page only (595×112) */
 export const STAR_FOOTER_LAST_IMAGE = "/assets/star/footer.svg";
 
 /** Serializable only — Paginator is a Client Component */
@@ -18,7 +18,7 @@ const STAR_PAGINATION_CONFIG = {
   footerVariant: "star" as const,
   starFooter: {
     generalHeight: 14,
-    lastHeight: 111,
+    lastHeight: 112,
   },
 };
 

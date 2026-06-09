@@ -27,6 +27,7 @@ interface PaginationConfig {
 
 const STAR_FOOTER_GENERAL = "/assets/star/footer-general.svg";
 const STAR_FOOTER_LAST = "/assets/star/footer.svg";
+const STAR_FOOTER_LAST_HEIGHT = 112;
 
 function getFooterHeight(
   page: number,
@@ -60,8 +61,8 @@ function buildPageFooterHtml(
         src="${STAR_FOOTER_LAST}"
         alt=""
         width="595"
-        height="111"
-        style="display:block;width:100%;height:111px;object-fit:cover;object-position:left bottom;"
+        height="${STAR_FOOTER_LAST_HEIGHT}"
+        style="display:block;width:100%;height:${STAR_FOOTER_LAST_HEIGHT}px;"
       />
     </div>
   `;
@@ -82,7 +83,7 @@ function buildPageFooterHtml(
           aria-hidden="true"
         ></span>
         <span
-          style="position:absolute;left:62px;top:2.7px;height:14px;line-height:14px;font-size:7px;color:#7E8197;white-space:nowrap;font-weight:300;"
+          style="position:absolute;left:62px;top:2.2px;height:14px;line-height:14px;font-size:7px;color:#7E8197;white-space:nowrap;font-weight:300;"
         >
           Page ${page + 1} of ${totalPages}
         </span>
@@ -545,6 +546,8 @@ function placeFooters(
   for (let page = 0; page < totalPages; page++) {
     const footerHeight = getFooterHeight(page, totalPages, config);
     const y = getFooterY(page, paperHeight, config, totalPages);
+    const isLastStarPage =
+      isStar && page === totalPages - 1 && config.starFooter;
 
     const footer = document.createElement("div");
     footer.setAttribute("data-paginator-footer", String(page + 1));
@@ -561,6 +564,7 @@ function placeFooters(
       font-size: 7px;
       color: #818181;
       z-index: 100;
+      overflow: ${isLastStarPage ? "visible" : "hidden"};
     `;
     footer.innerHTML = buildPageFooterHtml(config.footerVariant, page, totalPages);
 
