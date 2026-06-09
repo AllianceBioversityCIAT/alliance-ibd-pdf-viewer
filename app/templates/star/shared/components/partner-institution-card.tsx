@@ -15,7 +15,7 @@ interface PartnerFieldRowProps {
   leading?: string;
 }
 
-function PartnerFieldRow({
+export function PartnerFieldRow({
   label,
   value,
   leading = "1.15",

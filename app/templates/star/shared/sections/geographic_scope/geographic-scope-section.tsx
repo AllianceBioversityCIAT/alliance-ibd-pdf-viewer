@@ -53,7 +53,7 @@ function GeoScopeIcon({
 function FieldLabel({ children }: Readonly<{ children: string }>) {
   return (
     <p
-      className="text-[10px] font-bold leading-[1.15] m-0"
+      className="text-[11px] font-bold leading-[1.15] m-0"
       style={{ color: STAR_COLORS.primaryBlue500 }}
     >
       {children}

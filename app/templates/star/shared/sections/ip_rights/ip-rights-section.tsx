@@ -33,7 +33,7 @@ interface IpRightsQuestionBlockProps {
 function QuestionLabel({ children }: Readonly<{ children: string }>) {
   return (
     <p
-      className="text-[10px] font-bold leading-[1.15] break-words m-0"
+      className="text-[11px] font-bold leading-[1.15] break-words m-0"
       style={{ color: STAR_COLORS.primaryBlue500 }}
     >
       {children}
@@ -44,7 +44,7 @@ function QuestionLabel({ children }: Readonly<{ children: string }>) {
 function AnswerText({ children }: Readonly<{ children: string }>) {
   return (
     <p
-      className="text-[10px] leading-[1.25] break-words m-0"
+      className="text-[11px] leading-[1.25] break-words m-0"
       style={{ color: STAR_COLORS.bodyText }}
     >
       {children}

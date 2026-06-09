@@ -71,7 +71,7 @@ function EvidenceCard({
       <div className="flex flex-col gap-[10px]">
         <div className="flex items-center justify-between gap-3">
           <p
-            className="text-[8px] font-[450] leading-[1.15] uppercase m-0"
+            className="text-[9px] font-[450] leading-[1.15] uppercase m-0"
             style={{ color: STAR_COLORS.primaryBlue600 }}
           >
             {getEvidenceNumberLabel(index)}
@@ -83,7 +83,7 @@ function EvidenceCard({
         </div>
 
         {shouldShowEvidenceDescription(evidence) && (
-          <p className="text-[10px] leading-[1.25] m-0 break-words">
+          <p className="text-[11px] leading-[1.25] m-0 break-words">
             <span className="font-bold" style={{ color: STAR_COLORS.primaryBlue500 }}>
               Evidence description:
             </span>{" "}

@@ -212,10 +212,25 @@
     ]
   },
   "geographic_scope": {
-    "geo_scope_id": "50",
-    "regions": [],
-    "countries": [],
-    "comment_geo_scope": "123"
+    "geo_scope_id": "1",
+    "regions": [
+      { "region_id": 1, "name": "Eastern Africa" },
+      { "region_id": 2, "name": "Southern Africa" },
+      { "region_id": 3, "name": "Western Africa" }
+    ],
+    "countries": [
+      {
+        "isoAlpha2": "ET",
+        "name": "Ethiopia",
+        "result_countries_sub_nationals": []
+      },
+      {
+        "isoAlpha2": "ZA",
+        "name": "South Africa",
+        "result_countries_sub_nationals": []
+      }
+    ],
+    "comment_geo_scope": "This impact was primarily implemented at a global level, with specific activities and collaborations carried out in regions such as Africa and South America."
   },
   "evidence": {
     "evidence": [
