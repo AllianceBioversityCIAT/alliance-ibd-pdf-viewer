@@ -63,7 +63,11 @@ export function getTrainingTypeTableRows(
   if (hasText(degree)) {
     rows.push({
       label: "Degree",
-      value: degree,
+      value: (
+        <TrainingDetailIconValue iconSrc={TRAINING_TYPE_ICONS.degree}>
+          {degree}
+        </TrainingDetailIconValue>
+      ),
     });
   }
 

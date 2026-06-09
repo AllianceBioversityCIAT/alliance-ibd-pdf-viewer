@@ -7,7 +7,7 @@ import {
   getSupervisorInitials,
 } from "../rules";
 import type { DataTableRow } from "../../shared/components/data-table";
-import { TRAINING_DETAIL_ICONS } from "../assets";
+import { getDeliveryModalityIconSrc, TRAINING_DETAIL_ICONS } from "../assets";
 import {
   SupervisorDetailValue,
   TrainingDetailIconValue,
@@ -77,12 +77,15 @@ export function getTrainingDetailRows(
 
   const deliveryModality = getDeliveryModalityLabel(data);
   if (deliveryModality) {
+    const modalityIcon = getDeliveryModalityIconSrc(data.delivery_modality_id);
     rows.push({
       label: "Delivery modality",
-      value: (
-        <TrainingDetailIconValue iconSrc={TRAINING_DETAIL_ICONS.deliveryModality}>
+      value: modalityIcon ? (
+        <TrainingDetailIconValue iconSrc={modalityIcon}>
           {deliveryModality}
         </TrainingDetailIconValue>
+      ) : (
+        deliveryModality
       ),
     });
   }

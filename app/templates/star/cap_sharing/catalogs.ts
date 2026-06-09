@@ -18,3 +18,9 @@ export const ATTENDING_ORGANIZATION = {
   NO: 0,
   YES: 1,
 } as const;
+
+export const DELIVERY_MODALITY_IDS = {
+  VIRTUAL: 1,
+  HYBRID: 2,
+  IN_PERSON: 3,
+} as const;
