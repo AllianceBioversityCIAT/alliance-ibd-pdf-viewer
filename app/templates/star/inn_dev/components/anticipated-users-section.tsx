@@ -24,6 +24,8 @@ export function AnticipatedUsersSection({
 
   const anticipatedUsersLabel = getAnticipatedUsersLabel(data);
   const expanded = shouldRenderAnticipatedUsersExpanded(data);
+  const intendedBeneficiaries = data.intended_beneficiaries_description?.trim() ?? "";
+  const expectedOutcome = data.expected_outcome?.trim() ?? "";
 
   return (
     <SubSectionBlock title="Anticipated Users">
@@ -34,17 +36,17 @@ export function AnticipatedUsersSection({
         />
       )}
 
-      {expanded && hasText(data.intended_beneficiaries_description) && (
+      {expanded && hasText(intendedBeneficiaries) && (
         <LabelValueRow
           label="Intended beneficiaries"
-          value={data.intended_beneficiaries_description.trim()}
+          value={intendedBeneficiaries}
         />
       )}
 
-      {expanded && hasText(data.expected_outcome) && (
+      {expanded && hasText(expectedOutcome) && (
         <LabelValueRow
           label="Expected outcome"
-          value={data.expected_outcome.trim()}
+          value={expectedOutcome}
         />
       )}
 
