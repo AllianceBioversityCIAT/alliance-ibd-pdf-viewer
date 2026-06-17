@@ -1,0 +1,439 @@
+{
+  "$schema": "STAR Innovation Development PDF payload guide",
+  "template": "inn_dev",
+  "description": "Complete payload for the STAR Innovation Development PDF template. Field names match alliance-research-indicators (STAR backend). Optional *_label, *_labels, and nested display objects (e.g. innovation_readiness) are PDF display enrichments supplied by the backend — the template never maps lookup ids to display names.",
+  "sections": {
+    "general_information": {
+      "interface": "GeneralInformation + GeneralInformationPdfContext",
+      "note": "Reuse shared STAR General Information section. Set indicator_id to 2 for Innovation Development."
+    },
+    "alliance_alignment": {
+      "interface": "AllianceAlignment",
+      "note": "Reuse shared STAR Alliance Alignment section."
+    },
+    "innovation_details": {
+      "interface": "GetInnovationDetails + InnovationDetailsPdfContext",
+      "visibility": "Rendered when at least one relevant field has data (see rules.ts).",
+      "fields": [
+        {
+          "path": "innovation_details.short_title",
+          "type": "string",
+          "required": false,
+          "used_in": ["Innovation Details — plain text row"],
+          "description": "Short title of the innovation.",
+          "example": "Drought-tolerant maize for Eastern Africa"
+        },
+        {
+          "path": "innovation_details.innovation_nature_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["Conditional rules only"],
+          "description": "Lookup id for innovation nature. Display via innovation_nature object or innovation_nature_label."
+        },
+        {
+          "path": "innovation_details.innovation_nature",
+          "type": "InnovationCharacteristic",
+          "required": false,
+          "used_in": ["Innovation Details — Innovation nature row"],
+          "description": "Optional display object with name and definition."
+        },
+        {
+          "path": "innovation_details.innovation_nature_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Innovation Details — Innovation nature row (fallback)"],
+          "description": "PDF display label when innovation_nature object is not provided."
+        },
+        {
+          "path": "innovation_details.innovation_type_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["Conditional rules — value 12 triggers variety fields"],
+          "description": "Lookup id for innovation type."
+        },
+        {
+          "path": "innovation_details.innovation_type",
+          "type": "InnovationType",
+          "required": false,
+          "used_in": ["Innovation Details — Innovation type row"],
+          "description": "Optional display object with name and definition."
+        },
+        {
+          "path": "innovation_details.innovation_type_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Innovation Details — Innovation type row (fallback)"],
+          "description": "PDF display label when innovation_type object is not provided."
+        },
+        {
+          "path": "innovation_details.is_new_or_improved_variety",
+          "type": "number | boolean",
+          "required": false,
+          "used_in": ["Innovation Details — shown when innovation_type_id === 12"],
+          "description": "Whether the innovation is a new or improved variety."
+        },
+        {
+          "path": "innovation_details.is_new_or_improved_variety_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Innovation Details — variety yes/no display"],
+          "description": "Resolved label for is_new_or_improved_variety."
+        },
+        {
+          "path": "innovation_details.new_or_improved_varieties_count",
+          "type": "number",
+          "required": false,
+          "used_in": ["Innovation Details — shown when type 12 and is_new_or_improved_variety is truthy"],
+          "description": "Count of new or improved varieties."
+        },
+        {
+          "path": "innovation_details.innovation_readiness_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["Backend reference only"],
+          "description": "Lookup id for selected readiness level."
+        },
+        {
+          "path": "innovation_details.innovation_readiness",
+          "type": "InnovationLevel",
+          "required": false,
+          "used_in": ["Innovation Details — readiness scale graphic", "Knowledge Sharing visibility", "Scaling Potential visibility"],
+          "description": "Selected readiness level with level, name, definition, and additional_guidance. Renders as a 0–9 step scale with the selected level filled. Caption shows \"Level N - name\". Knowledge Sharing and Scaling Potential render when level >= 7."
+        },
+        {
+          "path": "innovation_details.innovation_readiness_explanation",
+          "type": "string",
+          "required": false,
+          "used_in": ["Innovation Details — plain text row"],
+          "description": "Free-text explanation of readiness. Shown only when non-empty."
+        },
+        {
+          "path": "innovation_details.anticipated_users_id",
+          "type": "number",
+          "required": false,
+          "used_in": ["Anticipated users row", "Actors/Organizations visibility"],
+          "description": "Lookup id. Value 2 expands to actors, organizations, intended beneficiaries, and expected outcome."
+        },
+        {
+          "path": "innovation_details.anticipated_users_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Anticipated Users section — question row value"],
+          "description": "Resolved answer for \"Who would be the user(s) of this Innovation?\". Shown under the Anticipated Users subsection title, not as a separate \"Anticipated users\" label row.",
+          "example": "User have been determined"
+        },
+        {
+          "path": "innovation_details.intended_beneficiaries_description",
+          "type": "string",
+          "required": false,
+          "used_in": ["Innovation Details — shown when anticipated_users_id === 2"],
+          "description": "Description of intended beneficiaries."
+        },
+        {
+          "path": "innovation_details.expected_outcome",
+          "type": "string",
+          "required": false,
+          "used_in": ["Innovation Details — shown when anticipated_users_id === 2"],
+          "description": "Expected outcome for anticipated users."
+        },
+        {
+          "path": "innovation_details.actors",
+          "type": "Actor[]",
+          "required": false,
+          "used_in": ["Actors subsection — repeated cards"],
+          "description": "Rendered when anticipated_users_id === 2 and length > 0.",
+          "item_fields": [
+            {
+              "path": "actor_type_id",
+              "type": "number",
+              "description": "Lookup id. Value 5 shows actor_type_custom_name."
+            },
+            {
+              "path": "actor_type_custom_name",
+              "type": "string",
+              "description": "Custom actor type name. Shown only when actor_type_id === 5."
+            },
+            {
+              "path": "sex_age_disaggregation_not_apply",
+              "type": "boolean | number",
+              "description": "When true, sex/age disaggregation rows are hidden."
+            },
+            {
+              "path": "women_youth",
+              "type": "boolean | number",
+              "description": "Shown as 'Women youth: Yes' when truthy and disaggregation applies."
+            },
+            {
+              "path": "women_not_youth",
+              "type": "boolean | number",
+              "description": "Shown as 'Women non-youth: Yes' when truthy."
+            },
+            {
+              "path": "men_youth",
+              "type": "boolean | number",
+              "description": "Shown as 'Men youth: Yes' when truthy."
+            },
+            {
+              "path": "men_not_youth",
+              "type": "boolean | number",
+              "description": "Shown as 'Men non-youth: Yes' when truthy."
+            }
+          ]
+        },
+        {
+          "path": "innovation_details.actor_type_labels",
+          "type": "Record<number, string>",
+          "required": false,
+          "used_in": ["Actor cards — actor type display"],
+          "description": "Map of actor_type_id to display label."
+        },
+        {
+          "path": "innovation_details.institution_types",
+          "type": "InstitutionType[]",
+          "required": false,
+          "used_in": ["Organizations subsection — repeated cards"],
+          "description": "Rendered when anticipated_users_id === 2 and length > 0.",
+          "item_fields": [
+            {
+              "path": "is_organization_known",
+              "type": "boolean | number",
+              "description": "When true, show institution_id / institution name. When false, show organization type and subtype."
+            },
+            {
+              "path": "institution_id",
+              "type": "number | null",
+              "description": "Known institution id. Resolve name via institution_labels."
+            },
+            {
+              "path": "institution_type_id",
+              "type": "number | null",
+              "description": "Organization type id. Resolve label via institution_type_labels when institution_type_custom_name is absent."
+            },
+            {
+              "path": "sub_institution_type_id",
+              "type": "number | null",
+              "description": "Organization subtype id for unknown organizations."
+            },
+            {
+              "path": "institution_type_custom_name",
+              "type": "string | null",
+              "description": "Custom organization name. Rendered as Name on the organization card (not Organization type)."
+            }
+          ]
+        },
+        {
+          "path": "innovation_details.institution_type_labels",
+          "type": "Record<number, string>",
+          "required": false,
+          "used_in": ["Organization cards — type display"]
+        },
+        {
+          "path": "innovation_details.sub_institution_type_labels",
+          "type": "Record<number, string>",
+          "required": false,
+          "used_in": ["Organization cards — subtype display"]
+        },
+        {
+          "path": "innovation_details.institution_labels",
+          "type": "Record<number, string>",
+          "required": false,
+          "used_in": ["Organization cards — known institution name"]
+        },
+        {
+          "path": "innovation_details.knowledge_sharing_form",
+          "type": "KnowledgeSharingForm",
+          "required": false,
+          "used_in": ["Knowledge Sharing subsection"],
+          "description": "Rendered when innovation_readiness.level >= 7 and at least one field has data. Question copy is fixed in the template (not in payload).",
+          "item_fields": [
+            {
+              "path": "is_knowledge_sharing",
+              "type": "boolean | number",
+              "description": "Shown when readiness >= 7. Display via is_knowledge_sharing_label."
+            },
+            {
+              "path": "dissemination_qualification_id",
+              "type": "number",
+              "description": "Shown when is_knowledge_sharing is truthy. 1 = Opt out (second question only). 2 = Proceed (all remaining fields)."
+            },
+            {
+              "path": "tool_useful_context",
+              "type": "string",
+              "description": "Shown when dissemination_qualification_id === 2."
+            },
+            {
+              "path": "results_achieved_expected",
+              "type": "string",
+              "description": "Shown when dissemination_qualification_id === 2."
+            },
+            {
+              "path": "tool_function_id",
+              "type": "ToolFunction[]",
+              "description": "Multiple tool functions. Display via tool_function_labels or tool_function_name on each item."
+            },
+            {
+              "path": "is_used_beyond_original_context",
+              "type": "boolean | number",
+              "description": "Display via is_used_beyond_original_context_label. Backend supplies adoption_adaptation_context_label for the narrative question."
+            },
+            {
+              "path": "adoption_adaptation_context",
+              "type": "string",
+              "description": "Shown only when is_used_beyond_original_context is true (Yes). Label via adoption_adaptation_context_label (e.g. How has it been adopted...)."
+            },
+            {
+              "path": "link_to_result",
+              "type": "LinkToResult[]",
+              "description": "Linked tools shown as cards. Each item: other_result_id/result_code + linked_result_title, optional result_type_label, qa_status_label, reporting_project_name."
+            },
+            {
+              "path": "other_tools",
+              "type": "string"
+            },
+            {
+              "path": "other_tools_integration",
+              "type": "string"
+            }
+          ]
+        },
+        {
+          "path": "innovation_details.is_knowledge_sharing_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Knowledge Sharing — answer to primary question (Yes/No)"]
+        },
+        {
+          "path": "innovation_details.dissemination_qualification_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Knowledge Sharing — answer when is_knowledge_sharing is true (Opt out / Proceed)"]
+        },
+        {
+          "path": "innovation_details.is_used_beyond_original_context_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Knowledge Sharing — used beyond context answer"]
+        },
+        {
+          "path": "innovation_details.tool_function_labels",
+          "type": "string[]",
+          "required": false,
+          "used_in": ["Knowledge Sharing — tool function answer (ordered list of labels)"]
+        },
+        {
+          "path": "innovation_details.scaling_potential_form",
+          "type": "ScalingPotentialForm",
+          "required": false,
+          "used_in": ["Scaling Potential subsection"],
+          "description": "Rendered when innovation_readiness.level >= 7 and at least one field has data. Scale questions (1–5) render as read-only radio rows; expansion_potential_id renders as Yes / Yes, with adaptations / No.",
+          "groups": {
+            "Formulation": [
+              "is_cheaper_than_alternatives",
+              "is_simpler_to_use",
+              "does_perform_better"
+            ],
+            "Demand and Investment": [
+              "is_desirable_to_users",
+              "has_commercial_viability"
+            ],
+            "Sustained use": [
+              "has_suitable_enabling_environment",
+              "has_evidence_of_uptake"
+            ],
+            "Expansion potential (standalone)": ["expansion_potential_id"]
+          },
+          "item_fields": [
+            {
+              "path": "is_cheaper_than_alternatives",
+              "type": "number",
+              "description": "Scale 1–5. Example: 5."
+            },
+            {
+              "path": "expansion_potential_id",
+              "type": "number",
+              "description": "1 = Yes, 2 = Yes with adaptations (shows expansion_adaptation_details), 3 = No."
+            },
+            {
+              "path": "expansion_adaptation_details",
+              "type": "string",
+              "description": "Shown when expansion_potential_id === 2."
+            }
+          ]
+        },
+        {
+          "path": "innovation_details.is_cheaper_than_alternatives_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Scaling Potential — Formulation group"]
+        },
+        {
+          "path": "innovation_details.is_simpler_to_use_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Scaling Potential — Formulation group"]
+        },
+        {
+          "path": "innovation_details.does_perform_better_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Scaling Potential — Formulation group"]
+        },
+        {
+          "path": "innovation_details.is_desirable_to_users_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Scaling Potential — Demand and Investment group"]
+        },
+        {
+          "path": "innovation_details.has_commercial_viability_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Scaling Potential — Demand and Investment group"]
+        },
+        {
+          "path": "innovation_details.has_suitable_enabling_environment_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Scaling Potential — Sustained use group"]
+        },
+        {
+          "path": "innovation_details.has_evidence_of_uptake_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Scaling Potential — Sustained use group"]
+        },
+        {
+          "path": "innovation_details.expansion_potential_label",
+          "type": "string",
+          "required": false,
+          "used_in": ["Scaling Potential — Sustained use group"]
+        }
+      ]
+    },
+    "results_partners": {
+      "interface": "ResultsPartners",
+      "note": "Reuse shared STAR Results Partners section."
+    },
+    "geographic_scope": {
+      "interface": "GeographicScope",
+      "note": "Reuse shared STAR Geographic Scope section."
+    },
+    "evidence": {
+      "interface": "Evidence",
+      "note": "Reuse shared STAR Evidence section."
+    },
+    "ip_rights": {
+      "interface": "IpRights",
+      "note": "Reuse shared STAR IP Rights section. Pass general_information.indicator_id (2 for Innovation Development)."
+    }
+  },
+  "conditional_rules_summary": {
+    "innovation_type_id_12": "Shows is_new_or_improved_variety; if truthy, shows new_or_improved_varieties_count",
+    "anticipated_users_id_2": "Shows actors, institution_types, intended_beneficiaries_description, expected_outcome",
+    "actor_type_id_5": "Shows actor_type_custom_name",
+    "institution_type_id_78": "Shows institution_type_custom_name for unknown organizations",
+    "readiness_level_gte_7": "Enables Knowledge Sharing and Scaling Potential sections",
+    "dissemination_qualification_id_2": "Expands Knowledge Sharing detail fields",
+    "expansion_potential_id_2": "Shows expansion_adaptation_details when expansion_potential_id === 2 (Yes, with adaptations)"
+  }
+}

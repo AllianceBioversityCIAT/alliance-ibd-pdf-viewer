@@ -1,0 +1,27 @@
+{
+  "evidence": [
+    {
+      "created_at": "2026-06-01T22:02:43.531Z",
+      "updated_at": "2026-06-01T22:02:43.531Z",
+      "is_active": true,
+      "result_evidence_id": 1681,
+      "result_id": 3118,
+      "evidence_description": "private",
+      "evidence_url": "google.com",
+      "evidence_role_id": 1,
+      "is_private": true
+    },
+    {
+      "created_at": "2026-06-01T22:02:43.538Z",
+      "updated_at": "2026-06-01T22:02:43.538Z",
+      "is_active": true,
+      "result_evidence_id": 1682,
+      "result_id": 3118,
+      "evidence_description": "public",
+      "evidence_url": "as.com",
+      "evidence_role_id": 1,
+      "is_private": false
+    }
+  ],
+  "notable_references": []
+}

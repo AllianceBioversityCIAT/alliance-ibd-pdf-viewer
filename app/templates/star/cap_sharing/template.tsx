@@ -1,0 +1,42 @@
+import type { TemplateProps } from "../..";
+import type { CapSharingPdfPayload } from "./types";
+import { PageShell } from "../shared/components/page-shell";
+import { GeneralInformationSection } from "../shared/sections/general_information";
+import { AllianceAlignmentSection } from "../shared/sections/alliance_alignment";
+import { ResultsPartnersSection } from "../shared/sections/results_partners";
+import { GeographicScopeSection } from "../shared/sections/geographic_scope";
+import { EvidenceSection } from "../shared/sections/evidence";
+import { IpRightsSection } from "../shared/sections/ip_rights";
+import { CapSharingDetailsSection } from "./components/cap-sharing-details-section";
+import {
+  getResultSubtitle,
+  shouldRenderTitle,
+} from "../shared/sections/general_information/rules";
+
+export default function CapSharingTemplate({ data }: Readonly<TemplateProps>) {
+  const payload = data as CapSharingPdfPayload | null;
+  const general = payload?.general_information;
+
+  const title = shouldRenderTitle(general)
+    ? general!.title.trim()
+    : "STAR Result";
+
+  return (
+    <PageShell
+      title={title}
+      resultSubtitle={getResultSubtitle(general)}
+      generatedAt={general?.generated_at}
+    >
+      <GeneralInformationSection data={general} />
+      <AllianceAlignmentSection data={payload?.alliance_alignment} />
+      <CapSharingDetailsSection data={payload?.cap_sharing} />
+      <ResultsPartnersSection data={payload?.results_partners} />
+      <GeographicScopeSection data={payload?.geographic_scope} />
+      <EvidenceSection data={payload?.evidence} />
+      <IpRightsSection
+        data={payload?.ip_rights}
+        indicatorId={general?.indicator_id}
+      />
+    </PageShell>
+  );
+}

@@ -1,0 +1,17 @@
+{
+  "geo_scope_id": "4",
+  "regions": [],
+  "countries": [
+    {
+      "isoAlpha2": "ET",
+      "name": "Ethiopia",
+      "result_countries_sub_nationals": []
+    },
+    {
+      "isoAlpha2": "ZA",
+      "name": "South Africa",
+      "result_countries_sub_nationals": []
+    }
+  ],
+  "comment_geo_scope": ""
+}

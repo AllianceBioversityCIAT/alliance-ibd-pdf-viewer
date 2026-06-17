@@ -1,0 +1,21 @@
+{
+  "is_partner_not_applicable": false,
+  "institutions": [
+    {
+      "institution_id": 101,
+      "institution_role_id": 1,
+      "acronym": "WUR",
+      "name": "Wageningen University and Research Centre",
+      "institution_type_name": "Research organizations and universities International (Universities)",
+      "headquarters": "Netherlands"
+    },
+    {
+      "institution_id": 102,
+      "institution_role_id": 2,
+      "acronym": "GRA",
+      "name": "Global Research Alliance on Agricultural Greenhouse Gases",
+      "institution_type_name": "Other",
+      "headquarters": "New Zealand"
+    }
+  ]
+}

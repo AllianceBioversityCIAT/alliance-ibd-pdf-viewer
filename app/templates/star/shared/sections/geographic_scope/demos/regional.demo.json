@@ -1,0 +1,10 @@
+{
+  "geo_scope_id": "2",
+  "regions": [
+    { "region_id": 1, "name": "Eastern Africa" },
+    { "region_id": 2, "name": "Southern Africa" },
+    { "region_id": 3, "name": "Western Africa" }
+  ],
+  "countries": [],
+  "comment_geo_scope": ""
+}

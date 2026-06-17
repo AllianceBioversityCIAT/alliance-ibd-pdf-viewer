@@ -1,0 +1,115 @@
+{
+  "indicator_id": 5,
+  "contracts": [
+    {
+      "is_active": true,
+      "result_contract_id": 1,
+      "result_id": 8245,
+      "contract_id": "A1048",
+      "contract_role_id": 1,
+      "is_primary": true,
+      "agreement_id": "A1048",
+      "description": "CIFOR Hosted - HQ",
+      "contract_status": "Active",
+      "project_lead_description": "Grespan, Gabriele",
+      "start_date": "31/12/2024",
+      "end_date": "3/12/2025",
+      "levers": {
+        "lever_id": 4,
+        "short_name": "Lever 4 - Agrobiodiversity",
+        "full_name": "Lever 4 - Agrobiodiversity",
+        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+      }
+    },
+    {
+      "is_active": true,
+      "result_contract_id": 2,
+      "result_id": 8245,
+      "contract_id": "A1065",
+      "contract_role_id": 2,
+      "is_primary": false,
+      "agreement_id": "A1065",
+      "description": "ECPGR Phase X hosted",
+      "project_lead_description": "Maggioni, Lorenzo",
+      "start_date": "31/12/2022",
+      "levers": {
+        "full_name": "Not available"
+      }
+    },
+    {
+      "is_active": true,
+      "result_contract_id": 3,
+      "result_id": 8245,
+      "contract_id": "S231",
+      "contract_role_id": 2,
+      "is_primary": false,
+      "agreement_id": "S231",
+      "description": "BI (IFAD) - Private sector incentives",
+      "project_lead_description": "Mockshell, Jonathan",
+      "start_date": "31/12/2021",
+      "endDateGlobal": "31/12/2025",
+      "levers": {
+        "lever_id": 2,
+        "short_name": "Lever 2 - Multifunctional Landscapes",
+        "full_name": "Lever 2 - Multifunctional Landscapes",
+        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L2-Multifuntional-Landscapes_COLOR.png"
+      }
+    }
+  ],
+  "result_sdgs": [],
+  "primary_levers": [
+    {
+      "result_lever_id": 1,
+      "result_id": 8245,
+      "lever_id": 4,
+      "lever_role_id": 1,
+      "is_primary": true,
+      "short_name": "Lever 4 - Agrobiodiversity",
+      "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png",
+      "result_lever_strategic_outcomes": [
+        {
+          "name": "Outcome A",
+          "description": "Improved agrobiodiversity conservation outcomes"
+        }
+      ],
+      "result_lever_sdg_targets": [
+        {
+          "target": "SDG target 2.5",
+          "description": "Maintain genetic diversity of seeds, cultivated plants and farmed animals"
+        }
+      ]
+    },
+    {
+      "result_lever_id": 3,
+      "result_id": 8245,
+      "lever_id": 3,
+      "lever_role_id": 1,
+      "is_primary": true,
+      "short_name": "Lever 3 - Climate Action",
+      "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L3-Climate-Action_COLOR.png",
+      "result_lever_sdg_targets": [
+        {
+          "target": "SDG target 13.1",
+          "description": "Strengthen resilience and adaptive capacity to climate-related hazards"
+        }
+      ]
+    }
+  ],
+  "contributor_levers": [
+    {
+      "result_lever_id": 2,
+      "result_id": 8245,
+      "lever_id": 2,
+      "lever_role_id": 2,
+      "is_primary": false,
+      "short_name": "Lever 2 - Multifunctional Landscapes",
+      "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L2-Multifuntional-Landscapes_COLOR.png",
+      "result_lever_sdg_targets": [
+        {
+          "target": "SDG target 1.5",
+          "description": "By 2030, build the resilience of the poor and those in vulnerable situations"
+        }
+      ]
+    }
+  ]
+}

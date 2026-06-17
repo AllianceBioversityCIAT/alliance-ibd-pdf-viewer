@@ -1,0 +1,333 @@
+{
+  "general_information": {
+    "title": "Climate-resilient drought-tolerant maize varieties for smallholder farmers",
+    "description": "This innovation development result documents the breeding and validation of drought-tolerant maize varieties adapted to Eastern Africa's changing rainfall patterns.",
+    "keywords": ["Innovation", "Maize", "Climate adaptation"],
+    "user_id": "f.arango@cgiar.org",
+    "year": "2025",
+    "main_contact_person": {
+      "user_id": "f.arango@cgiar.org"
+    },
+    "indicator_id": 2,
+    "result_code": 9150,
+    "result_type": "Innovation Development",
+    "generated_at": "Monday, June 1st, 2026, at 14:30 CET",
+    "main_contact_display": "Fernando Arango Suelto (f.arango@cgiar.org)"
+  },
+  "alliance_alignment": {
+    "indicator_id": 2,
+    "contracts": [
+      {
+        "is_active": true,
+        "result_contract_id": 1,
+        "result_id": 9150,
+        "contract_id": "A1048",
+        "contract_role_id": 1,
+        "is_primary": true,
+        "agreement_id": "A1048",
+        "description": "CIFOR Hosted - HQ",
+        "project_lead_description": "Grespan, Gabriele",
+        "start_date": "31/12/2024",
+        "end_date": "3/12/2025",
+        "levers": {
+          "lever_id": 4,
+          "short_name": "Lever 4 - Agrobiodiversity",
+          "full_name": "Lever 4 - Agrobiodiversity",
+          "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+        }
+      },
+      {
+        "is_active": true,
+        "result_contract_id": 2,
+        "result_id": 9150,
+        "contract_id": "A1065",
+        "contract_role_id": 2,
+        "is_primary": false,
+        "agreement_id": "A1065",
+        "description": "ECPGR Phase X hosted",
+        "project_lead_description": "Maggioni, Lorenzo",
+        "start_date": "31/12/2022",
+        "levers": {
+          "lever_id": 2,
+          "short_name": "Lever 2 - Multifunctional Landscapes",
+          "full_name": "Lever 2 - Multifunctional Landscapes",
+          "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L2-Multifuntional-Landscapes_COLOR.png"
+        }
+      }
+    ],
+    "result_sdgs": [],
+    "primary_levers": [
+      {
+        "result_lever_id": 1,
+        "result_id": 9150,
+        "lever_id": 4,
+        "lever_role_id": 1,
+        "is_primary": true,
+        "short_name": "Lever 4 - Agrobiodiversity",
+        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png",
+        "result_lever_strategic_outcomes": [
+          {
+            "name": "Outcome A",
+            "description": "Improved agrobiodiversity conservation outcomes"
+          }
+        ],
+        "result_lever_sdg_targets": [
+          {
+            "target": "SDG target 2.5",
+            "description": "Maintain genetic diversity of seeds, cultivated plants and farmed animals"
+          }
+        ]
+      }
+    ],
+    "contributor_levers": [
+      {
+        "result_lever_id": 2,
+        "result_id": 9150,
+        "lever_id": 2,
+        "lever_role_id": 2,
+        "is_primary": false,
+        "short_name": "Lever 2 - Multifunctional Landscapes",
+        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L2-Multifuntional-Landscapes_COLOR.png",
+        "result_lever_sdg_targets": [
+          {
+            "target": "SDG target 1.5",
+            "description": "By 2030, build the resilience of the poor and those in vulnerable situations"
+          }
+        ]
+      }
+    ]
+  },
+  "innovation_details": {
+    "short_title": "Drought-tolerant maize for Eastern Africa",
+    "innovation_nature_id": 1,
+    "innovation_type_id": 12,
+    "innovation_readiness_id": 7,
+    "anticipated_users_id": 2,
+    "is_new_or_improved_variety": 1,
+    "new_or_improved_varieties_count": 4,
+    "innovation_readiness_explanation": "Validated in multi-location trials across Ethiopia and Kenya with consistent yield advantage under water stress.",
+    "intended_beneficiaries_description": "Smallholder maize farmers in drought-prone areas of Eastern Africa, particularly women and youth engaged in rainfed agriculture.",
+    "expected_outcome": "Increased adoption of climate-resilient maize varieties leading to stabilized yields during drought seasons.",
+    "innovation_nature": {
+      "id": 1,
+      "name": "Technological",
+      "definition": "A physical or digital technology, tool, or product."
+    },
+    "innovation_type": {
+      "code": 12,
+      "name": "New or improved variety",
+      "definition": "A crop variety or animal breed that is new or substantially improved."
+    },
+    "innovation_readiness": {
+      "id": 7,
+      "level": 7,
+      "name": "Prototype",
+      "definition": "The innovation is validated for its ability to achieve a specific impact under semi-controlled conditions. Level 7 is a validation stage confirming readiness based on prior semi-controlled testing. Evidence may include documentation showing validation in semi-controlled settings (e.g., summaries of pilot results).",
+      "additional_guidance": ""
+    },
+    "anticipated_users_label": "User have been determined",
+    "is_new_or_improved_variety_label": "Yes",
+    "actor_type_labels": {
+      "1": "Farmer",
+      "5": "Other"
+    },
+    "institution_type_labels": {
+      "37": "National extension service",
+      "78": "Other"
+    },
+    "sub_institution_type_labels": {
+      "38": "Regional extension unit"
+    },
+    "institution_labels": {
+      "1": "International Center for Tropical Agriculture (CIAT)"
+    },
+    "is_knowledge_sharing_label": "Yes",
+    "dissemination_qualification_label": "Proceed",
+    "tool_function_labels": [
+      "Research and analysis",
+      "Decision support",
+      "Capacity building",
+      "Communication and outreach"
+    ],
+    "is_used_beyond_original_context_label": "Yes",
+    "actors": [
+      {
+        "is_active": true,
+        "result_actors_id": 1560,
+        "result_id": 9150,
+        "actor_type_id": 1,
+        "actor_type_custom_name": null,
+        "sex_age_disaggregation_not_apply": true,
+        "women_youth": false,
+        "women_not_youth": false,
+        "men_youth": false,
+        "men_not_youth": false,
+        "actor_role_id": 1
+      },
+      {
+        "is_active": true,
+        "result_actors_id": 1561,
+        "result_id": 9150,
+        "actor_type_id": 1,
+        "actor_type_custom_name": null,
+        "sex_age_disaggregation_not_apply": false,
+        "women_youth": true,
+        "women_not_youth": true,
+        "men_youth": true,
+        "men_not_youth": true,
+        "actor_role_id": 1
+      },
+      {
+        "is_active": true,
+        "result_actors_id": 1562,
+        "result_id": 9150,
+        "actor_type_id": 5,
+        "actor_type_custom_name": "other",
+        "sex_age_disaggregation_not_apply": false,
+        "women_youth": false,
+        "women_not_youth": true,
+        "men_youth": false,
+        "men_not_youth": true,
+        "actor_role_id": 1
+      },
+      {
+        "is_active": true,
+        "result_actors_id": 1563,
+        "result_id": 9150,
+        "actor_type_id": 1,
+        "actor_type_custom_name": null,
+        "sex_age_disaggregation_not_apply": false,
+        "women_youth": false,
+        "women_not_youth": false,
+        "men_youth": false,
+        "men_not_youth": false,
+        "actor_role_id": 1
+      }
+    ],
+    "institution_types": [
+      {
+        "is_active": true,
+        "result_institution_type_id": 1230,
+        "result_id": 9150,
+        "institution_type_id": null,
+        "sub_institution_type_id": null,
+        "institution_type_custom_name": null,
+        "institution_type_role_id": 1,
+        "is_organization_known": true,
+        "institution_id": 1
+      },
+      {
+        "is_active": true,
+        "result_institution_type_id": 1231,
+        "result_id": 9150,
+        "institution_type_id": 37,
+        "sub_institution_type_id": 38,
+        "institution_type_custom_name": null,
+        "institution_type_role_id": 1,
+        "is_organization_known": false,
+        "institution_id": null
+      },
+      {
+        "is_active": true,
+        "result_institution_type_id": 1232,
+        "result_id": 9150,
+        "institution_type_id": 78,
+        "sub_institution_type_id": null,
+        "institution_type_custom_name": "other",
+        "institution_type_role_id": 1,
+        "is_organization_known": false,
+        "institution_id": null
+      }
+    ],
+    "knowledge_sharing_form": {
+      "is_knowledge_sharing": true,
+      "dissemination_qualification_id": 2,
+      "tool_useful_context": "what context is this tool usefu",
+      "results_achieved_expected": "achieved or expected): identify and detail selected examples of relevance, adding numbers, facts, figures, names, and locations",
+      "tool_function_id": [
+        { "innovation_tool_function_id": 24, "tool_function_id": 1 },
+        { "innovation_tool_function_id": 25, "tool_function_id": 3 },
+        { "innovation_tool_function_id": 26, "tool_function_id": 2 },
+        { "innovation_tool_function_id": 27, "tool_function_id": 4 }
+      ],
+      "is_used_beyond_original_context": true,
+      "adoption_adaptation_context": "How has it been",
+      "other_tools": "Other tools",
+      "other_tools_integration": "Please provide a short description of how other tools are used with this one.",
+      "link_to_result": [
+        {
+          "link_result_id": 146,
+          "other_result_id": 26053,
+          "link_result_role_id": 2,
+          "linked_result_title": "A holistic framework for valuing ecosystem services in livestock farming",
+          "result_type_label": "INNOVATION DEVELOPMENT",
+          "qa_status_label": "QAED IN PRMS",
+          "reporting_project_name": "CIFOR Hosted - HQ (A1048)"
+        },
+        {
+          "link_result_id": 147,
+          "other_result_id": 13793,
+          "link_result_role_id": 2,
+          "linked_result_title": "Participatory variety selection toolkit for Eastern Africa",
+          "result_type_label": "INNOVATION DEVELOPMENT",
+          "qa_status_label": "QAED IN PRMS",
+          "reporting_project_name": "ECPGR Phase X hosted (A1065)"
+        }
+      ]
+    },
+    "scaling_potential_form": {
+      "is_cheaper_than_alternatives": 5,
+      "is_simpler_to_use": 5,
+      "does_perform_better": 5,
+      "is_desirable_to_users": 5,
+      "has_commercial_viability": 5,
+      "has_suitable_enabling_environment": 5,
+      "has_evidence_of_uptake": 5,
+      "expansion_potential_id": 2,
+      "expansion_adaptation_details": "The innovation could be expanded through regional seed networks and policy partnerships. Varieties would need local adaptation trials and alignment with national certification before wider release."
+    }
+  },
+  "results_partners": {
+    "is_partner_not_applicable": false,
+    "institutions": [
+      {
+        "institution_id": 101,
+        "institution_role_id": 1,
+        "acronym": "WUR",
+        "name": "Wageningen University and Research Centre",
+        "institution_type_name": "Research organizations and universities International (Universities)",
+        "headquarters": "Netherlands"
+      }
+    ]
+  },
+  "geographic_scope": {
+    "geo_scope_id": "50",
+    "regions": [],
+    "countries": [],
+    "comment_geo_scope": ""
+  },
+  "evidence": {
+    "evidence": [
+      {
+        "is_active": true,
+        "result_evidence_id": 2001,
+        "result_id": 9150,
+        "evidence_description": "Multi-location trial report",
+        "evidence_url": "https://example.org/trial-report",
+        "evidence_role_id": 1,
+        "is_private": false
+      }
+    ],
+    "notable_references": []
+  },
+  "ip_rights": {
+    "asset_ip_owner_description": "Variety release documentation and breeding records",
+    "publicity_restriction": false,
+    "requires_futher_development": false,
+    "asset_ip_owner": 1,
+    "potential_asset": true,
+    "potential_asset_description": "Drought-tolerant maize germplasm",
+    "private_sector_engagement_id": 1,
+    "formal_ip_rights_application_id": 1
+  }
+}
