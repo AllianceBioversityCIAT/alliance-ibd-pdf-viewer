@@ -46,7 +46,7 @@ export function getIndividualTrainingTableRows(
   }
 
 
-  const nationality = data.nationality_label?.trim();
+  const nationality = data.nationality_label?.trim() ?? "";
   if (hasText(nationality)) {
     rows.push({
       label: "Trainee nationality",

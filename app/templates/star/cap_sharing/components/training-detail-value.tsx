@@ -17,6 +17,7 @@ export function TrainingDetailIconValue({
 }: Readonly<TrainingDetailIconValueProps>) {
   return (
     <span className="inline-flex items-center gap-2 min-w-0">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={iconSrc}
         alt=""
@@ -60,6 +61,7 @@ export function SupervisorDetailValue({
 
 function CountryFlag({ isoAlpha2 }: Readonly<{ isoAlpha2: string }>) {
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={`https://flagcdn.com/w20/${isoAlpha2.trim().toLowerCase()}.png`}
       alt=""

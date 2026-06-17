@@ -273,6 +273,7 @@ export default function Example({ data }: TemplateProps) {
       </div>
 
       {/* Right green strip */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/img.png" className="w-[20px] h-full object-cover" alt="" />
     </div>
   );

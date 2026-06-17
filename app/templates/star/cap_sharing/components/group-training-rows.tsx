@@ -45,6 +45,7 @@ function ParticipantStatsValue({ group }: Readonly<{ group: GroupTraining }>) {
 
   return (
     <span className="inline-flex items-center gap-2 min-w-0 flex-wrap">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={GROUP_TRAINING_ICONS.totalParticipants}
         alt=""

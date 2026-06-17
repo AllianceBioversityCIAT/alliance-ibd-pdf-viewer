@@ -24,6 +24,7 @@ interface GeographicScopeSectionProps {
 
 function ToBeDeterminedSearchIcon() {
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={GEO_SCOPE_TO_BE_DETERMINED_ICON_SRC}
       alt=""
@@ -39,6 +40,7 @@ function GeoScopeIcon({
   variant,
 }: Readonly<{ variant: Exclude<GeoScopeVariant, "to_be_determined"> }>) {
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={GEO_SCOPE_ICON_SRC[variant]}
       alt=""
@@ -96,6 +98,7 @@ function CountryFlag({ isoAlpha2 }: Readonly<{ isoAlpha2: string | undefined }>)
   if (!isoAlpha2?.trim()) return null;
 
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={`https://flagcdn.com/w20/${isoAlpha2.trim().toLowerCase()}.png`}
       alt=""

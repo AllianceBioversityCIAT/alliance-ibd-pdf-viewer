@@ -99,7 +99,7 @@ export function getContractEndDate(contract: Contract): string | null {
   return null;
 }
 
-export function shouldRenderContractLever(contract: Contract): boolean {
+export function shouldRenderContractLever(): boolean {
   return true;
 }
 
