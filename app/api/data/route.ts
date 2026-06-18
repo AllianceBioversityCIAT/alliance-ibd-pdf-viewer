@@ -10,14 +10,11 @@ function matches(secret: string, expected: string): boolean {
 }
 
 function isAuthorized(req: NextRequest): boolean {
-  // Accept either API_SECRET (for external consumers) or ADMIN_SECRET (for admin UI)
-  const apiSecret = req.headers.get("x-api-secret");
+  // Validated by Middleware via CLARISA
+  if (req.headers.has("x-clarisa-app-acronym")) return true;
+
+  // Fallback for admin UI
   const adminSecret = req.headers.get("x-admin-secret");
-
-  if (apiSecret && process.env.API_SECRET) {
-    if (matches(apiSecret, process.env.API_SECRET)) return true;
-  }
-
   if (adminSecret && process.env.ADMIN_SECRET) {
     if (matches(adminSecret, process.env.ADMIN_SECRET)) return true;
   }
