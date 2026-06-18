@@ -289,7 +289,7 @@ data (payload)        → what the template will see as its `data` prop
 It exposes a RabbitMQ message pattern called **`pdf.generateUrl`**. When it receives one:
 
 1. Validates the `credentials` field against CLARISA. Rejects with `Unauthorized` if invalid.
-2. Takes the `data` from the payload and POSTs it to `{viewer}/api/data` with the `x-api-secret` header. The viewer stores the data in DynamoDB and returns an object (typically `{ uuid: "..." }`).
+2. Takes the `data` from the payload and POSTs it to `{viewer}/api/data` with the `x-api-key` header (using its CLARISA API Key). The viewer validates the API key against CLARISA, stores the data in DynamoDB, and returns an object (typically `{ uuid: "..." }`).
 3. Builds the viewer URL: `{viewer}/{templateName}?{viewer-response-as-query-params}` → e.g. `https://viewer-host/results_p25?uuid=8f0b5a72-...`
 4. Calls Gotenberg (`{gotenberg}/forms/chromium/convert/url`) with that URL + `paperWidth` + `paperHeight` + margins.
 5. Gotenberg navigates the URL, waits for the render to settle, and captures the PDF.
@@ -542,7 +542,7 @@ The backend **should not** call the viewer directly (everything goes through the
 
 | Method | Path | Auth header | Purpose |
 |---|---|---|---|
-| `POST` | `/api/data` | `x-api-secret` or `x-admin-secret` | Stores a JSON payload in DynamoDB. Returns `{ uuid }`. |
+| `POST` | `/api/data` | `x-api-key` or `x-admin-secret` | Stores a JSON payload in DynamoDB. Returns `{ uuid }`. |
 | `GET` | `/{template}` | (public; carries `uuid` in the query) | Renders the template HTML for Gotenberg. |
 | `GET` | `/api/templates` | (public) | Lists discovered templates. |
 | `GET` | `/api/list` | `x-admin-secret` | Lists items currently in DynamoDB (debug). |
@@ -564,7 +564,9 @@ The backend **should not** call the viewer directly (everything goes through the
 
 ```env
 # Authentication
-API_SECRET=             # consumed by the microservice (header x-api-secret)
+CLARISA_HOST=https://api.clarisa.cgiar.org # URL to CLARISA API
+CLARISA_MIS_ACRONYM=IBD_PDF_VIEWER         # The MIS acronym
+CLARISA_MICROSERVICE_NAME=PDF Viewer Ms9   # The name sent to CLARISA
 ADMIN_SECRET=           # consumed by this repo's admin UI
 
 # DynamoDB
@@ -588,7 +590,7 @@ GOTENBERG_MARGIN_BOTTOM=0
 GOTENBERG_MARGIN_LEFT=0
 GOTENBERG_MARGIN_RIGHT=0
 GOTENBERG_PRINT_BACKGROUND=true
-API_SECRET=                    # must match the viewer's
+API_KEY=                       # valid CLARISA API Key for this microservice
 ```
 
 ---
@@ -621,7 +623,7 @@ alliance-ibd-pdf-viewer/
 ├── app/
 │   ├── [template]/page.tsx       ← GET /{template}?uuid=...
 │   ├── api/
-│   │   ├── data/route.ts         ← POST /api/data       (x-api-secret)
+│   │   ├── data/route.ts         ← POST /api/data       (x-api-key)
 │   │   ├── templates/route.ts    ← GET  /api/templates
 │   │   ├── list/route.ts         ← GET  /api/list       (x-admin-secret)
 │   │   └── delete/route.ts       ← POST /api/delete     (x-admin-secret)
@@ -655,4 +657,4 @@ alliance-ibd-pdf-viewer/
 | Onboard START for the first time | Part 2 — step 1 (subscribe-application in CLARISA). |
 | See available templates | `GET /api/templates`. |
 | Clean up stale DynamoDB items | `/admin` or `POST /api/delete` with `x-admin-secret`. |
-| Rotate the consumer secret | Update `API_SECRET` on the viewer **and** the microservice at the same time. |
+| Rotate the consumer secret | Update `API_KEY` on the microservice, the viewer relies on CLARISA to validate it. |
