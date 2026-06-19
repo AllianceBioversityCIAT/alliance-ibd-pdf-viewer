@@ -1,9 +1,8 @@
-import type { GeographicScopePayload, GeoScopeVariant } from "./types";
+import type { Country, GeographicScopePayload, GeoScopeVariant } from "./types";
 import { GEO_SCOPE_ICON_SRC, GEO_SCOPE_TO_BE_DETERMINED_ICON_SRC } from "./assets";
 import {
   GEO_SCOPE_COLORS,
   GEO_SCOPE_EMPTY_LABELS,
-  getCountriesWithSubnationals,
   getCountryDisplayName,
   getCountrySubnationalNames,
   getGeoScopeLabel,
@@ -11,7 +10,6 @@ import {
   getRegionNames,
   shouldRenderComments,
   shouldRenderGeographicScope,
-  shouldRenderSubnational,
 } from "./rules";
 import { SectionTitle } from "../../components/section-title";
 import { STAR_COLORS } from "../../tokens";
@@ -159,30 +157,54 @@ function RegionList({
   );
 }
 
-function SubnationalGroups({
+function CountryWithFlag({
+  country,
   payload,
-}: Readonly<{ payload: GeographicScopePayload }>) {
-  const countries = getCountriesWithSubnationals(payload);
-  if (countries.length === 0) return null;
+}: Readonly<{ country: Country; payload: GeographicScopePayload }>) {
+  const name = getCountryDisplayName(country, payload);
 
   return (
-    <>
-      {countries.map((country) => {
-        const countryName = getCountryDisplayName(country, payload);
-        const subnationals = getCountrySubnationalNames(country);
-        if (subnationals.length === 0) return null;
 
-        return (
-          <div
-            key={`${country.isoAlpha2}-subnationals`}
-            className="flex flex-col gap-[5px]"
-          >
-            <FieldLabel>{`States specified of ${countryName} for this result:`}</FieldLabel>
-            <BulletList items={subnationals} />
-          </div>
-        );
-      })}
-    </>
+    <span
+      className="text-[10px] leading-normal inline-flex items-center gap-1"
+      style={{ color: STAR_COLORS.bodyText }}
+    >
+      <CountryFlag isoAlpha2={country?.isoAlpha2} />
+      {name}
+    </span>
+  );
+}
+
+function SubnationalCountryGroups({
+  payload,
+}: Readonly<{ payload: GeographicScopePayload }>) {
+  const countries = payload.countries ?? [];
+
+  return (
+    <div className="flex flex-col gap-[5px]">
+      <FieldLabel>Country and States for this result:</FieldLabel>
+      {countries.length === 0 ? (
+        <EmptyListPlaceholder>{GEO_SCOPE_EMPTY_LABELS.noCountries}</EmptyListPlaceholder>
+      ) : (
+        <div className="flex flex-col gap-[18px] pt-1">
+          {countries.map((country) => {
+            const subnationals = getCountrySubnationalNames(country);
+
+            return (
+              <div
+                key={`${country.isoAlpha2}-subnationals`}
+                className="flex flex-col gap-[5px]"
+              >
+                <CountryWithFlag country={country} payload={payload} />
+                {subnationals.length > 0 ? (
+                  <BulletList items={subnationals} />
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -267,8 +289,7 @@ function GeoScopeCardContent({
     case "subnational":
       return (
         <>
-          <CountryList payload={payload} />
-          {shouldRenderSubnational(payload) && <SubnationalGroups payload={payload} />}
+          <SubnationalCountryGroups payload={payload} />
           {shouldRenderComments(payload) && comment && (
             <CommentsBlock comment={comment} />
           )}
