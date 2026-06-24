@@ -265,7 +265,7 @@
         "is_active": true,
         "result_evidence_id": 1681,
         "result_id": 8245,
-        "evidence_description": "private",
+        "evidence_description": "this is a private evidence",
         "evidence_url": "google.com",
         "evidence_role_id": 1,
         "is_private": true
@@ -274,7 +274,7 @@
         "is_active": true,
         "result_evidence_id": 1682,
         "result_id": 8245,
-        "evidence_description": "public",
+        "evidence_description": "It is a public evidence of the result 8245.",
         "evidence_url": "as.com",
         "evidence_role_id": 1,
         "is_private": false
