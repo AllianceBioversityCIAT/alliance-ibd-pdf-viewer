@@ -27,10 +27,15 @@ export function getNormalizedEvidenceUrl(
   return `https://${raw}`;
 }
 
+export const PRIVATE_EVIDENCE_TITLE = "Private evidence items";
+
+export const PRIVATE_EVIDENCE_NOTICE =
+  "Private evidence items associated with this result cannot be displayed in this report.";
+
 export function shouldRenderEvidenceList(
   payload: EvidencePayload | null | undefined,
 ): boolean {
-  return getActiveEvidence(payload).length > 0;
+  return getPublicEvidence(payload).length > 0;
 }
 
 export function shouldRenderNotableReferences(
@@ -43,7 +48,11 @@ export function shouldRenderSection(
   payload: EvidencePayload | null | undefined,
 ): boolean {
   if (!payload) return false;
-  return shouldRenderEvidenceList(payload) || shouldRenderNotableReferences(payload);
+  return (
+    shouldRenderEvidenceList(payload) ||
+    hasPrivateEvidence(payload) ||
+    shouldRenderNotableReferences(payload)
+  );
 }
 
 export function getActiveEvidence(
@@ -54,6 +63,18 @@ export function getActiveEvidence(
       item.is_active !== false &&
       (hasText(item.evidence_url) || hasText(item.evidence_description)),
   );
+}
+
+export function getPublicEvidence(
+  payload: EvidencePayload | null | undefined,
+): Evidence[] {
+  return getActiveEvidence(payload).filter((item) => item.is_private !== true);
+}
+
+export function hasPrivateEvidence(
+  payload: EvidencePayload | null | undefined,
+): boolean {
+  return getActiveEvidence(payload).some((item) => item.is_private === true);
 }
 
 export function getVisibleNotableReferences(
