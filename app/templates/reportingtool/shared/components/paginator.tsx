@@ -21,12 +21,13 @@ interface PaginationConfig {
   /** STAR-only: compact footer on all pages except the last */
   starFooter?: {
     generalHeight: number;
+    generalBottomOffset?: number;
     lastHeight: number;
   };
 }
 
 const STAR_FOOTER_GENERAL = "/assets/star/footer-general.svg";
-const STAR_FOOTER_LAST = "/assets/star/footer.svg";
+const STAR_FOOTER_LAST = "/assets/star/footer.png";
 const STAR_FOOTER_LAST_HEIGHT = 112;
 
 function getFooterHeight(
@@ -44,6 +45,22 @@ function getFooterHeight(
       : config.starFooter.generalHeight;
   }
   return config.footerHeight;
+}
+
+function getFooterBottomOffset(
+  page: number,
+  totalPages: number | undefined,
+  config: PaginationConfig,
+): number {
+  if (
+    config.footerVariant === "star" &&
+    config.starFooter &&
+    (totalPages == null || page !== totalPages - 1)
+  ) {
+    return config.starFooter.generalBottomOffset ?? 0;
+  }
+
+  return 0;
 }
 
 function buildPageFooterHtml(
@@ -170,7 +187,12 @@ function getSafeZoneEnd(
   c: PaginationConfig,
   totalPages?: number,
 ): number {
-  return (page + 1) * ph - getFooterHeight(page, totalPages, c) - c.marginBottom;
+  return (
+    (page + 1) * ph -
+    getFooterHeight(page, totalPages, c) -
+    getFooterBottomOffset(page, totalPages, c) -
+    c.marginBottom
+  );
 }
 
 function getFooterY(
@@ -179,7 +201,11 @@ function getFooterY(
   c: PaginationConfig,
   totalPages?: number,
 ): number {
-  return (page + 1) * ph - getFooterHeight(page, totalPages, c);
+  return (
+    (page + 1) * ph -
+    getFooterHeight(page, totalPages, c) -
+    getFooterBottomOffset(page, totalPages, c)
+  );
 }
 
 function findPageRoot(container: HTMLElement): HTMLElement {
