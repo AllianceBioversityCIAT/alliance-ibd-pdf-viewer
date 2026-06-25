@@ -66,16 +66,16 @@
           "path": "general_information.result_code",
           "type": "string | number",
           "required": false,
-          "used_in": ["PageShell subtitle"],
-          "description": "PDF display enrichment for result code line.",
+          "used_in": ["PageShell metadata"],
+          "description": "PDF display enrichment for the compact “Result code:” metadata line.",
           "example": 8245
         },
         {
           "path": "general_information.result_type",
           "type": "string",
           "required": false,
-          "used_in": ["PageShell subtitle"],
-          "description": "PDF display enrichment for result type label.",
+          "used_in": ["PageShell metadata"],
+          "description": "PDF display enrichment for the compact “Indicator:” metadata line.",
           "example": "Capacity Sharing for Development"
         },
         {
@@ -93,6 +93,38 @@
           "used_in": ["General Information section"],
           "description": "Optional resolved display string for main contact (name + email).",
           "example": "Obilo Chinyere (o.chinyere@cgiar.org)"
+        },
+        {
+          "path": "general_information.status.status_name",
+          "type": "string",
+          "required": false,
+          "used_in": ["PageShell status badge"],
+          "description": "Status label rendered as an uppercase pill at the start of the PDF.",
+          "example": "OICR Accepted"
+        },
+        {
+          "path": "general_information.status.status_description",
+          "type": "string",
+          "required": false,
+          "used_in": ["PageShell status disclaimer"],
+          "description": "Short explanatory note describing what the current status means.",
+          "example": "This result has been accepted. The status reflects the current review outcome in STAR and may change if the result is updated or reviewed again."
+        },
+        {
+          "path": "general_information.status.status_border_color",
+          "type": "string",
+          "required": false,
+          "used_in": ["PageShell status badge"],
+          "description": "Optional hex border color for the transparent status pill and icon. Falls back to the STAR light blue palette when missing or invalid.",
+          "example": "#6FA17A"
+        },
+        {
+          "path": "general_information.status.status_text_color",
+          "type": "string",
+          "required": false,
+          "used_in": ["PageShell status badge", "PageShell status disclaimer"],
+          "description": "Optional hex text/accent color for the status pill and disclaimer icon/rule. Falls back to the STAR light blue palette when missing or invalid.",
+          "example": "#6FA17A"
         }
       ]
     },

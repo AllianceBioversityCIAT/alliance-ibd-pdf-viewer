@@ -8,23 +8,21 @@ import { GeographicScopeSection } from "../shared/sections/geographic_scope";
 import { EvidenceSection } from "../shared/sections/evidence";
 import { IpRightsSection } from "../shared/sections/ip_rights";
 import { InnovationDetailsSection } from "./components/innovation-details-section";
-import {
-  getResultSubtitle,
-  shouldRenderTitle,
-} from "../shared/sections/general_information/rules";
+import { shouldRenderTitle } from "../shared/sections/general_information/rules";
 
 export default function InnDevTemplate({ data }: Readonly<TemplateProps>) {
   const payload = data as InnDevPdfPayload | null;
   const general = payload?.general_information;
 
   const title = shouldRenderTitle(general)
-    ? general!.title!.trim()
+    ? general!.title.trim()
     : "STAR Result";
 
   return (
     <PageShell
       title={title}
-      resultSubtitle={getResultSubtitle(general)}
+      resultCode={general?.result_code}
+      indicator={general?.result_type}
       generatedAt={general?.generated_at}
     >
       <GeneralInformationSection data={general} />

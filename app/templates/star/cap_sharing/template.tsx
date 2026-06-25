@@ -8,10 +8,7 @@ import { GeographicScopeSection } from "../shared/sections/geographic_scope";
 import { EvidenceSection } from "../shared/sections/evidence";
 import { IpRightsSection } from "../shared/sections/ip_rights";
 import { CapSharingDetailsSection } from "./components/cap-sharing-details-section";
-import {
-  getResultSubtitle,
-  shouldRenderTitle,
-} from "../shared/sections/general_information/rules";
+import { shouldRenderTitle } from "../shared/sections/general_information/rules";
 
 export default function CapSharingTemplate({ data }: Readonly<TemplateProps>) {
   const payload = data as CapSharingPdfPayload | null;
@@ -24,8 +21,10 @@ export default function CapSharingTemplate({ data }: Readonly<TemplateProps>) {
   return (
     <PageShell
       title={title}
-      resultSubtitle={getResultSubtitle(general)}
+      resultCode={general?.result_code}
+      indicator={general?.result_type}
       generatedAt={general?.generated_at}
+      status={general?.status}
     >
       <GeneralInformationSection data={general} />
       <AllianceAlignmentSection data={payload?.alliance_alignment} />
