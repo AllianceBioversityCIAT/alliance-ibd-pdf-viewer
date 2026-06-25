@@ -9,7 +9,7 @@ export const STAR_HEADER_IMAGE = "/assets/star/header.png";
 /** Compact footer on pages 1…N-1 (521×14) */
 export const STAR_FOOTER_GENERAL_IMAGE = "/assets/star/footer-general.svg";
 /** Full footer on the last page only (595×112) */
-export const STAR_FOOTER_LAST_IMAGE = "/assets/star/footer.svg";
+export const STAR_FOOTER_LAST_IMAGE = "/assets/star/footer.png";
 
 /** Serializable only — Paginator is a Client Component */
 const STAR_PAGINATION_CONFIG = {
@@ -19,6 +19,7 @@ const STAR_PAGINATION_CONFIG = {
   footerVariant: "star" as const,
   starFooter: {
     generalHeight: 14,
+    generalBottomOffset: 12,
     lastHeight: 112,
   },
 };

@@ -43,10 +43,9 @@ export function shouldRenderAllianceAlignment(
 ): boolean {
   if (!data) return false;
   return (
-    hasArrayItems(data.contracts) ||
-    hasArrayItems(data.primary_levers) ||
-    hasArrayItems(data.contributor_levers) ||
-    hasArrayItems(data.result_sdgs)
+    shouldRenderContracts(data) ||
+    shouldRenderPrimaryLevers(data) ||
+    shouldRenderContributorLevers(data)
   );
 }
 
