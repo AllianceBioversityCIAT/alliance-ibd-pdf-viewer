@@ -11,5 +11,11 @@
   "result_code": 8245,
   "result_type": "Capacity Sharing for Development",
   "generated_at": "Tuesday, February 18th, 2025, at 21:18 CET",
-  "main_contact_display": "Obilo Chinyere (o.chinyere@cgiar.org)"
+  "main_contact_display": "Obilo Chinyere (o.chinyere@cgiar.org)",
+  "status": {
+    "status_name": "OICR Accepted",
+    "status_description": "This result has been accepted. The status reflects the current review outcome in STAR and may change if the result is updated or reviewed again.",
+    "status_border_color": "#6FA17A",
+    "status_text_color": "#6FA17A"
+  }
 }
