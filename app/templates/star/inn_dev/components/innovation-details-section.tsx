@@ -45,6 +45,8 @@ export function InnovationDetailsSection({
     shouldRenderKnowledgeSharing(data) ||
     shouldRenderScalingPotential(data);
 
+  if (!hasMainContent && !hasSubSections) return null;
+
   return (
     <section className={`flex flex-col gap-4 ${CONTENT_WIDTH_CLASS}`}>
       <SectionTitle>Innovation Details</SectionTitle>

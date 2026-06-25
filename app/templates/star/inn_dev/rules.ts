@@ -46,15 +46,10 @@ export function shouldRenderInnovationDetails(
   if (!payload) return false;
 
   return (
-    hasText(payload.short_title) ||
-    hasText(getInnovationNatureDisplay(payload)) ||
-    hasText(getInnovationTypeDisplay(payload)) ||
-    hasText(getNewOrImprovedVarietyLabel(payload)) ||
-    payload.new_or_improved_varieties_count != null ||
-    getReadinessLevel(payload) != null ||
-    hasText(payload.innovation_readiness_explanation) ||
-    payload.anticipated_users_id != null ||
-    shouldRenderAnticipatedUsersExpanded(payload) ||
+    getInnovationDetailsPlainRows(payload).length > 0 ||
+    shouldRenderReadinessScale(payload) ||
+    getInnovationDetailsPlainRowsAfterReadiness(payload).length > 0 ||
+    shouldRenderAnticipatedUsers(payload) ||
     shouldRenderKnowledgeSharing(payload) ||
     shouldRenderScalingPotential(payload)
   );
@@ -161,7 +156,15 @@ export function shouldRenderReadinessScale(
 export function shouldRenderAnticipatedUsers(
   payload: InnovationDetailsPayload | null | undefined,
 ): boolean {
-  return payload?.anticipated_users_id != null;
+  if (!payload || payload.anticipated_users_id == null) return false;
+  if (hasText(getAnticipatedUsersLabel(payload))) return true;
+  if (!shouldRenderAnticipatedUsersExpanded(payload)) return false;
+  return (
+    hasText(payload.intended_beneficiaries_description) ||
+    hasText(payload.expected_outcome) ||
+    shouldRenderActors(payload) ||
+    shouldRenderOrganizations(payload)
+  );
 }
 
 export function getAnticipatedUsersLabel(
@@ -306,7 +309,8 @@ export function getOrganizationSubtypeDisplay(
 export function shouldRenderKnowledgeSharing(
   payload: InnovationDetailsPayload | null | undefined,
 ): boolean {
-  return isReadinessAtKnowledgeSharingLevel(payload);
+  if (!payload || !isReadinessAtKnowledgeSharingLevel(payload)) return false;
+  return hasText(getKnowledgeSharingLabel(payload));
 }
 
 export function getKnowledgeSharingLabel(
