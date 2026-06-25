@@ -33,6 +33,14 @@ export function CapSharingDetailsSection({
   const individualRows = getIndividualTrainingTableRows(data);
   const organizationInstitutions = getOrganizationInstitutions(data);
   const trainingDetailRows = getTrainingDetailRows(data);
+  const hasVisibleContent =
+    trainingTypeRows.length > 0 ||
+    groupRows.length > 0 ||
+    individualRows.length > 0 ||
+    organizationInstitutions.length > 0 ||
+    trainingDetailRows.length > 0;
+
+  if (!hasVisibleContent) return null;
 
   return (
     <section className="flex flex-col gap-4 w-full">

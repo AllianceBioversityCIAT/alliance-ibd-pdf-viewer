@@ -48,11 +48,7 @@ export function shouldRenderSection(
   payload: EvidencePayload | null | undefined,
 ): boolean {
   if (!payload) return false;
-  return (
-    shouldRenderEvidenceList(payload) ||
-    hasPrivateEvidence(payload) ||
-    shouldRenderNotableReferences(payload)
-  );
+  return shouldRenderEvidenceList(payload) || hasPrivateEvidence(payload);
 }
 
 export function getActiveEvidence(

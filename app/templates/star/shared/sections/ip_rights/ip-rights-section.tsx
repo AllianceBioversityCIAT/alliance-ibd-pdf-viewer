@@ -72,56 +72,78 @@ export function IpRightsSection({
 
   if (!shouldRenderIpRights(effectiveIndicatorId) || !data) return null;
 
+  const assetIpOwner = getAssetIpOwnerDisplayValue(data);
+  const publicityRestriction = getPublicityRestrictionDisplayValue(data);
+  const potentialAsset = getPotentialAssetDisplayValue(data);
+  const requiresFurtherDevelopment =
+    getRequiresFurtherDevelopmentDisplayValue(data);
+  const privateSectorEngagement = getPrivateSectorEngagementDisplayValue(data);
+  const formalIpRightsApplication =
+    getFormalIpRightsApplicationDisplayValue(data);
+  const hasVisibleContent =
+    (!!assetIpOwner && shouldRenderAssetIpOwner(effectiveIndicatorId)) ||
+    (!!publicityRestriction &&
+      shouldRenderPublicityRestriction(effectiveIndicatorId)) ||
+    (!!potentialAsset && shouldRenderPotentialAsset(effectiveIndicatorId)) ||
+    (!!requiresFurtherDevelopment &&
+      shouldRenderRequiresFurtherDevelopment(effectiveIndicatorId)) ||
+    (!!privateSectorEngagement &&
+      shouldRenderPrivateSectorEngagement(data, effectiveIndicatorId)) ||
+    (!!formalIpRightsApplication &&
+      shouldRenderFormalIpRightsApplication(data, effectiveIndicatorId));
+
+  if (!hasVisibleContent) return null;
+
   return (
     <section className={`flex flex-col gap-[10px] ${CONTENT_WIDTH_CLASS}`}>
       <SectionTitle>IP Rights</SectionTitle>
 
       <div className="flex flex-col gap-[10px]">
         {shouldRenderAssetIpOwner(effectiveIndicatorId) &&
-          getAssetIpOwnerDisplayValue(data) && (
+          assetIpOwner && (
             <IpRightsQuestionBlock
               question="Who owns the intellectual property rights to this asset?"
-              answer={getAssetIpOwnerDisplayValue(data)!}
+              answer={assetIpOwner}
             />
           )}
 
         {shouldRenderPublicityRestriction(effectiveIndicatorId) &&
-          getPublicityRestrictionDisplayValue(data) && (
+          publicityRestriction && (
             <IpRightsQuestionBlock
               question="Are there any legal restrictions for the publication of the work?"
-              answer={getPublicityRestrictionDisplayValue(data)!}
+              answer={publicityRestriction}
             />
           )}
 
         {shouldRenderPotentialAsset(effectiveIndicatorId) &&
-          getPotentialAssetDisplayValue(data) && (
+          potentialAsset && (
             <IpRightsQuestionBlock
               question="Is there any potential for commercialization/release/making available this asset?"
-              answer={getPotentialAssetDisplayValue(data)!}
+              answer={potentialAsset}
             />
           )}
 
         {shouldRenderRequiresFurtherDevelopment(effectiveIndicatorId) &&
-          getRequiresFurtherDevelopmentDisplayValue(data) && (
+          requiresFurtherDevelopment && (
             <IpRightsQuestionBlock
               question="Does this asset require further development or refinement?"
-              answer={getRequiresFurtherDevelopmentDisplayValue(data)!}
+              answer={requiresFurtherDevelopment}
             />
           )}
 
         {shouldRenderPrivateSectorEngagement(data, effectiveIndicatorId) &&
-          getPrivateSectorEngagementDisplayValue(data) && (
+          privateSectorEngagement && (
             <IpRightsQuestionBlock
               question="Do you expect private sector engagement in innovation development and/or scaling?"
-              answer={getPrivateSectorEngagementDisplayValue(data)!}
+              answer={privateSectorEngagement}
             />
           )}
 
         {shouldRenderFormalIpRightsApplication(data, effectiveIndicatorId) &&
-          getFormalIpRightsApplicationDisplayValue(data) && (
+          formalIpRightsApplication && (
             <IpRightsQuestionBlock
               question="Do you consider applying for formal Intellectual Property Rights?"
-              answer={getFormalIpRightsApplicationDisplayValue(data)!}
+              answer={formalIpRightsApplication}
             />
           )}
       </div>

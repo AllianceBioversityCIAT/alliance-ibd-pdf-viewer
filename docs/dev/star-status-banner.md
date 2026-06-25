@@ -9,6 +9,7 @@ Add support for a status badge and explanatory note at the start of STAR PDFs.
 - Extend `general_information` with status display fields from the backend: name, description, border color, and text color.
 - Render compact header metadata for status, result code, and indicator.
 - Keep rendering optional so partial payloads continue to work.
+- Add bottom breathing room to the compact STAR footer on non-final pages.
 
 ## Design Notes
 
@@ -18,3 +19,4 @@ Add support for a status badge and explanatory note at the start of STAR PDFs.
 ## Validation
 
 - `npm run lint -- "app/templates/star/shared/components/page-shell.tsx" "app/templates/star/shared/sections/general_information/types.ts" "app/templates/star/cap_sharing/template.tsx" "app/templates/star/inn_dev/template.tsx"`
+- `npm run lint -- "app/templates/reportingtool/shared/components/paginator.tsx" "app/templates/star/shared/components/page-shell.tsx"`
