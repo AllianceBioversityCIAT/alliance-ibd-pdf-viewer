@@ -2,9 +2,10 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { Paginator } from "@/app/templates/reportingtool/shared/components/paginator";
 import { STAR_COLORS, STAR_FONT_IMPORT, STAR_FONTS } from "../tokens";
+import type { StatusDisplay } from "../sections/general_information/types";
 
 /** Figma node 34466:20857 — full header bar (595×131) */
-export const STAR_HEADER_IMAGE = "/assets/star/header.svg";
+export const STAR_HEADER_IMAGE = "/assets/star/header.png";
 /** Compact footer on pages 1…N-1 (521×14) */
 export const STAR_FOOTER_GENERAL_IMAGE = "/assets/star/footer-general.svg";
 /** Full footer on the last page only (595×112) */
@@ -22,17 +23,137 @@ const STAR_PAGINATION_CONFIG = {
   },
 };
 
+type HeaderResultCode = string | number | null;
+
 export interface PageShellProps {
   title: string;
+  resultCode?: HeaderResultCode;
+  indicator?: string | null;
   resultSubtitle?: string | null;
   generatedAt?: string | null;
+  status?: StatusDisplay | null;
   children: ReactNode;
+}
+
+const DEFAULT_STATUS_COLOR = STAR_COLORS.lightBlue300;
+const STATUS_NOTE_BACKGROUND_COLOR = "#F7F8F9";
+
+function safeHexColor(
+  value: string | null | undefined,
+  fallback: string,
+): string {
+  if (!value) return fallback;
+  const color = value.trim();
+  return /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(color) ? color : fallback;
+}
+
+function StatusBadge({ status }: Readonly<{ status?: StatusDisplay | null }>) {
+  const name = status?.status_name?.trim();
+  if (!name) return null;
+
+  const textColor = safeHexColor(
+    status?.status_text_color,
+    DEFAULT_STATUS_COLOR,
+  );
+  const borderColor = safeHexColor(
+    status?.status_border_color,
+    DEFAULT_STATUS_COLOR,
+  );
+
+  return (
+    <span
+      className="inline-flex w-fit items-center rounded-full border px-2 py-[2px] text-[9px] font-bold uppercase leading-none tracking-[0.02em]"
+      style={{ borderColor, color: textColor }}
+    >
+      {name}
+    </span>
+  );
+}
+
+function StatusNote({ status }: Readonly<{ status?: StatusDisplay | null }>) {
+  const description = status?.status_description?.trim();
+  if (!description) return null;
+
+  return (
+    <div
+      className="mb-2 flex items-center gap-2.5 px-3 py-2"
+      style={{
+        backgroundColor: STATUS_NOTE_BACKGROUND_COLOR,
+        borderLeft: `4px solid ${STAR_COLORS.primaryBlue500}`,
+      }}
+    >
+      <span
+        className="flex h-[13px] w-[13px] shrink-0 rotate-180 items-center justify-center rounded-full border text-[9px] font-semibold leading-none"
+        style={{
+          borderColor: STAR_COLORS.primaryBlue500,
+          color: STAR_COLORS.primaryBlue500,
+        }}
+        aria-hidden
+      >
+        i
+      </span>
+      <p
+        className="text-[9px] font-light leading-normal"
+        style={{ color: STAR_COLORS.greyMuted }}
+      >
+        {description}
+      </p>
+    </div>
+  );
+}
+
+function getHeaderSubtitle({
+  resultCode,
+  indicator,
+  resultSubtitle,
+}: Readonly<{
+  resultCode?: HeaderResultCode;
+  indicator?: string | null;
+  resultSubtitle?: string | null;
+}>): string | null | undefined {
+  const normalizedIndicator = indicator?.trim();
+
+  if (resultCode != null && normalizedIndicator) {
+    return `Result code #${resultCode} - ${normalizedIndicator}`;
+  }
+  if (resultCode != null) return `Result code #${resultCode}`;
+  if (normalizedIndicator) return normalizedIndicator;
+  return resultSubtitle;
+}
+
+function HeaderMetadata({
+  resultCode,
+  indicator,
+  resultSubtitle,
+  status,
+}: Readonly<{
+  resultCode?: HeaderResultCode;
+  indicator?: string | null;
+  resultSubtitle?: string | null;
+  status?: StatusDisplay | null;
+}>) {
+  const subtitle = getHeaderSubtitle({ resultCode, indicator, resultSubtitle });
+
+  if (!status?.status_name?.trim() && !subtitle) return null;
+
+  return (
+    <div
+      className="flex items-center gap-2 text-[12px] font-bold leading-[1.15]"
+      style={{ color: STAR_COLORS.bodyText }}
+    >
+      <StatusBadge status={status} />
+      {subtitle && <p>{subtitle}</p>}
+    </div>
+  );
 }
 
 export function PageShell({
   title,
+  resultCode,
+  indicator,
   resultSubtitle,
   generatedAt,
+  status,
   children,
 }: Readonly<PageShellProps>) {
   const disclaimer = generatedAt
@@ -65,14 +186,12 @@ export function PageShell({
           >
             {title}
           </h1>
-          {resultSubtitle && (
-            <p
-              className="text-[12px] font-bold leading-[1.15]"
-              style={{ color: STAR_COLORS.bodyText }}
-            >
-              {resultSubtitle}
-            </p>
-          )}
+          <HeaderMetadata
+            resultCode={resultCode}
+            indicator={indicator}
+            resultSubtitle={resultSubtitle}
+            status={status}
+          />
         </div>
         <p
           className="text-[9px] font-light leading-normal"
@@ -80,6 +199,7 @@ export function PageShell({
         >
           {disclaimer}
         </p>
+        <StatusNote status={status} />
       </div>
 
       <div

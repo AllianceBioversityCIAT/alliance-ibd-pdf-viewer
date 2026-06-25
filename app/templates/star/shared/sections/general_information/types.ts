@@ -2,6 +2,13 @@ export interface MainContractPerson {
   user_id: string;
 }
 
+export interface StatusDisplay {
+  status_name?: string | null;
+  status_description?: string | null;
+  status_border_color?: string | null;
+  status_text_color?: string | null;
+}
+
 /** STAR backend interface — preserve field names */
 export interface GeneralInformation {
   title: string;
@@ -10,6 +17,7 @@ export interface GeneralInformation {
   user_id: string;
   year: string;
   main_contact_person: MainContractPerson;
+  status?: StatusDisplay | null;
 }
 
 /** PDF-specific extensions (not sent by STAR core, optional enrichments) */
