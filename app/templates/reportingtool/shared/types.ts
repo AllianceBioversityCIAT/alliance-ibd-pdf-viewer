@@ -53,6 +53,27 @@ export interface PartnerEntry {
   partner_delivery_type: string;
 }
 
+/**
+ * P2-3095 — 2026 Contributors and Partners split (ToC vs "Other(s)"), sent by PRMS only for
+ * phase 2026+ results mapped to a ToC KPI. Absent for every earlier phase.
+ */
+export interface ContributorsSplit {
+  toc_contributing_initiatives: ContributingInitiative[];
+  other_contributing_initiatives: ContributingInitiative[];
+  toc_contributing_centers: ContributingCenter[];
+  other_contributing_centers: ContributingCenter[];
+  toc_external_partners: Omit<PartnerEntry, "partner_delivery_type">[];
+  other_external_partners: Omit<PartnerEntry, "partner_delivery_type">[];
+}
+
+/** P2-3095 — the two questions asked when a phase 2026+ result is NOT mapped to the ToC. */
+export interface TocUnplanned {
+  show_financial_resources: boolean;
+  program_invested_financial_resources: "Yes" | "No" | null;
+  show_why_reported: boolean;
+  why_reported: string | null;
+}
+
 export interface QAAdjustment {
   label: string;
   from_value?: string;
@@ -240,6 +261,10 @@ export interface PRMSResultData {
 
   // Bundled innovations
   bundled_innovations?: BundledInnovation[];
+
+  // P2-3095 (phase 2026+ only)
+  contributors_split?: ContributorsSplit | null;
+  toc_unplanned?: TocUnplanned | null;
 
   // Innovation Development (rt_id=7)
   readiness_level?: string;
