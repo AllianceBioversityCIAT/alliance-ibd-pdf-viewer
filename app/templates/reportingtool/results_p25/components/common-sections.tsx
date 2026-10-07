@@ -6,6 +6,8 @@ import type {
   GeoLocation,
   Evidence,
   TocPrimaryEntry,
+  ContributingCenter,
+  PartnerEntry,
 } from "../../shared/types";
 import { ImpactAreaCard, OECDCriteria } from "../../shared/components/impact-areas";
 import { DataTable } from "../../shared/components/tables";
@@ -170,6 +172,53 @@ function TheoryOfChangeCard({
 
 // ── Contributors and Partners ──
 
+function CenterList({
+  label,
+  centers,
+}: Readonly<{ label: string; centers: ContributingCenter[] }>) {
+  return (
+    <div>
+      <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15] mb-[4px]">
+        {label}:
+      </p>
+      <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
+        {centers.map((c, i) => (
+          <li key={`${c.center_name}-${i}`} className="leading-normal">
+            {c.center_name}
+            {!!c.is_primary_center && (
+              <span className="text-(--theme-mid) font-bold ml-[4px]">
+                (Primary)
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function PartnersTable({
+  title,
+  partners,
+}: Readonly<{
+  title: string;
+  partners: Pick<PartnerEntry, "partner_name" | "partner_country_hq" | "partner_type">[];
+}>) {
+  return (
+    <div className="flex flex-col gap-2.5" data-paginator-block>
+      <SubSectionTitle>{title}</SubSectionTitle>
+      <DataTable
+        columns={["Name", "Country HQ", "Institution type"]}
+        rows={partners.map((p) => [
+          p.partner_name ?? "Not provided",
+          p.partner_country_hq ?? "Not provided",
+          p.partner_type ?? "Not provided",
+        ])}
+      />
+    </div>
+  );
+}
+
 export function ContributorsSection({
   data,
   tocEntries,
@@ -177,26 +226,59 @@ export function ContributorsSection({
   data: PRMSResultData;
   tocEntries: TheoryOfChange;
 }>) {
-  const hasContributingInitiatives =
-    data.contributing_initiatives && data.contributing_initiatives.length > 0;
-  const hasCenters =
-    data.contributing_centers && data.contributing_centers.length > 0;
-  const hasBilateralProjects =
-    data.bilateral_projects && data.bilateral_projects.length > 0;
-  const allPartners = [
-    ...(data.non_kp_partner_data ?? []),
+  // P2-3095: phase 2026+ only. `split` = mapped to the ToC (ToC vs "Other(s)" lists);
+  // `unplanned` = NOT mapped to the ToC (two questions replace the ToC cards). Both are absent
+  // for every earlier phase, so those PDFs render exactly as before.
+  const split = data.contributors_split ?? null;
+  const unplanned = data.toc_unplanned ?? null;
+
+  const initiatives = split
+    ? split.toc_contributing_initiatives ?? []
+    : data.contributing_initiatives ?? [];
+  const otherInitiatives = split?.other_contributing_initiatives ?? [];
+  const centers = split
+    ? split.toc_contributing_centers ?? []
+    : data.contributing_centers ?? [];
+  const otherCenters = split?.other_contributing_centers ?? [];
+  const partners = [
+    ...((split ? split.toc_external_partners : data.non_kp_partner_data) ?? []),
     ...(data.kp_partner_data ?? []),
   ];
-  const hasPartners = allPartners?.length > 0;
+  const otherPartners = split?.other_external_partners ?? [];
+
+  // Same as the form: with nothing from the ToC, "Other(s)" keeps the plain label.
+  const otherInitiativesLabel = initiatives.length
+    ? "Other(s) Science Program(s)"
+    : "Contributing Program";
+  const otherCentersLabel = centers.length
+    ? "Other(s) Contributing CGIAR Centers"
+    : "Contributing CGIAR Centers";
+  const otherPartnersTitle = partners.length
+    ? "Other(s) External Partners"
+    : "Partners";
+
+  const hasContributingInitiatives =
+    initiatives.length > 0 || otherInitiatives.length > 0;
+  const hasCenters = centers.length > 0 || otherCenters.length > 0;
+  const hasBilateralProjects =
+    data.bilateral_projects && data.bilateral_projects.length > 0;
+  const hasPartners = partners.length > 0;
+  const hasOtherPartners = otherPartners.length > 0;
   const hasBundled =
     data.bundled_innovations && data.bundled_innovations.length > 0;
+  const showTocCards = !unplanned && tocEntries.toc_primary.length > 0;
+  const showUnplanned =
+    !!unplanned &&
+    (unplanned.show_financial_resources || unplanned.show_why_reported);
 
   const hasAnything =
-    tocEntries.toc_primary.length > 0 ||
+    showTocCards ||
+    showUnplanned ||
     hasContributingInitiatives ||
     hasCenters ||
     hasBilateralProjects ||
     hasPartners ||
+    hasOtherPartners ||
     hasBundled;
 
   if (!hasAnything) return null;
@@ -205,7 +287,27 @@ export function ContributorsSection({
     <div className="flex flex-col gap-2.5">
       <SectionTitle>Contributors and Partners</SectionTitle>
 
-      {tocEntries.toc_primary.length > 0 && (
+      {showUnplanned && unplanned && (
+        <div className="flex flex-col gap-2.5">
+          <SubSectionTitle>Theory of Change</SubSectionTitle>
+          <div className="flex flex-col gap-[8px] text-[10px]">
+            {unplanned.show_financial_resources && (
+              <LabelValue
+                label="Did the Program invest financial resources in the achievement of this result?"
+                value={unplanned.program_invested_financial_resources ?? "Not provided"}
+              />
+            )}
+            {unplanned.show_why_reported && (
+              <LabelValue
+                label="Why is the result being reported?"
+                value={unplanned.why_reported ?? "Not provided"}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {showTocCards && (
         <div className="flex flex-col gap-2.5">
           <SubSectionTitle>Theory of Change</SubSectionTitle>
           {tocEntries.toc_primary.map((toc, i) => (
@@ -222,36 +324,30 @@ export function ContributorsSection({
         <div className="flex flex-col gap-2.5">
           <SubSectionTitle>Contributors</SubSectionTitle>
           <div className="flex flex-col gap-[8px] text-[10px]">
-            {!!data.contributing_initiatives?.length && (
+            {initiatives.length > 0 && (
               <LabelValue
                 label="Contributing Program"
-                value={data.contributing_initiatives
+                value={initiatives
                   .map((i) => i.initiative_short_name)
                   .join(", ")}
               />
             )}
 
-            {hasCenters && (
-              <div>
-                <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15] mb-[4px]">
-                  Contributing CGIAR Centers:
-                </p>
-                <ul className="list-disc ml-[15px] text-[#393939] text-[10px]">
-                  {data.contributing_centers?.map((c, i) => (
-                    <li
-                      key={`${c.center_name}-${i}`}
-                      className="leading-normal"
-                    >
-                      {c.center_name}
-                      {!!c.is_primary_center && (
-                        <span className="text-(--theme-mid) font-bold ml-[4px]">
-                          (Primary)
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            {otherInitiatives.length > 0 && (
+              <LabelValue
+                label={otherInitiativesLabel}
+                value={otherInitiatives
+                  .map((i) => i.initiative_short_name)
+                  .join(", ")}
+              />
+            )}
+
+            {centers.length > 0 && (
+              <CenterList label="Contributing CGIAR Centers" centers={centers} />
+            )}
+
+            {otherCenters.length > 0 && (
+              <CenterList label={otherCentersLabel} centers={otherCenters} />
             )}
 
             {hasBilateralProjects && (
@@ -281,19 +377,11 @@ export function ContributorsSection({
       )}
 
       {hasPartners && (
-        <div className="flex flex-col gap-2.5" data-paginator-block>
-          <SubSectionTitle>Partners</SubSectionTitle>
-          <DataTable
-            columns={["Name", "Country HQ", "Institution type"]}
-            rows={
-              allPartners?.map((p) => [
-                p.partner_name ?? "Not provided",
-                p.partner_country_hq ?? "Not provided",
-                p.partner_type ?? "Not provided",
-              ]) ?? []
-            }
-          />
-        </div>
+        <PartnersTable title="Partners" partners={partners} />
+      )}
+
+      {hasOtherPartners && (
+        <PartnersTable title={otherPartnersTitle} partners={otherPartners} />
       )}
 
       {hasBundled && (
