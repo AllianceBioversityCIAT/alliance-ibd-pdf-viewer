@@ -1,3 +1,4 @@
+// @akili-spec changes/bilateral-pdf-mds-only (BPM-R-4: MDS-only; no short title / impact areas)
 import Image from "next/image";
 import type {
   PRMSResultData,
@@ -38,7 +39,6 @@ export { SectionTitle, SubSectionTitle, LabelValue };
 
 // ── Result Details ──
 
-// @akili-spec changes/bilateral-pdf-mds-only (BPM-R-4: MDS-only; no short title / impact areas)
 export function ResultDetailsSection({
   data,
 }: Readonly<{
@@ -169,7 +169,7 @@ export function ContributorsSection({
     hasContributingInitiatives ||
     hasCenters ||
     hasBilateralProjects ||
-    hasPartners;
+    kpPartners.length > 0;
 
   if (!hasAnything) return null;
 
