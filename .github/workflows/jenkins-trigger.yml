@@ -1,10 +1,9 @@
 name: Trigger Jenkins Job - ingestion-ecosystem
 
 on:
-  push:
-    branches:
-      - next-ssr-version-lambda-setup
-      - main
+  # main and next-ssr-version-lambda-setup removed (PDF-VIEWER cutover): a push to main runs pdf-viewer-cicd.yml ->
+  # pdf-viewer-cd, which deploys without Docker on the Jenkins agent. The legacy job pdf-viewer stays available through
+  # workflow_dispatch (manual recovery).
   workflow_dispatch: # Allows manual execution
 
 jobs:
