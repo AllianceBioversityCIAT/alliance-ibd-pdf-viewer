@@ -1,0 +1,151 @@
+{
+  "indicator_id": 5,
+  "portfolio": {
+    "id": 2,
+    "name": "Portfolio 2",
+    "start_year": 2026,
+    "end_year": 2030
+  },
+  "contracts": [
+    {
+      "is_active": true,
+      "result_contract_id": 1,
+      "result_id": 8245,
+      "contract_id": "A1048",
+      "contract_role_id": 1,
+      "is_primary": true,
+      "agreement_id": "A1048",
+      "description": "CIFOR Hosted - HQ",
+      "contract_status": "Active",
+      "project_lead_description": "Grespan, Gabriele",
+      "start_date": "31/12/2024",
+      "end_date": "31/12/2026",
+      "levers": {
+        "lever_id": 4,
+        "short_name": "Lever 4 - Agrobiodiversity",
+        "full_name": "Lever 4 - Agrobiodiversity",
+        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+      }
+    },
+    {
+      "is_active": true,
+      "result_contract_id": 2,
+      "result_id": 8245,
+      "contract_id": "S231",
+      "contract_role_id": 2,
+      "is_primary": false,
+      "agresso_contract": {
+        "agreement_id": "S231",
+        "description": "BI (IFAD) - Private sector incentives",
+        "project_lead_description": "Mockshell, Jonathan",
+        "start_date": "31/12/2021",
+        "endDateGlobal": "31/12/2026"
+      }
+    }
+  ],
+  "research_areas": [
+    {
+      "result_lever_id": 11,
+      "result_id": 8245,
+      "lever_id": 12,
+      "lever_role_id": 3,
+      "is_primary": false,
+      "portfolio_id": 2,
+      "short_name": "Biodiversity for Food and Agriculture",
+      "full_name": "Conservation and use of crop and tree genetic resources",
+      "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+    },
+    {
+      "result_lever_id": 12,
+      "result_id": 8245,
+      "lever_id": 14,
+      "lever_role_id": 3,
+      "is_primary": false,
+      "portfolio_id": 2,
+      "short_name": "Climate Action",
+      "full_name": "Adaptation and mitigation across agri-food systems",
+      "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L3-Climate-Action_COLOR.png"
+    }
+  ],
+  "strategic_objectives": [
+    {
+      "id": 1,
+      "strategic_objective_id": 1,
+      "portfolio_id": 2,
+      "name": "Transform food systems for healthy, sustainable diets",
+      "description": "Shift production and consumption towards diverse, nutritious and affordable diets."
+    },
+    {
+      "id": 3,
+      "strategic_objective_id": 3,
+      "portfolio_id": 2,
+      "name": "Build climate-resilient and biodiverse landscapes",
+      "description": "Restore ecosystems and secure agrobiodiversity as the foundation of resilient livelihoods."
+    }
+  ],
+  "impact_outcomes": [
+    {
+      "id": 2,
+      "impact_outcome_id": 2,
+      "portfolio_id": 2,
+      "name": "Improved policy environments for agrobiodiversity",
+      "description": "National and subnational policies integrate genetic diversity conservation and use."
+    },
+    {
+      "id": 5,
+      "impact_outcome_id": 5,
+      "portfolio_id": 2,
+      "name": "Increased adoption of climate-smart practices"
+    }
+  ],
+  "result_sdg_targets": [
+    {
+      "sdg_target_id": 11,
+      "sdg_target_code": "2.4",
+      "sdg_target": "By 2030, ensure sustainable food production systems and implement resilient agricultural practices that increase productivity and production, that help maintain ecosystems, that strengthen capacity for adaptation to climate change, extreme weather, drought, flooding and other disasters and that progressively improve land and soil quality",
+      "clarisa_sdg": {
+        "id": 2,
+        "short_name": "Goal 2: Zero Hunger",
+        "full_name": "End hunger, achieve food security and improved nutrition and promote sustainable agriculture",
+        "icon": "https://reporting.cgiar.org/assets/sdg/2.png",
+        "color": "#DDA63A"
+      }
+    },
+    {
+      "sdg_target_id": 12,
+      "sdg_target_code": "2.5",
+      "sdg_target": "By 2020, maintain the genetic diversity of seeds, cultivated plants and farmed and domesticated animals and their related wild species, including through soundly managed and diversified seed and plant banks at the national, regional and international levels, and promote access to and fair and equitable sharing of benefits arising from the utilization of genetic resources and associated traditional knowledge, as internationally agreed",
+      "clarisa_sdg": {
+        "id": 2,
+        "short_name": "Goal 2: Zero Hunger",
+        "full_name": "End hunger, achieve food security and improved nutrition and promote sustainable agriculture",
+        "icon": "https://reporting.cgiar.org/assets/sdg/2.png",
+        "color": "#DDA63A"
+      }
+    },
+    {
+      "sdg_target_id": 112,
+      "sdg_target_code": "13.1",
+      "sdg_target": "Strengthen resilience and adaptive capacity to climate-related hazards and natural disasters in all countries",
+      "clarisa_sdg": {
+        "id": 13,
+        "short_name": "Goal 13: Climate Action",
+        "full_name": "Take urgent action to combat climate change and its impacts[b]",
+        "icon": "https://reporting.cgiar.org/assets/sdg/13.png",
+        "color": "#3F7E44"
+      }
+    },
+    {
+      "sdg_target_id": 132,
+      "sdg_target_code": "15.6",
+      "sdg_target": "Promote fair and equitable sharing of the benefits arising from the utilization of genetic resources and promote appropriate access to such resources, as internationally agreed",
+      "clarisa_sdg": {
+        "id": 15,
+        "short_name": "Goal 15: Life on Land",
+        "full_name": "Protect, restore and promote sustainable use of terrestrial ecosystems, sustainably manage forests, combat desertification, and halt and reverse land degradation and halt biodiversity loss",
+        "icon": "https://reporting.cgiar.org/assets/sdg/15.png",
+        "color": "#56C02B"
+      }
+    }
+  ]
+}

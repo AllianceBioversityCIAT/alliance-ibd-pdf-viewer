@@ -1,0 +1,105 @@
+{
+  "indicator_id": 2,
+  "portfolio": {
+    "id": 1,
+    "name": "Portfolio 1",
+    "start_year": 2021,
+    "end_year": 2025
+  },
+  "contracts": [
+    {
+      "is_active": true,
+      "result_contract_id": 1,
+      "result_id": 8245,
+      "contract_id": "A1048",
+      "contract_role_id": 1,
+      "is_primary": true,
+      "agreement_id": "A1048",
+      "description": "CIFOR Hosted - HQ",
+      "contract_status": "Active",
+      "project_lead_description": "Grespan, Gabriele",
+      "start_date": "31/12/2024",
+      "end_date": "31/12/2026",
+      "levers": {
+        "lever_id": 4,
+        "short_name": "Lever 4 - Agrobiodiversity",
+        "full_name": "Lever 4 - Agrobiodiversity",
+        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+      }
+    },
+    {
+      "is_active": true,
+      "result_contract_id": 2,
+      "result_id": 8245,
+      "contract_id": "S231",
+      "contract_role_id": 2,
+      "is_primary": false,
+      "agresso_contract": {
+        "agreement_id": "S231",
+        "description": "BI (IFAD) - Private sector incentives",
+        "project_lead_description": "Mockshell, Jonathan",
+        "start_date": "31/12/2021",
+        "endDateGlobal": "31/12/2026"
+      }
+    }
+  ],
+  "primary_levers": [
+    {
+      "result_lever_id": 1,
+      "result_id": 8245,
+      "lever_id": 4,
+      "lever_role_id": 1,
+      "is_primary": true,
+      "short_name": "Lever 4 - Agrobiodiversity",
+      "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+    }
+  ],
+  "contributor_levers": [
+    {
+      "result_lever_id": 2,
+      "result_id": 8245,
+      "lever_id": 2,
+      "lever_role_id": 1,
+      "is_primary": false,
+      "short_name": "Lever 2 - Multifunctional Landscapes",
+      "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L2-Multifuntional-Landscapes_COLOR.png"
+    },
+    {
+      "result_lever_id": 3,
+      "result_id": 8245,
+      "lever_id": 9,
+      "lever_role_id": 1,
+      "is_primary": false,
+      "short_name": "Other",
+      "custom_lever_name": "Digital Agronomy Team"
+    }
+  ],
+  "result_sdgs": [
+    {
+      "id": 2,
+      "clarisa_sdg_id": 2,
+      "result_sdg_id": 102,
+      "smo_code": 2,
+      "financial_code": "SDG2",
+      "short_name": "Goal 2: Zero Hunger",
+      "full_name": "End hunger, achieve food security and improved nutrition and promote sustainable agriculture",
+      "icon": "https://reporting.cgiar.org/assets/sdg/2.png",
+      "color": "#DDA63A",
+      "description": "Goal 2 seeks to end hunger and all forms of malnutrition and to achieve sustainable food production by 2030. It is premised on the idea that everyone should have access to sufficient nutritious food, which will require widespread promotion of sustainable agriculture, a doubling of agricultural productivity, increased investments and properly functioning food markets.",
+      "is_active": true
+    },
+    {
+      "id": 13,
+      "clarisa_sdg_id": 13,
+      "result_sdg_id": 113,
+      "smo_code": 13,
+      "financial_code": "SDG13",
+      "short_name": "Goal 13: Climate Action",
+      "full_name": "Take urgent action to combat climate change and its impacts[b]",
+      "icon": "https://reporting.cgiar.org/assets/sdg/13.png",
+      "color": "#3F7E44",
+      "description": "Climate change presents the single biggest threat to development, and its widespread, unprecedented effects disproportionately burden the poorest and the most vulnerable. Urgent action is needed not only to combat climate change and its impacts, but also to build resilience in responding to climate-related hazards and natural disasters.",
+      "is_active": true
+    }
+  ]
+}

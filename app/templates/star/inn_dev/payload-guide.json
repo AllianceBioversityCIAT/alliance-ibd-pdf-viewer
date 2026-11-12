@@ -8,8 +8,173 @@
       "note": "Reuse shared STAR General Information section. Set indicator_id to 2 for Innovation Development."
     },
     "alliance_alignment": {
-      "interface": "AllianceAlignment",
-      "note": "Reuse shared STAR Alliance Alignment section."
+      "interface": "GetAllianceAlignment + AllianceAlignmentPdfContext",
+      "visibility_matrix": {
+        "note": "Portfolio comes from STAR (report year vs `portfolios` table) — never hardcoded. portfolio.id 2 → Portfolio 2 view; any other value or missing → Portfolio 1 view (same as the STAR client).",
+        "always": [
+          "Contributing Projects"
+        ],
+        "portfolio_1": {
+          "always": [
+            "Primary Levers",
+            "Contributing Levers (\"Other Contributing Levers\" in OICR)"
+          ],
+          "oicr_only": [
+            "Strategic Outcome(s) per primary lever (not lever 9 'Other')",
+            "SDG target(s) per lever"
+          ]
+        },
+        "portfolio_2": {
+          "always": [
+            "Research Areas",
+            "Strategic Objectives"
+          ],
+          "indicators_4_5_6": [
+            "Impact Outcomes"
+          ],
+          "oicr_only": [
+            "SDG Targets (result level, grouped by SDG)"
+          ]
+        },
+        "all_except_oicr": [
+          "Contribution to SDG"
+        ]
+      },
+      "fields": [
+        {
+          "path": "alliance_alignment.indicator_id",
+          "type": "number",
+          "required": true,
+          "used_in": [
+            "Alliance Alignment — visibility"
+          ],
+          "description": "1 Capacity Sharing, 2 Innovation Dev, 4 Policy Change, 5 OICR, 6 Innovation Use.",
+          "example": 2
+        },
+        {
+          "path": "alliance_alignment.portfolio",
+          "type": "{ id, name?, start_year?, end_year? }",
+          "required": true,
+          "used_in": [
+            "Alliance Alignment — visibility + header tag"
+          ],
+          "description": "`metadata.portfolio` from STAR. Aliases accepted: portfolio_id / portfolioId. name + years render as a small tag next to the title.",
+          "example": {
+            "id": 2,
+            "name": "Portfolio 2",
+            "start_year": 2026,
+            "end_year": 2030
+          }
+        },
+        {
+          "path": "alliance_alignment.contracts",
+          "type": "Contract[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Contributing Projects"
+          ],
+          "description": "Active contracts (is_active !== false). is_primary shows the PRIMARY badge and sorts first. Agresso data may come flat or nested in `agresso_contract`.",
+          "example": [
+            {
+              "contract_id": "A1048",
+              "agreement_id": "A1048",
+              "description": "CIFOR Hosted - HQ",
+              "is_primary": true,
+              "project_lead_description": "Grespan, Gabriele",
+              "start_date": "31/12/2024",
+              "end_date": "31/12/2026"
+            }
+          ]
+        },
+        {
+          "path": "alliance_alignment.primary_levers",
+          "type": "Lever[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Primary Levers (P1)"
+          ],
+          "description": "result_levers role 1, is_primary=true. icon (or lever_url) = S3 URL. OICR: result_lever_strategic_outcomes[].strategic_outcome ('SO1: text') and result_lever_sdg_targets[] { sdg_target_code, sdg_target, clarisa_sdg { icon, short_name } }. Lever 9 'Other' → custom_lever_name.",
+          "example": [
+            {
+              "lever_id": 4,
+              "short_name": "Lever 4 - Agrobiodiversity",
+              "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+            }
+          ]
+        },
+        {
+          "path": "alliance_alignment.contributor_levers",
+          "type": "Lever[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Contributing Levers (P1)"
+          ],
+          "description": "result_levers role 1, is_primary=false. Same shape as primary_levers (no strategic outcomes)."
+        },
+        {
+          "path": "alliance_alignment.research_areas",
+          "type": "Lever[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Research Areas (P2)"
+          ],
+          "description": "result_levers role 3. Fallback: levers with lever_role_id 3 inside primary_levers/contributor_levers. Lever 18 'Other' → custom_lever_name.",
+          "example": [
+            {
+              "lever_id": 12,
+              "short_name": "Biodiversity for Food and Agriculture",
+              "full_name": "Conservation and use of crop and tree genetic resources",
+              "icon": "https://…"
+            }
+          ]
+        },
+        {
+          "path": "alliance_alignment.strategic_objectives",
+          "type": "{ id, name, description?, icon? }[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Strategic Objectives (P2)"
+          ],
+          "description": "Alias: result_strategic_objectives. Nested `strategic_objective` row also accepted."
+        },
+        {
+          "path": "alliance_alignment.impact_outcomes",
+          "type": "{ id, name, description?, icon? }[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Impact Outcomes (P2, indicators 4/5/6)"
+          ],
+          "description": "Alias: result_impact_outcomes. Ignored for other indicators even if sent."
+        },
+        {
+          "path": "alliance_alignment.result_sdg_targets",
+          "type": "SdgTarget[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — SDG Targets (P2, OICR)"
+          ],
+          "description": "Result-level targets { sdg_target_code, sdg_target, clarisa_sdg { short_name, icon, color } }. Alias: sdg_targets. Grouped by SDG in the PDF."
+        },
+        {
+          "path": "alliance_alignment.result_sdgs",
+          "type": "GetSdgs[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Contribution to SDG (all except OICR)"
+          ],
+          "description": "CLARISA SDGs { smo_code, short_name ('Goal 2: Zero Hunger'), full_name, icon, color }. Also used as icon catalog for SDG targets. Ignored in OICR.",
+          "example": [
+            {
+              "smo_code": 2,
+              "short_name": "Goal 2: Zero Hunger",
+              "full_name": "End hunger, achieve food security and improved nutrition and promote sustainable agriculture",
+              "icon": "https://reporting.cgiar.org/assets/sdg/2.png",
+              "color": "#DDA63A"
+            }
+          ]
+        }
+      ],
+      "demos": "app/templates/star/shared/sections/alliance_alignment/demos/*.demo.json (p1-oicr, p1-innovation-dev, p2-oicr, p2-policy-change, p2-cap-sharing)"
     },
     "innovation_details": {
       "interface": "GetInnovationDetails + InnovationDetailsPdfContext",
