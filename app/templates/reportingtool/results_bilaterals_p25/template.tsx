@@ -2,7 +2,6 @@ import type { TemplateProps } from "../..";
 import { formatDateCET } from "../../utils";
 import type { PRMSResultData } from "../shared/types";
 import {
-  extractImpactAreas,
   extractGeoLocation,
   extractTocEntries,
   extractEvidences,
@@ -25,7 +24,6 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
   const d = data as PRMSResultData | null;
   const theme = getThemeColors(d?.primary_submitter_acronym);
 
-  const impactAreas = d ? extractImpactAreas(d) : [];
   const geo = d ? extractGeoLocation(d) : null;
   const tocEntries = d
     ? extractTocEntries(d)
@@ -49,16 +47,16 @@ export default function ResultsP25({ data }: Readonly<TemplateProps>) {
       leadCenterAcronym={d?.lead_center_acronym ?? ""}
     >
       {/* Common sections */}
-      {d && <ResultDetailsSection data={d} impactAreas={impactAreas} />}
+      {d && <ResultDetailsSection data={d} />}
       {d && <ContributorsSection data={d} tocEntries={tocEntries} />}
       {geo?.geo_focus && <GeographicSection geo={geo} />}
       {evidences?.length > 0 && <EvidenceSection evidences={evidences} />}
 
       {/* Variant-specific sections based on rt_id */}
       {d?.rt_id === 1 && <PolicyChangeSection data={d} />}
-      {d?.rt_id === 2 && <InnovationUseSections data={d} />}
-      {d?.rt_id === 5 && <CapacitySharingSections data={d} />}
-      {d?.rt_id === 7 && <InnovationDevelopmentSections data={d} />}
+      {d?.rt_id === 2 && <InnovationUseSections data={d} mdsOnly />}
+      {d?.rt_id === 5 && <CapacitySharingSections data={d} mdsOnly />}
+      {d?.rt_id === 7 && <InnovationDevelopmentSections data={d} mdsOnly />}
       {d?.rt_id === 6 && <KPDetailsSection data={d} />}
     </PageShell>
   );
