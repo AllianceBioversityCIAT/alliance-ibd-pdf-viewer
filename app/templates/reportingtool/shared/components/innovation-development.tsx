@@ -4,32 +4,37 @@ import { DataTable } from "./tables";
 
 export function InnovationDevelopmentSections({
   data,
+  mdsOnly = false,
 }: Readonly<{
   data: PRMSResultData;
+  mdsOnly?: boolean;
 }>) {
+  // @akili-spec changes/bilateral-pdf-mds-only — mdsOnly: nature, developers, readiness level (+ details)
+  // only; the guards below are recomputed from those fields.
   const hasDevelopers = !!data.innovation_developers;
-  const hasCollaborators = !!data.innovation_collaborators;
-  const hasInvestments = !!data.innovation_investments?.length;
-  const hasActors = !!data.innovation_actors?.length;
-  const hasOrgs = !!data.innovation_organizations?.length;
-  const hasMeasures = !!data.innovation_measures?.length;
-  const hasMaterialsEvidence = !!data.materials_evidence?.length;
+  const hasCollaborators = !mdsOnly && !!data.innovation_collaborators;
+  const hasInvestments = !mdsOnly && !!data.innovation_investments?.length;
+  const hasActors = !mdsOnly && !!data.innovation_actors?.length;
+  const hasOrgs = !mdsOnly && !!data.innovation_organizations?.length;
+  const hasMeasures = !mdsOnly && !!data.innovation_measures?.length;
+  const hasMaterialsEvidence = !mdsOnly && !!data.materials_evidence?.length;
 
-  const hasInnovationDevelopmentData =
-    hasDevelopers ||
-    hasCollaborators ||
-    hasInvestments ||
-    hasActors ||
-    hasOrgs ||
-    data.readiness_level;
+  const hasInnovationDevelopmentData = mdsOnly
+    ? hasDevelopers || data.readiness_level || data.innovation_nature
+    : hasDevelopers ||
+      hasCollaborators ||
+      hasInvestments ||
+      hasActors ||
+      hasOrgs ||
+      data.readiness_level;
 
   const hasInnoDevMainDetails =
     hasDevelopers ||
     data.readiness_level ||
-    data.readiness_level_justification ||
+    (!mdsOnly && data.readiness_level_justification) ||
     hasCollaborators ||
     data.innovation_nature ||
-    data.innovation_type ||
+    (!mdsOnly && data.innovation_type) ||
     hasMaterialsEvidence;
 
   if (!hasInnovationDevelopmentData) return null;
@@ -64,7 +69,7 @@ export function InnovationDevelopmentSections({
               </p>
             )}
 
-            {data.readiness_level_justification && (
+            {!mdsOnly && data.readiness_level_justification && (
               <p className="leading-normal">
                 <span className="font-bold text-[#1d1d1d]">
                   Innovation readiness justification:
@@ -97,7 +102,7 @@ export function InnovationDevelopmentSections({
               </p>
             )}
 
-            {data.innovation_type && (
+            {!mdsOnly && data.innovation_type && (
               <p className="leading-normal">
                 <span className="font-bold text-[#1d1d1d]">
                   Innovation type:
@@ -106,7 +111,7 @@ export function InnovationDevelopmentSections({
               </p>
             )}
 
-            {data.materials_evidence && (
+            {!mdsOnly && data.materials_evidence && (
               <div className="flex flex-col gap-[5px]">
                 <p className="font-bold text-[#1d1d1d] leading-[1.15]">
                   Reference materials:

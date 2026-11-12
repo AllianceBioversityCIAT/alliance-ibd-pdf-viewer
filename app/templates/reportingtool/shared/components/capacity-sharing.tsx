@@ -4,7 +4,10 @@ import { KeyValueTable } from "./tables";
 
 export default function CapacitySharingSections({
   data,
-}: Readonly<{ data: PRMSResultData }>) {
+  mdsOnly = false,
+}: Readonly<{ data: PRMSResultData; mdsOnly?: boolean }>) {
+  // @akili-spec changes/bilateral-pdf-mds-only — mdsOnly drops the "on behalf of an organization" row
+  // and its contribution to the section guard.
   const hasCapDevData =
     data.capdev_female_using ||
     data.capdev_male_using ||
@@ -12,7 +15,7 @@ export default function CapacitySharingSections({
     data.capdev_unkown_using ||
     data.capdev_term ||
     data.capdev_delivery_method_name ||
-    data.capdev_organizations?.length;
+    (!mdsOnly && data.capdev_organizations?.length);
 
   if (!hasCapDevData) return null;
 
@@ -65,7 +68,7 @@ export default function CapacitySharingSections({
           {
             label: "Were the trainees attending on behalf of an organization?",
             value: data.capdev_organizations?.join(", ") ?? "Not provided",
-            hideRowIf: !data.capdev_organizations?.length,
+            hideRowIf: mdsOnly || !data.capdev_organizations?.length,
           },
         ]}
       />

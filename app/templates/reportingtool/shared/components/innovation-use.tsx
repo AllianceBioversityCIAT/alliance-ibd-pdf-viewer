@@ -111,12 +111,17 @@ function ActorsTable({ actors }: Readonly<{ actors: InnovationUseActor[] }>) {
 
 export function InnovationUseSections({
   data,
-}: Readonly<{ data: PRMSResultData }>) {
-  const hasInnovationUseData =
-    !!data.innovation_use_actors?.length ||
-    !!data.innovation_use_organizations?.length ||
-    !!data.innovation_use_measures?.length ||
-    data.readiness_level;
+  mdsOnly = false,
+}: Readonly<{ data: PRMSResultData; mdsOnly?: boolean }>) {
+  // @akili-spec changes/bilateral-pdf-mds-only — mdsOnly: Actors + Other quantitative measures only,
+  // and the section guard looks at those two fields only.
+  const hasInnovationUseData = mdsOnly
+    ? !!data.innovation_use_actors?.length ||
+      !!data.innovation_use_measures?.length
+    : !!data.innovation_use_actors?.length ||
+      !!data.innovation_use_organizations?.length ||
+      !!data.innovation_use_measures?.length ||
+      data.readiness_level;
 
   if (!hasInnovationUseData) return null;
 
@@ -134,7 +139,7 @@ export function InnovationUseSections({
         </div>
       )}
 
-      {!!data.innovation_use_organizations?.length && (
+      {!mdsOnly && !!data.innovation_use_organizations?.length && (
         <div className="flex flex-col gap-2.5" data-paginator-block>
           <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
             Organizations
@@ -180,7 +185,7 @@ export function InnovationUseSections({
         </div>
       )}
 
-      {data.readiness_level && (
+      {!mdsOnly && data.readiness_level && (
         <>
           <div className="flex items-center gap-1 mb-4">
             <p className="font-bold text-[#1d1d1d] text-[10px] leading-[1.15]">
