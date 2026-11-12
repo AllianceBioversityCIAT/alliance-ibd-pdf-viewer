@@ -21,7 +21,13 @@
     }
   },
   "alliance_alignment": {
-    "indicator_id": 5,
+    "indicator_id": 1,
+    "portfolio": {
+      "id": 2,
+      "name": "Portfolio 2",
+      "start_year": 2026,
+      "end_year": 2030
+    },
     "contracts": [
       {
         "is_active": true,
@@ -32,9 +38,10 @@
         "is_primary": true,
         "agreement_id": "A1048",
         "description": "CIFOR Hosted - HQ",
+        "contract_status": "Active",
         "project_lead_description": "Grespan, Gabriele",
         "start_date": "31/12/2024",
-        "end_date": "3/12/2025",
+        "end_date": "31/12/2026",
         "levers": {
           "lever_id": 4,
           "short_name": "Lever 4 - Agrobiodiversity",
@@ -46,89 +53,81 @@
         "is_active": true,
         "result_contract_id": 2,
         "result_id": 8245,
-        "contract_id": "A1065",
-        "contract_role_id": 2,
-        "is_primary": false,
-        "agreement_id": "A1065",
-        "description": "ECPGR Phase X hosted",
-        "project_lead_description": "Maggioni, Lorenzo",
-        "start_date": "31/12/2022",
-        "levers": { "full_name": "Not available" }
-      },
-      {
-        "is_active": true,
-        "result_contract_id": 3,
-        "result_id": 8245,
         "contract_id": "S231",
         "contract_role_id": 2,
         "is_primary": false,
-        "agreement_id": "S231",
-        "description": "BI (IFAD) - Private sector incentives",
-        "project_lead_description": "Mockshell, Jonathan",
-        "start_date": "31/12/2021",
-        "endDateGlobal": "31/12/2025",
-        "levers": {
-          "lever_id": 2,
-          "short_name": "Lever 2 - Multifunctional Landscapes",
-          "full_name": "Lever 2 - Multifunctional Landscapes",
-          "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L2-Multifuntional-Landscapes_COLOR.png"
+        "agresso_contract": {
+          "agreement_id": "S231",
+          "description": "BI (IFAD) - Private sector incentives",
+          "project_lead_description": "Mockshell, Jonathan",
+          "start_date": "31/12/2021",
+          "endDateGlobal": "31/12/2026"
         }
       }
     ],
-    "result_sdgs": [],
-    "primary_levers": [
+    "research_areas": [
       {
-        "result_lever_id": 1,
+        "result_lever_id": 11,
         "result_id": 8245,
-        "lever_id": 4,
-        "lever_role_id": 1,
-        "is_primary": true,
-        "short_name": "Lever 4 - Agrobiodiversity",
-        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png",
-        "result_lever_strategic_outcomes": [
-          {
-            "name": "Outcome A",
-            "description": "Improved agrobiodiversity conservation outcomes"
-          }
-        ],
-        "result_lever_sdg_targets": [
-          {
-            "target": "SDG target 2.5",
-            "description": "Maintain genetic diversity of seeds, cultivated plants and farmed animals"
-          }
-        ]
-      },
-      {
-        "result_lever_id": 3,
-        "result_id": 8245,
-        "lever_id": 3,
-        "lever_role_id": 1,
-        "is_primary": true,
-        "short_name": "Lever 3 - Climate Action",
-        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L3-Climate-Action_COLOR.png",
-        "result_lever_sdg_targets": [
-          {
-            "target": "SDG target 13.1",
-            "description": "Strengthen resilience and adaptive capacity to climate-related hazards"
-          }
-        ]
+        "lever_id": 12,
+        "lever_role_id": 3,
+        "is_primary": false,
+        "portfolio_id": 2,
+        "short_name": "Biodiversity for Food and Agriculture",
+        "full_name": "Conservation and use of crop and tree genetic resources",
+        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
       }
     ],
-    "contributor_levers": [
+    "strategic_objectives": [
       {
-        "result_lever_id": 2,
-        "result_id": 8245,
-        "lever_id": 2,
-        "lever_role_id": 2,
-        "is_primary": false,
-        "short_name": "Lever 2 - Multifunctional Landscapes",
-        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L2-Multifuntional-Landscapes_COLOR.png",
-        "result_lever_sdg_targets": [
-          {
-            "target": "SDG target 1.5",
-            "description": "By 2030, build the resilience of the poor and those in vulnerable situations"
-          }
-        ]
+        "id": 1,
+        "strategic_objective_id": 1,
+        "portfolio_id": 2,
+        "name": "Transform food systems for healthy, sustainable diets",
+        "description": "Shift production and consumption towards diverse, nutritious and affordable diets."
+      }
+    ],
+    "impact_outcomes": [
+      {
+        "id": 2,
+        "impact_outcome_id": 2,
+        "portfolio_id": 2,
+        "name": "Improved policy environments for agrobiodiversity",
+        "description": "National and subnational policies integrate genetic diversity conservation and use."
+      },
+      {
+        "id": 5,
+        "impact_outcome_id": 5,
+        "portfolio_id": 2,
+        "name": "Increased adoption of climate-smart practices"
+      }
+    ],
+    "result_sdgs": [
+      {
+        "id": 4,
+        "clarisa_sdg_id": 4,
+        "result_sdg_id": 104,
+        "smo_code": 4,
+        "financial_code": "SDG4",
+        "short_name": "Goal 4: Quality Education",
+        "full_name": "Ensure inclusive and equitable quality education and promote lifelong learning opportunities for all",
+        "icon": "https://reporting.cgiar.org/assets/sdg/4.png",
+        "color": "#C5192D",
+        "description": "Goal 4 focuses on the acquisition of foundational and higher-order skills;\r\n greater and more equitable access to technical and vocational education and training and higher education;\r\n training throughout life; and the knowledge, skills and values needed to function well and contribute to society.",
+        "is_active": true
+      },
+      {
+        "id": 5,
+        "clarisa_sdg_id": 5,
+        "result_sdg_id": 105,
+        "smo_code": 5,
+        "financial_code": "SDG5",
+        "short_name": "Goal 5: Gender Equality",
+        "full_name": "Achieve gender equality and empower all women and girls",
+        "icon": "https://reporting.cgiar.org/assets/sdg/5.png",
+        "color": "#FF3A21",
+        "description": "Goal 5 aims to empower women and girls to reach their full potential, which requires eliminating all forms of discrimination and violence against them, including harmful practices. It seeks to ensure that they have every opportunity for sexual and reproductive health and reproductive rights; receive due recognition for their unpaid work; have full access to productive resources;\r\n and enjoy equal participation with men in political, economic and public life.",
+        "is_active": true
       }
     ]
   },
