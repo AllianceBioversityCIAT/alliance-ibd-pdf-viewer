@@ -306,6 +306,28 @@ export function getOrganizationSubtypeDisplay(
   return resolvePayloadLabel(mapped);
 }
 
+/** Description shown after the type name ("Name: description"). Only when the type name is shown. */
+export function getOrganizationTypeDescription(
+  payload: InnovationDetailsPayload,
+  entry: InstitutionType,
+): string | null {
+  if (!getOrganizationTypeDisplay(payload, entry)) return null;
+  const id = entry.institution_type_id;
+  if (id == null) return null;
+  return resolvePayloadLabel(payload.institution_type_descriptions?.[id]);
+}
+
+/** Description shown after the sub-type name ("Name: description"). Only when the sub-type name is shown. */
+export function getOrganizationSubtypeDescription(
+  payload: InnovationDetailsPayload,
+  entry: InstitutionType,
+): string | null {
+  if (!getOrganizationSubtypeDisplay(payload, entry)) return null;
+  const id = entry.sub_institution_type_id;
+  if (id == null) return null;
+  return resolvePayloadLabel(payload.sub_institution_type_descriptions?.[id]);
+}
+
 export function shouldRenderKnowledgeSharing(
   payload: InnovationDetailsPayload | null | undefined,
 ): boolean {

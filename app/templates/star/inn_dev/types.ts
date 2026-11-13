@@ -127,6 +127,10 @@ export interface InnovationDetailsPdfContext {
   actor_type_labels?: Record<number, string>;
   institution_type_labels?: Record<number, string>;
   sub_institution_type_labels?: Record<number, string>;
+  /** CLARISA institution type description by id — rendered as "Name: description" (same as STAR). */
+  institution_type_descriptions?: Record<number, string>;
+  /** CLARISA institution sub-type description by id — rendered as "Name: description". */
+  sub_institution_type_descriptions?: Record<number, string>;
   institution_labels?: Record<number, string>;
   is_knowledge_sharing_label?: string;
   dissemination_qualification_label?: string;
