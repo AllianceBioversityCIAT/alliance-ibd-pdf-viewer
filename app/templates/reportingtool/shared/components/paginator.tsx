@@ -364,6 +364,84 @@ function getPreviousContentSibling(el: HTMLElement): HTMLElement | null {
   return sibling as HTMLElement | null;
 }
 
+/**
+ * Like getPreviousContentSibling, but when `el` is the first content child of a
+ * wrapper it climbs up and returns the wrapper's previous sibling. This finds a
+ * heading that sits outside the wrapper, e.g.
+ * `<section><h2/><div><p>first row</p>…</div></section>`.
+ */
+function getPreviousContentNode(
+  el: HTMLElement,
+  container: HTMLElement,
+): HTMLElement | null {
+  let current: HTMLElement = el;
+  while (current !== container) {
+    const sibling = getPreviousContentSibling(current);
+    if (sibling) return sibling;
+    const parent = current.parentElement;
+    if (!parent || parent === container) return null;
+    current = parent;
+  }
+  return null;
+}
+
+/**
+ * Original rule, unchanged for non-STAR templates: pull in the direct previous
+ * sibling only when it is small (< 30px, likely a heading) and on the same page.
+ */
+function getLegacyPushTarget(
+  block: HTMLElement,
+  page: number,
+  paperHeight: number,
+  pageRootTop: number,
+): HTMLElement {
+  let pushTarget: HTMLElement = block;
+  const prevSibling = getPreviousContentSibling(block);
+  if (prevSibling && prevSibling.getBoundingClientRect().height < 30) {
+    const prevTop =
+      prevSibling.getBoundingClientRect().top +
+      window.scrollY -
+      pageRootTop;
+    const prevPage = Math.floor(prevTop / paperHeight);
+    if (prevPage === page) {
+      // Small sibling on the same page — likely a heading, push it along
+      pushTarget = prevSibling;
+    }
+  }
+  return pushTarget;
+}
+
+/** STAR only. Max small blocks (headings, short rows) pulled along with an overflowing block. */
+const MAX_ORPHAN_PULLS = 3;
+const ORPHAN_MAX_HEIGHT = 30;
+
+/**
+ * Picks the element to push to the next page: the overflowing block itself, or
+ * the small blocks right before it (headings / labels) on the same page, so a
+ * title is never left alone at the bottom of a page.
+ */
+function getPushTarget(
+  block: HTMLElement,
+  container: HTMLElement,
+  page: number,
+  paperHeight: number,
+  pageRootTop: number,
+): HTMLElement {
+  let target = block;
+  for (let i = 0; i < MAX_ORPHAN_PULLS; i++) {
+    const prev = getPreviousContentNode(target, container);
+    if (!prev) break;
+    const rect = prev.getBoundingClientRect();
+    if (rect.height >= ORPHAN_MAX_HEIGHT) break;
+    const prevPage = Math.floor(
+      (rect.top + window.scrollY - pageRootTop) / paperHeight,
+    );
+    if (prevPage !== page) break;
+    target = prev;
+  }
+  return target;
+}
+
 // ── Single processing pass ──
 
 /**
@@ -411,20 +489,13 @@ function processPass(
       }
     }
 
-    // Determine push target — pull in a small preceding sibling (orphaned heading)
-    let pushTarget: HTMLElement = block;
-    const prevSibling = getPreviousContentSibling(block);
-    if (prevSibling && prevSibling.getBoundingClientRect().height < 30) {
-      const prevTop =
-        prevSibling.getBoundingClientRect().top +
-        window.scrollY -
-        pageRootTop;
-      const prevPage = Math.floor(prevTop / paperHeight);
-      if (prevPage === page) {
-        // Small sibling on the same page — likely a heading, push it along
-        pushTarget = prevSibling;
-      }
-    }
+    // Determine push target — pull in small preceding blocks (orphaned headings).
+    // STAR only: also climbs out of wrappers to catch a heading outside them.
+    // Other templates (PRMS, etc.) keep the original single-sibling rule.
+    const pushTarget =
+      config.footerVariant === "star"
+        ? getPushTarget(block, container, page, paperHeight, pageRootTop)
+        : getLegacyPushTarget(block, page, paperHeight, pageRootTop);
 
     // Push to next page
     const pushTop =
