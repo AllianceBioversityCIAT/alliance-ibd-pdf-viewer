@@ -2,7 +2,10 @@ import type { TemplateProps } from "../..";
 import type { InnDevPdfPayload } from "./types";
 import { PageShell } from "../shared/components/page-shell";
 import { GeneralInformationSection } from "../shared/sections/general_information";
-import { AllianceAlignmentSection } from "../shared/sections/alliance_alignment";
+import {
+  AllianceAlignmentSection,
+  getPortfolioLabel,
+} from "../shared/sections/alliance_alignment";
 import { ResultsPartnersSection } from "../shared/sections/results_partners";
 import { GeographicScopeSection } from "../shared/sections/geographic_scope";
 import { EvidenceSection } from "../shared/sections/evidence";
@@ -25,7 +28,10 @@ export default function InnDevTemplate({ data }: Readonly<TemplateProps>) {
       indicator={general?.result_type}
       generatedAt={general?.generated_at}
     >
-      <GeneralInformationSection data={general} />
+      <GeneralInformationSection
+        data={general}
+        portfolioLabel={getPortfolioLabel(payload?.alliance_alignment)}
+      />
       <AllianceAlignmentSection data={payload?.alliance_alignment} />
       <InnovationDetailsSection data={payload?.innovation_details} />
       <ResultsPartnersSection data={payload?.results_partners} />

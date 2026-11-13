@@ -2,7 +2,10 @@ import type { TemplateProps } from "../..";
 import type { CapSharingPdfPayload } from "./types";
 import { PageShell } from "../shared/components/page-shell";
 import { GeneralInformationSection } from "../shared/sections/general_information";
-import { AllianceAlignmentSection } from "../shared/sections/alliance_alignment";
+import {
+  AllianceAlignmentSection,
+  getPortfolioLabel,
+} from "../shared/sections/alliance_alignment";
 import { ResultsPartnersSection } from "../shared/sections/results_partners";
 import { GeographicScopeSection } from "../shared/sections/geographic_scope";
 import { EvidenceSection } from "../shared/sections/evidence";
@@ -26,7 +29,10 @@ export default function CapSharingTemplate({ data }: Readonly<TemplateProps>) {
       generatedAt={general?.generated_at}
       status={general?.status}
     >
-      <GeneralInformationSection data={general} />
+      <GeneralInformationSection
+        data={general}
+        portfolioLabel={getPortfolioLabel(payload?.alliance_alignment)}
+      />
       <AllianceAlignmentSection data={payload?.alliance_alignment} />
       <CapSharingDetailsSection data={payload?.cap_sharing} />
       <ResultsPartnersSection data={payload?.results_partners} />

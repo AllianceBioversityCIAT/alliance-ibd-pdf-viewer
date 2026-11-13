@@ -10,13 +10,17 @@ import {
 } from "./rules";
 import { SectionTitle } from "../../components/section-title";
 import { LabelValueRow, KeywordList } from "../../components/label-value";
+import { PortfolioTag } from "../../components/info-card";
 
 interface GeneralInformationSectionProps {
   data: GeneralInformationPayload | null | undefined;
+  /** e.g. "Portfolio 2026–2030" — shown as a tag next to Reporting year. */
+  portfolioLabel?: string | null;
 }
 
 export function GeneralInformationSection({
   data,
+  portfolioLabel,
 }: Readonly<GeneralInformationSectionProps>) {
   if (!shouldRenderSection(data)) return null;
 
@@ -30,7 +34,12 @@ export function GeneralInformationSection({
           <LabelValueRow label="Description" value={data!.description.trim()} />
         )}
         {shouldRenderYear(data) && (
-          <LabelValueRow label="Reporting year" value={data!.year.trim()} />
+          <div className="flex items-center gap-2 w-full">
+            <div className="min-w-0">
+              <LabelValueRow label="Reporting year" value={data!.year.trim()} />
+            </div>
+            {portfolioLabel?.trim() && <PortfolioTag label={portfolioLabel.trim()} />}
+          </div>
         )}
         {shouldRenderMainContact(data) && (
           <LabelValueRow
