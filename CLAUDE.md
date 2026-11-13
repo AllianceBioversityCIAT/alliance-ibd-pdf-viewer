@@ -114,6 +114,7 @@ The `Paginator` component is a **client-side pagination engine** that runs after
    - **Tables**: split at row boundaries, continuation has no repeated thead
    - **Other blocks**: insert a spacer div to push the block to the next page
    - **Orphan detection**: if the previous sibling is small (<30px, typically a heading), it gets pushed along with the block to avoid orphaned headings
+   - **STAR only** (`footerVariant: "star"`): the orphan check also climbs out of wrappers to find a heading outside them, and pulls up to 3 small blocks. Other templates keep the single-sibling rule above.
 3. **Multi-pass** — runs up to 10 passes until no more DOM changes (cascading shifts)
 4. **Footer placement** — absolute-positioned footers with "CGIAR Results Framework" + page numbers
 5. **Final padding** — pads document to exact multiple of `paperHeight`

@@ -14,10 +14,12 @@ import {
   getContractDisplayRows,
   getContractTitle,
   hasAllianceAlignmentContent,
+  isPoolFundingContributor,
+  POOL_FUNDING_TAG_LABEL,
 } from "./rules";
 import { LeverIcon } from "../../components/lever-icon";
 import { SectionTitle, SubSectionBlock } from "../../components/section-title";
-import { InfoCard, PrimaryBadge } from "../../components/info-card";
+import { InfoCard, PoolFundingBadge, PrimaryBadge } from "../../components/info-card";
 import { STAR_COLORS } from "../../tokens";
 
 /** Figma content width (Page 111) inside 37px horizontal margins */
@@ -32,11 +34,12 @@ interface AllianceAlignmentSectionProps {
 function Card({
   children,
   compact = false,
-}: Readonly<{ children: ReactNode; compact?: boolean }>) {
+  className = "",
+}: Readonly<{ children: ReactNode; compact?: boolean; className?: string }>) {
   return (
     <div
       data-paginator-block
-      className={`rounded-[12px] ${compact ? "py-[10px] px-[14px]" : "py-[15px] px-[19px]"} ${CONTENT_WIDTH_CLASS}`}
+      className={`rounded-[12px] ${compact ? "py-[10px] px-[14px]" : "py-[15px] px-[19px]"} ${CONTENT_WIDTH_CLASS} ${className}`.trim()}
       style={{ backgroundColor: STAR_COLORS.cardBg }}
     >
       {children}
@@ -89,17 +92,6 @@ function CodeTag({ children }: Readonly<{ children: ReactNode }>) {
   );
 }
 
-function PortfolioTag({ label }: Readonly<{ label: string }>) {
-  return (
-    <span
-      className="inline-flex shrink-0 items-center rounded-full border px-[8px] py-[3px] text-[8px] font-medium leading-none whitespace-nowrap"
-      style={{ borderColor: STAR_COLORS.lightBlue300, color: STAR_COLORS.primaryBlue500 }}
-    >
-      {label}
-    </span>
-  );
-}
-
 function Divider() {
   return <div className="h-px w-full" style={{ backgroundColor: STAR_COLORS.grey300 }} />;
 }
@@ -140,11 +132,18 @@ function ContractCard({
   contract,
 }: Readonly<{ payload: AllianceAlignmentPayload; contract: Contract }>) {
   const rows = getContractDisplayRows(payload, contract);
+  const isPrimary = contract.is_primary === true;
+  const isPoolFunding = isPoolFundingContributor(contract);
 
   return (
     <InfoCard className={CONTENT_WIDTH_CLASS}>
       <div className="flex flex-col gap-2">
-        {contract.is_primary === true && <PrimaryBadge />}
+        {(isPrimary || isPoolFunding) && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {isPrimary && <PrimaryBadge />}
+            {isPoolFunding && <PoolFundingBadge label={POOL_FUNDING_TAG_LABEL} />}
+          </div>
+        )}
         <CardTitle>{getContractTitle(payload, contract)}</CardTitle>
         {rows.length > 0 && (
           <div className="flex flex-wrap gap-x-3.5 gap-y-1 text-[10px]">
@@ -285,8 +284,8 @@ function SdgTargetGroupCard({ group }: Readonly<{ group: SdgTargetGroupDisplay }
 
 function SdgCard({ sdg }: Readonly<{ sdg: SdgDisplay }>) {
   return (
-    <Card compact>
-      <div className="flex items-center gap-[10px] w-full">
+    <Card compact className="h-full">
+      <div className="flex items-center gap-[10px] w-full h-full">
         {sdg.icon && <LeverIcon icon={sdg.icon} size={34} className="rounded-[3px]" />}
         <div className="flex flex-col gap-[3px] min-w-0">
           <p className="text-[12px] font-semibold leading-[1.15] break-words m-0">
@@ -299,6 +298,28 @@ function SdgCard({ sdg }: Readonly<{ sdg: SdgDisplay }>) {
         </div>
       </div>
     </Card>
+  );
+}
+
+/** Two cards per row. Each row is one paginator block, so a row never splits across pages. */
+function SdgGrid({ sdgs }: Readonly<{ sdgs: SdgDisplay[] }>) {
+  const rows: SdgDisplay[][] = [];
+  for (let i = 0; i < sdgs.length; i += 2) rows.push(sdgs.slice(i, i + 2));
+
+  return (
+    <>
+      {rows.map((row) => (
+        <div
+          key={row.map((sdg) => sdg.key).join("|")}
+          data-paginator-block
+          className={`grid grid-cols-2 gap-[10px] ${CONTENT_WIDTH_CLASS}`}
+        >
+          {row.map((sdg) => (
+            <SdgCard key={sdg.key} sdg={sdg} />
+          ))}
+        </div>
+      ))}
+    </>
   );
 }
 
@@ -338,12 +359,7 @@ export function AllianceAlignmentSection({ data }: Readonly<AllianceAlignmentSec
 
   return (
     <section className={`flex flex-col gap-2 ${CONTENT_WIDTH_CLASS}`}>
-      <div className="flex items-center gap-2 w-full">
-        <div className="flex-1 min-w-0">
-          <SectionTitle>Alliance Alignment</SectionTitle>
-        </div>
-        {view.portfolioLabel && <PortfolioTag label={view.portfolioLabel} />}
-      </div>
+      <SectionTitle>Alliance Alignment</SectionTitle>
 
       {view.contracts.length > 0 && (
         <SubSectionBlock title="Contributing Projects" paginatorBlock>
@@ -362,9 +378,7 @@ export function AllianceAlignmentSection({ data }: Readonly<AllianceAlignmentSec
 
         {view.sdgs.length > 0 && (
           <SubSectionBlock title="Contribution to SDG">
-            {view.sdgs.map((sdg) => (
-              <SdgCard key={sdg.key} sdg={sdg} />
-            ))}
+            <SdgGrid sdgs={view.sdgs} />
           </SubSectionBlock>
         )}
       </div>

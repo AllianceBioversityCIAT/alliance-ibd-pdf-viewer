@@ -30,6 +30,7 @@
         "contract_id": "A1048",
         "contract_role_id": 1,
         "is_primary": true,
+        "is_pool_funding_contributor": true,
         "agreement_id": "A1048",
         "description": "CIFOR Hosted - HQ",
         "contract_status": "Active",
@@ -159,6 +160,13 @@
     },
     "sub_institution_type_labels": {
       "38": "Regional extension unit"
+    },
+    "institution_type_descriptions": {
+      "37": "Public agencies that provide agricultural advisory and training services to farmers at national level.",
+      "78": "Organization type not listed in the CLARISA catalog."
+    },
+    "sub_institution_type_descriptions": {
+      "38": "Decentralized extension office that serves farmers in a specific region or province."
     },
     "institution_labels": {
       "1": "International Center for Tropical Agriculture (CIAT)"

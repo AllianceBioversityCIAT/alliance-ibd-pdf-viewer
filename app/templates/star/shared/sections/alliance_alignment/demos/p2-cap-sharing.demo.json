@@ -14,6 +14,7 @@
       "contract_id": "A1048",
       "contract_role_id": 1,
       "is_primary": true,
+      "is_pool_funding_contributor": true,
       "agreement_id": "A1048",
       "description": "CIFOR Hosted - HQ",
       "contract_status": "Active",

@@ -194,13 +194,14 @@
           "used_in": [
             "Alliance Alignment — Contributing Projects"
           ],
-          "description": "Active contracts (is_active !== false). is_primary shows the PRIMARY badge and sorts first. Agresso data may come flat or nested in `agresso_contract`.",
+          "description": "Active contracts (is_active !== false). is_primary shows the PRIMARY badge and sorts first. is_pool_funding_contributor (boolean) shows the 'Contributing to CGIAR Portfolio' tag next to the PRIMARY badge. Agresso data may come flat or nested in `agresso_contract`.",
           "example": [
             {
               "contract_id": "A1048",
               "agreement_id": "A1048",
               "description": "CIFOR Hosted - HQ",
               "is_primary": true,
+              "is_pool_funding_contributor": true,
               "project_lead_description": "Grespan, Gabriele",
               "start_date": "31/12/2024",
               "end_date": "31/12/2026"

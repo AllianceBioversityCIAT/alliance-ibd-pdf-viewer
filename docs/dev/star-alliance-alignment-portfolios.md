@@ -7,7 +7,7 @@ Because the section is shared, every STAR PDF that uses it (cap_sharing, inn_dev
 
 - The **portfolio** comes from the JSON (`portfolio.id`, or the aliases `portfolio_id` / `portfolioId`). STAR works it out from the report year and the `portfolios` table, so **no years are hardcoded**. `2` gives the P2 view. Any other value, or no value, gives the P1 view (same rule as the STAR client).
 - The **indicator** (`indicator_id`) turns blocks on and off, using the matrix below.
-- Portfolio `name`, `start_year` and `end_year`, when sent, show as a small tag next to the section title.
+- Portfolio `start_year` and `end_year`, when both are sent, show as a "Portfolio 2026–2030" tag next to **Reporting year** in General Information. The portfolio name is not shown. The templates pass `getPortfolioLabel(alliance_alignment)` to `GeneralInformationSection`. Before 2026-11-13 the tag sat next to the Alliance Alignment title.
 
 Source of business rules: `alliance-alignment-context.md` (ARI repo, branch `fix-testing`, 2026-11-11), plus the STAR client's `alliance-lever-card` and `portfolio-2-alignment.mapper.ts` (real field names).
 

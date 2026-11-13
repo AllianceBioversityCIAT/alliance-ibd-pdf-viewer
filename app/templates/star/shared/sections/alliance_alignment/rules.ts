@@ -163,23 +163,17 @@ export function isOicr(data: AllianceAlignmentPayload | null | undefined): boole
   return getIndicatorId(data) === INDICATOR_IDS.OICR;
 }
 
-/** e.g. "Portfolio 2 · 2026–2030" — built only from what STAR sends. */
+/**
+ * Tag shown next to "Reporting year" in General Information, e.g. "Portfolio 2026–2030".
+ * Years only (no portfolio name), from `portfolio.start_year` / `end_year`. Null when either is missing.
+ */
 export function getPortfolioLabel(
   data: AllianceAlignmentPayload | null | undefined,
 ): string | null {
-  const portfolio = data?.portfolio;
-  const name = text(portfolio?.name);
-  const start = toNumber(portfolio?.start_year);
-  const end = toNumber(portfolio?.end_year);
-  const years = start != null && end != null ? `${start}–${end}` : null;
-
-  if (name && years && !name.includes(years)) return `${name} · ${years}`;
-  if (name) return name;
-  if (years) {
-    const id = getPortfolioId(data);
-    return id != null ? `Portfolio ${id} · ${years}` : years;
-  }
-  return null;
+  const start = toNumber(data?.portfolio?.start_year);
+  const end = toNumber(data?.portfolio?.end_year);
+  if (start == null || end == null) return null;
+  return `Portfolio ${start}–${end}`;
 }
 
 // ── Applicability (portfolio × indicator) ──
@@ -234,6 +228,15 @@ export function getContractsForPdf(
 
 export function getPrimaryContracts(contracts: Contract[]): Contract[] {
   return contracts.filter((c) => c.is_primary === true);
+}
+
+/** Same text STAR shows on the pool-funding tag of Contributing projects. */
+export const POOL_FUNDING_TAG_LABEL = "Contributing to CGIAR Portfolio";
+
+/** STAR flag `is_pool_funding_contributor` (boolean, or 1/"true" from SQL rows). */
+export function isPoolFundingContributor(contract: Contract): boolean {
+  const flag: unknown = contract.is_pool_funding_contributor;
+  return flag === true || flag === 1 || flag === "1" || flag === "true";
 }
 
 export function getContractEndDate(contract: Contract): string | null {
@@ -690,7 +693,6 @@ export function getAllianceAlignmentView(
     variant,
     indicatorId: getIndicatorId(data),
     isOicr: oicr,
-    portfolioLabel: getPortfolioLabel(data),
     contracts: getContractsForPdf(data),
     primaryLevers,
     contributorLevers,

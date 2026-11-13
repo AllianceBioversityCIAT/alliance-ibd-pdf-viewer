@@ -3,7 +3,9 @@ import {
   getKnownOrganizationName,
   getOrganizationCustomName,
   getOrganizationNumberLabel,
+  getOrganizationSubtypeDescription,
   getOrganizationSubtypeDisplay,
+  getOrganizationTypeDescription,
   getOrganizationTypeDisplay,
   isOrganizationKnown,
 } from "../rules";
@@ -26,16 +28,24 @@ function CardNumberLabel({ label }: Readonly<{ label: string }>) {
 interface InlineFieldProps {
   label: string;
   value: string;
+  /** CLARISA description — rendered as "value: description", full width so it can wrap. */
+  description?: string | null;
 }
 
-function InlineField({ label, value }: Readonly<InlineFieldProps>) {
+function InlineField({ label, value, description }: Readonly<InlineFieldProps>) {
+  const layoutClass = description
+    ? "w-full whitespace-normal leading-[1.3]"
+    : "whitespace-nowrap leading-[1.15]";
   return (
-    <span className="text-[10px] break-words leading-[1.15] whitespace-nowrap">
+    <span className={`text-[10px] break-words ${layoutClass}`}>
       <span className="font-bold" style={{ color: STAR_COLORS.primaryBlue500 }}>
         {label}:
       </span>{" "}
-      <span className="font-normal" style={{ color: STAR_COLORS.bodyText }}>
-        {value}
+      <span style={{ color: STAR_COLORS.bodyText }}>
+        <span className={description ? "font-semibold" : "font-normal"}>
+          {value}
+        </span>
+        {description && <span className="font-normal">: {description}</span>}
       </span>
     </span>
   );
@@ -62,7 +72,7 @@ export function OrganizationCard({
     return null;
   }
 
-  const fields: { label: string; value: string }[] = [];
+  const fields: { label: string; value: string; description?: string | null }[] = [];
 
   if (known && institutionName) {
     fields.push({ label: "Organization", value: institutionName });
@@ -71,10 +81,18 @@ export function OrganizationCard({
       fields.push({ label: "Name", value: customName });
     }
     if (organizationType) {
-      fields.push({ label: "Organization type", value: organizationType });
+      fields.push({
+        label: "Organization type",
+        value: organizationType,
+        description: getOrganizationTypeDescription(payload, entry),
+      });
     }
     if (subtype) {
-      fields.push({ label: "Organization subtype", value: subtype });
+      fields.push({
+        label: "Organization subtype",
+        value: subtype,
+        description: getOrganizationSubtypeDescription(payload, entry),
+      });
     }
   }
 
@@ -88,6 +106,7 @@ export function OrganizationCard({
               key={field.label}
               label={field.label}
               value={field.value}
+              description={field.description}
             />
           ))}
         </div>
