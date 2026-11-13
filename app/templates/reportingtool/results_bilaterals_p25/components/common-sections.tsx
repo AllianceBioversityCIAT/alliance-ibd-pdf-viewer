@@ -1,16 +1,14 @@
+// @akili-spec changes/bilateral-pdf-mds-only (BPM-R-4: MDS-only; no short title / impact areas)
 import Image from "next/image";
 import type {
   PRMSResultData,
-  ImpactArea,
   TheoryOfChange,
   GeoLocation,
   Evidence,
   TocPrimaryEntry,
 } from "../../shared/types";
-import { ImpactAreaCard, OECDCriteria } from "../../shared/components/impact-areas";
 import { DataTable } from "../../shared/components/tables";
 import { Dot, Link } from "lucide-react";
-import { ImpactAreaIcon } from "../../shared/components/impact-area-icons";
 
 function SearchIcon({
   size,
@@ -43,19 +41,14 @@ export { SectionTitle, SubSectionTitle, LabelValue };
 
 export function ResultDetailsSection({
   data,
-  impactAreas,
 }: Readonly<{
   data: PRMSResultData;
-  impactAreas: ImpactArea[];
 }>) {
   return (
     <div className="flex flex-col gap-2.5">
       <SectionTitle>Result details</SectionTitle>
 
       <div className="flex flex-col gap-[8px]">
-        {data.short_title && (
-          <LabelValue label="Short title" value={data.short_title} />
-        )}
         {data.result_description && (
           <LabelValue
             label="Result description"
@@ -85,24 +78,6 @@ export function ResultDetailsSection({
           />
         )}
 
-        {impactAreas?.length > 0 &&
-          impactAreas.some((area) => !!area.score && area.score !== "") && (
-            <div className="flex flex-col gap-[5px]">
-              <p className="text-[#1d1d1d] text-[10px] font-bold leading-[1.15]">
-                Impact Areas targeted
-              </p>
-              <div className="flex flex-col gap-2.5">
-                <div className="grid grid-cols-2 gap-2.5" data-paginator-block>
-                  {impactAreas
-                    .filter((area) => !!area.score && area.score !== "")
-                    .map((area) => (
-                      <ImpactAreaCard key={area.name} area={area} />
-                    ))}
-                </div>
-                <OECDCriteria />
-              </div>
-            </div>
-          )}
       </div>
     </div>
   );
@@ -186,21 +161,15 @@ export function ContributorsSection({
     data.contributing_centers && data.contributing_centers.length > 0;
   const hasBilateralProjects =
     data.bilateral_projects && data.bilateral_projects.length > 0;
-  const allPartners = [
-    ...(data.non_kp_partner_data ?? []),
-    ...(data.kp_partner_data ?? []),
-  ];
-  const hasPartners = allPartners?.length > 0;
-  const hasBundled =
-    data.bundled_innovations && data.bundled_innovations.length > 0;
+  const kpPartners = data.kp_partner_data ?? [];
+  const hasPartners = kpPartners.length > 0;
 
   const hasAnything =
     tocEntries.toc_primary.length > 0 ||
     hasContributingInitiatives ||
     hasCenters ||
     hasBilateralProjects ||
-    hasPartners ||
-    hasBundled;
+    kpPartners.length > 0;
 
   if (!hasAnything) return null;
 
@@ -289,28 +258,12 @@ export function ContributorsSection({
           <DataTable
             columns={["Name", "Country HQ", "Institution type"]}
             rows={
-              allPartners?.map((p) => [
+              kpPartners.map((p) => [
                 p.partner_name ?? "Not provided",
                 p.partner_country_hq ?? "Not provided",
                 p.partner_type ?? "Not provided",
-              ]) ?? []
+              ])
             }
-          />
-        </div>
-      )}
-
-      {hasBundled && (
-        <div className="flex flex-col gap-2.5">
-          <SubSectionTitle>Bundled innovations</SubSectionTitle>
-          <DataTable
-            columns={["Portfolio", "Phase", "Code", "Indicator", "Title"]}
-            rows={(data.bundled_innovations ?? []).map((b) => [
-              b.portfolio ?? "Not provided",
-              b.phase ?? "Not provided",
-              b.code ?? "Not provided",
-              b.indicator ?? "Not provided",
-              b.title ?? "Not provided",
-            ])}
           />
         </div>
       )}
@@ -540,32 +493,6 @@ function EvidenceCard({ evidence }: Readonly<{ evidence: Evidence }>) {
             <span className="text-[#393939]"> {evidence.description}</span>
           </p>
         )}
-
-        {evidence.is_public_file ? (
-          <>
-            {!!evidence.tags?.length && evidence.tags?.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-[9px] leading-normal font-bold text-[#1d1d1d]">
-                  Impact Area related:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {evidence.tags.map((t) => (
-                    <div
-                      key={t.icon_key}
-                      className="text-[#393939] text-[9px] flex items-center gap-1"
-                    >
-                      <ImpactAreaIcon
-                        iconKey={t.icon_key}
-                        className="w-[20px] h-[20px] shrink-0"
-                      />
-                      {t.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        ) : null}
       </div>
     </div>
   );
