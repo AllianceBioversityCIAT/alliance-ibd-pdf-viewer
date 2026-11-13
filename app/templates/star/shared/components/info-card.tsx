@@ -37,6 +37,22 @@ function PrimaryStarIcon() {
   );
 }
 
+/** Outlined pill for projects that contribute to the CGIAR Portfolio (STAR `pool-funding` tag). */
+export function PoolFundingBadge({ label }: Readonly<{ label: string }>) {
+  return (
+    <span
+      className="inline-flex w-max items-center rounded-full border px-2 py-[3px] text-[8px] font-medium leading-none whitespace-nowrap"
+      style={{
+        borderColor: STAR_COLORS.lightBlue300,
+        backgroundColor: STAR_COLORS.white,
+        color: STAR_COLORS.lightBlue300,
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
 /** Pill badge for primary contributing projects — matches STAR app primary control (read-only in PDF). */
 export function PrimaryBadge({ label = "Primary" }: Readonly<PrimaryBadgeProps>) {
   return (
