@@ -37,6 +37,18 @@ function PrimaryStarIcon() {
   );
 }
 
+/** Outlined pill with the portfolio years, e.g. "Portfolio 2026–2030" (next to Reporting year). */
+export function PortfolioTag({ label }: Readonly<{ label: string }>) {
+  return (
+    <span
+      className="inline-flex shrink-0 items-center rounded-full border px-[8px] py-[3px] text-[8px] font-medium leading-none whitespace-nowrap"
+      style={{ borderColor: STAR_COLORS.lightBlue300, color: STAR_COLORS.primaryBlue500 }}
+    >
+      {label}
+    </span>
+  );
+}
+
 /** Outlined pill for projects that contribute to the CGIAR Portfolio (STAR `pool-funding` tag). */
 export function PoolFundingBadge({ label }: Readonly<{ label: string }>) {
   return (

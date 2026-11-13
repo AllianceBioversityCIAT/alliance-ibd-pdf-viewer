@@ -92,17 +92,6 @@ function CodeTag({ children }: Readonly<{ children: ReactNode }>) {
   );
 }
 
-function PortfolioTag({ label }: Readonly<{ label: string }>) {
-  return (
-    <span
-      className="inline-flex shrink-0 items-center rounded-full border px-[8px] py-[3px] text-[8px] font-medium leading-none whitespace-nowrap"
-      style={{ borderColor: STAR_COLORS.lightBlue300, color: STAR_COLORS.primaryBlue500 }}
-    >
-      {label}
-    </span>
-  );
-}
-
 function Divider() {
   return <div className="h-px w-full" style={{ backgroundColor: STAR_COLORS.grey300 }} />;
 }
@@ -370,12 +359,7 @@ export function AllianceAlignmentSection({ data }: Readonly<AllianceAlignmentSec
 
   return (
     <section className={`flex flex-col gap-2 ${CONTENT_WIDTH_CLASS}`}>
-      <div className="flex items-center gap-2 w-full">
-        <div className="flex-1 min-w-0">
-          <SectionTitle>Alliance Alignment</SectionTitle>
-        </div>
-        {view.portfolioLabel && <PortfolioTag label={view.portfolioLabel} />}
-      </div>
+      <SectionTitle>Alliance Alignment</SectionTitle>
 
       {view.contracts.length > 0 && (
         <SubSectionBlock title="Contributing Projects" paginatorBlock>

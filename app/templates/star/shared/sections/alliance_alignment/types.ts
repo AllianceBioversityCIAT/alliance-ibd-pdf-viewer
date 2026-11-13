@@ -275,7 +275,6 @@ export interface AllianceAlignmentView {
   variant: PortfolioVariant;
   indicatorId: number | null;
   isOicr: boolean;
-  portfolioLabel: string | null;
   contracts: Contract[];
   /** P1 */
   primaryLevers: LeverDisplay[];
