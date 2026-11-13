@@ -73,13 +73,14 @@
           "used_in": [
             "Alliance Alignment — Contributing Projects"
           ],
-          "description": "Active contracts (is_active !== false). is_primary shows the PRIMARY badge and sorts first. Agresso data may come flat or nested in `agresso_contract`.",
+          "description": "Active contracts (is_active !== false). is_primary shows the PRIMARY badge and sorts first. is_pool_funding_contributor (boolean) shows the 'Contributing to CGIAR Portfolio' tag next to the PRIMARY badge. Agresso data may come flat or nested in `agresso_contract`.",
           "example": [
             {
               "contract_id": "A1048",
               "agreement_id": "A1048",
               "description": "CIFOR Hosted - HQ",
               "is_primary": true,
+              "is_pool_funding_contributor": true,
               "project_lead_description": "Grespan, Gabriele",
               "start_date": "31/12/2024",
               "end_date": "31/12/2026"
@@ -397,6 +398,20 @@
           "type": "Record<number, string>",
           "required": false,
           "used_in": ["Organization cards — subtype display"]
+        },
+        {
+          "path": "innovation_details.institution_type_descriptions",
+          "type": "Record<number, string>",
+          "required": false,
+          "used_in": ["Organization cards — type description"],
+          "description": "CLARISA description by id. Rendered after the name as \"Name: description\" (same as STAR). Omit it to show only the name."
+        },
+        {
+          "path": "innovation_details.sub_institution_type_descriptions",
+          "type": "Record<number, string>",
+          "required": false,
+          "used_in": ["Organization cards — subtype description"],
+          "description": "CLARISA description by id. Rendered after the name as \"Name: description\" (same as STAR). Omit it to show only the name."
         },
         {
           "path": "innovation_details.institution_labels",
