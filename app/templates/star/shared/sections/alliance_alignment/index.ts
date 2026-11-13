@@ -48,6 +48,8 @@ export {
   getContractTitle,
   getContractDisplayRows,
   getContractEndDate,
+  POOL_FUNDING_TAG_LABEL,
+  isPoolFundingContributor,
   getContractLeverDisplay,
   getContributorLeversExcludingPrimary,
   getContributionSdgs,

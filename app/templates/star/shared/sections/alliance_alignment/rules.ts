@@ -236,6 +236,15 @@ export function getPrimaryContracts(contracts: Contract[]): Contract[] {
   return contracts.filter((c) => c.is_primary === true);
 }
 
+/** Same text STAR shows on the pool-funding tag of Contributing projects. */
+export const POOL_FUNDING_TAG_LABEL = "Contributing to CGIAR Portfolio";
+
+/** STAR flag `is_pool_funding_contributor` (boolean, or 1/"true" from SQL rows). */
+export function isPoolFundingContributor(contract: Contract): boolean {
+  const flag: unknown = contract.is_pool_funding_contributor;
+  return flag === true || flag === 1 || flag === "1" || flag === "true";
+}
+
 export function getContractEndDate(contract: Contract): string | null {
   return firstText(contract.end_date, contract.endDateGlobal);
 }

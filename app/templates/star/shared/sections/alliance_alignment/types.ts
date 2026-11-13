@@ -45,6 +45,8 @@ export interface Contract {
   end_date?: string;
   endDateGlobal?: string;
   levers?: ContractLever;
+  /** True when the contract contributes to the CGIAR Portfolio (pool funding). Shows the "Contributing to CGIAR Portfolio" tag. */
+  is_pool_funding_contributor?: boolean | number | string | null;
   /** STAR may nest the Agresso row (TypeORM relation) — flattened in rules.ts */
   agresso_contract?: Partial<Contract> | null;
 }
