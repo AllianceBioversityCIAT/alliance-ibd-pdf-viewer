@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Paginator } from "@/app/templates/reportingtool/shared/components/paginator";
 import { STAR_COLORS, STAR_FONT_IMPORT, STAR_FONTS } from "../tokens";
 import type { StatusDisplay } from "../sections/general_information/types";
+import { StatusBadge } from "./status-badge";
 
 /** Figma node 34466:20857 — full header bar (595×131) */
 export const STAR_HEADER_IMAGE = "/assets/star/header.png";
@@ -36,38 +37,15 @@ export interface PageShellProps {
   children: ReactNode;
 }
 
-const DEFAULT_STATUS_COLOR = STAR_COLORS.lightBlue300;
 const STATUS_NOTE_BACKGROUND_COLOR = "#F7F8F9";
 
-function safeHexColor(
-  value: string | null | undefined,
-  fallback: string,
-): string {
-  if (!value) return fallback;
-  const color = value.trim();
-  return /^#(?:[0-9a-fA-F]{3}){1,2}$/.test(color) ? color : fallback;
-}
-
-function StatusBadge({ status }: Readonly<{ status?: StatusDisplay | null }>) {
-  const name = status?.status_name?.trim();
-  if (!name) return null;
-
-  const textColor = safeHexColor(
-    status?.status_text_color,
-    DEFAULT_STATUS_COLOR,
-  );
-  const borderColor = safeHexColor(
-    status?.status_border_color,
-    DEFAULT_STATUS_COLOR,
-  );
-
+function HeaderStatusBadge({ status }: Readonly<{ status?: StatusDisplay | null }>) {
   return (
-    <span
-      className="inline-flex w-fit items-center rounded-full border px-2 py-[2px] text-[9px] font-bold uppercase leading-none tracking-[0.02em]"
-      style={{ borderColor, color: textColor }}
-    >
-      {name}
-    </span>
+    <StatusBadge
+      name={status?.status_name}
+      borderColor={status?.status_border_color}
+      textColor={status?.status_text_color}
+    />
   );
 }
 
@@ -142,7 +120,7 @@ function HeaderMetadata({
       className="flex items-center gap-2 text-[12px] font-bold leading-[1.15]"
       style={{ color: STAR_COLORS.bodyText }}
     >
-      <StatusBadge status={status} />
+      <HeaderStatusBadge status={status} />
       {subtitle && <p>{subtitle}</p>}
     </div>
   );
