@@ -12,7 +12,9 @@ import {
 } from "../rules";
 import { POLICY_CHANGE_LABELS as L } from "../catalogs";
 import { SectionTitle, SubSectionLabel } from "../../shared/components/section-title";
-import { DataTable, type DataTableRow } from "../../shared/components/data-table";
+import { LabelValueRow } from "../../shared/components/label-value";
+import { StatusBadge } from "../../shared/components/status-badge";
+import { STAR_COLORS } from "../../shared/tokens";
 import {
   PARTNER_CARD_WIDTH_CLASS,
   PartnerInstitutionCard,
@@ -29,31 +31,53 @@ interface PolicyChangeDetailsSectionProps {
   data: PolicyChangePayload | null | undefined;
 }
 
-function getPolicyDetailRows(data: PolicyChangePayload): DataTableRow[] {
-  const rows: { label: string; value: string | null }[] = [
-    { label: L.policyType, value: getPolicyTypeLabel(data) },
-    { label: L.policyStage, value: getPolicyStageLabel(data) },
-    { label: L.usdAmount, value: getUsdAmountLabel(data) },
-    { label: L.amountStatus, value: getAmountStatusLabel(data) },
-  ];
-  const result: DataTableRow[] = rows.filter(
-    (row): row is DataTableRow & { value: string } => !!row.value,
-  );
-
+/** "Label: value" rows, same as General Information / Innovation Details. Status sits as a pill after the amount. */
+function PolicyDetailRows({ data }: Readonly<{ data: PolicyChangePayload }>) {
+  const policyType = getPolicyTypeLabel(data);
+  const stage = getPolicyStageLabel(data);
+  const usdAmount = getUsdAmountLabel(data);
+  const amountStatus = getAmountStatusLabel(data);
   const evidenceStage = getEvidenceStage(data);
-  if (evidenceStage) {
-    result.push({
-      label: L.evidenceStage,
-      value: <span className="whitespace-pre-line break-words py-1">{evidenceStage}</span>,
-    });
-  }
-  return result;
+
+  if (!policyType && !stage && !usdAmount && !amountStatus && !evidenceStage) return null;
+
+  return (
+    <div className="flex flex-col gap-2.5" data-paginator-block>
+      <SubSectionLabel>{L.policyDetails}</SubSectionLabel>
+      <div className="flex flex-col gap-2">
+        {policyType && <LabelValueRow label={L.policyType} value={policyType} />}
+        {stage && <LabelValueRow label={L.policyStage} value={stage} />}
+        {usdAmount && (
+          <p className="text-[11px] leading-[1.25] w-full m-0">
+            <span className="font-bold" style={{ color: STAR_COLORS.primaryBlue500 }}>
+              {L.usdAmount}:
+            </span>{" "}
+            <span style={{ color: STAR_COLORS.bodyText }}>{usdAmount}</span>
+            {amountStatus && (
+              <span className="inline-flex align-middle ml-2 -mt-px">
+                <StatusBadge name={amountStatus} />
+              </span>
+            )}
+          </p>
+        )}
+        {/* Status without an amount still shows as its own row */}
+        {!usdAmount && amountStatus && <LabelValueRow label={L.amountStatus} value={amountStatus} />}
+        {evidenceStage && (
+          <p className="text-[11px] leading-[1.25] w-full m-0 whitespace-pre-line break-words">
+            <span className="font-bold" style={{ color: STAR_COLORS.primaryBlue500 }}>
+              {L.evidenceStage}:
+            </span>{" "}
+            <span style={{ color: STAR_COLORS.bodyText }}>{evidenceStage}</span>
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export function PolicyChangeDetailsSection({ data }: Readonly<PolicyChangeDetailsSectionProps>) {
   if (!shouldRenderSection(data) || !data) return null;
 
-  const detailRows = getPolicyDetailRows(data);
   const organizations = getImplementingOrganizations(data);
   const innovationDevelopment = getInnovationDevelopment(data);
   const innovationUse = getInnovationUse(data);
@@ -62,12 +86,7 @@ export function PolicyChangeDetailsSection({ data }: Readonly<PolicyChangeDetail
     <section className="flex flex-col gap-4 w-full">
       <SectionTitle>{L.sectionTitle}</SectionTitle>
 
-      {detailRows.length > 0 && (
-        <div className="flex flex-col gap-2.5" data-paginator-block>
-          <SubSectionLabel>{L.policyDetails}</SubSectionLabel>
-          <DataTable rows={detailRows} />
-        </div>
-      )}
+      <PolicyDetailRows data={data} />
 
       {organizations.length > 0 && (
         <div className={`flex flex-col gap-[10px] ${PARTNER_CARD_WIDTH_CLASS}`}>

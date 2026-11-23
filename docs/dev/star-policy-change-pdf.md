@@ -17,7 +17,7 @@ Route: `/policy_change?uuid=…` · Demo: `/policy_change?demo=true`
 
 | Block | Content | Visibility |
 |---|---|---|
-| Policy Details (DataTable, same as CapSharing tables) | Policy Type, Stage in Policy Process, USD Amount, Status, Evidence for stage | Each row only when it has data. USD Amount and Status only when policy type id = 3 |
+| Policy Details: "Label: value" text rows (`LabelValueRow`, same as General Information / Innovation Details), no table | Policy Type, Stage in Policy Process, USD Amount with the Status as a pill after it, Evidence for stage | Each row only when it has data. USD Amount and Status only when policy type id = 3 |
 | Whose policy is this? (implementing organizations) | `PartnerInstitutionCard` (same as Results Partners / CapSharing organizations) | Rows with a real name. Rows with only an id are skipped |
 | Linked Results | Two columns, same as the STAR form: "Link to a reported Innovation Development output" and "Link to a reported Innovation Use". Each column (`PolicyLinkedResultField`) has its label and a card with a top row (platform code pill, status tag, year pill) and the title below. One paginator block | The block shows when at least one full result with `title` is sent. A missing one shows "No result linked." |
 
