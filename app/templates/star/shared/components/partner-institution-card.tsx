@@ -44,14 +44,62 @@ export function PartnerFieldRow({
   );
 }
 
+interface CompactInstitutionCardProps {
+  className: string;
+  displayName: string;
+  institutionType: string | null;
+  headquarter: string | null;
+  isoAlpha2: string | null;
+}
+
+/**
+ * Same typography as the Alliance Alignment catalog cards (Strategic Objectives):
+ * 12px semibold title, then 10px muted lines with no field labels.
+ */
+function CompactInstitutionCard({
+  className,
+  displayName,
+  institutionType,
+  headquarter,
+  isoAlpha2,
+}: Readonly<CompactInstitutionCardProps>) {
+  const lineClass = "text-[10px] leading-[1.3] break-words m-0";
+  return (
+    <InfoCard className={`${className} py-[10px]! px-[14px]!`}>
+      <div className="flex flex-col gap-[4px] min-w-0">
+        <p
+          className="text-[12px] font-semibold leading-[1.15] break-words m-0"
+          style={{ color: STAR_COLORS.cardTitle }}
+        >
+          {displayName}
+        </p>
+        {institutionType && (
+          <p className={lineClass} style={{ color: STAR_COLORS.greyMuted }}>
+            {institutionType}
+          </p>
+        )}
+        {(headquarter || isoAlpha2) && (
+          <p className={`${lineClass} flex items-center gap-1`} style={{ color: STAR_COLORS.greyMuted }}>
+            {isoAlpha2 && <CountryFlag isoAlpha2={isoAlpha2} />}
+            {headquarter && <span>{headquarter}</span>}
+          </p>
+        )}
+      </div>
+    </InfoCard>
+  );
+}
+
 interface PartnerInstitutionCardProps {
   institution: Institution;
   className?: string;
+  /** Tighter padding and smaller title — for two-column grids. */
+  compact?: boolean;
 }
 
 export function PartnerInstitutionCard({
   institution,
   className = CONTENT_WIDTH_CLASS,
+  compact = false,
 }: Readonly<PartnerInstitutionCardProps>) {
   const institutionType = getInstitutionType(institution);
   const headquarter = getInstitutionHeadquarter(institution);
@@ -59,6 +107,18 @@ export function PartnerInstitutionCard({
   const displayName = getPartnerDisplayName(institution);
 
   if (!displayName) return null;
+
+  if (compact) {
+    return (
+      <CompactInstitutionCard
+        className={className}
+        displayName={displayName}
+        institutionType={institutionType}
+        headquarter={headquarter}
+        isoAlpha2={isoAlpha2}
+      />
+    );
+  }
 
   return (
     <InfoCard className={className}>
