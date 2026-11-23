@@ -1,4 +1,4 @@
-import { hasArrayItems, hasText } from "../../utils";
+import { hasArrayItems, hasText, normalizeIsoAlpha2 } from "../../utils";
 import type { Institution, ResultsPartnersPayload } from "./types";
 
 export function stripHtml(value: string | null | undefined): string | null {
@@ -66,7 +66,18 @@ export function getInstitutionHeadquarter(
     return institution.country_name!.trim();
   }
   if (hasText(institution.country)) return institution.country!.trim();
+  if (hasText(institution.institution_location_name)) {
+    return institution.institution_location_name!.trim();
+  }
   return null;
+}
+
+/** Headquarter ISO alpha-2 for the flag (`isoAlpha2` as STAR sends it, or `iso_alpha_2`). */
+export function getInstitutionIsoAlpha2(
+  institution: Institution | null | undefined,
+): string | null {
+  if (!institution) return null;
+  return normalizeIsoAlpha2(institution.isoAlpha2) ?? normalizeIsoAlpha2(institution.iso_alpha_2);
 }
 
 export function isPartnersNotApplicable(

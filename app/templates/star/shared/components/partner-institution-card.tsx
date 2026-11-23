@@ -1,6 +1,9 @@
+import type { ReactNode } from "react";
 import type { Institution } from "../sections/results_partners/types";
+import { CountryFlag } from "./country-flag";
 import {
   getInstitutionHeadquarter,
+  getInstitutionIsoAlpha2,
   getInstitutionType,
   getPartnerDisplayName,
 } from "../sections/results_partners/rules";
@@ -13,12 +16,15 @@ interface PartnerFieldRowProps {
   label: string;
   value: string;
   leading?: string;
+  /** Optional element before the value, e.g. a country flag. */
+  prefix?: ReactNode;
 }
 
 export function PartnerFieldRow({
   label,
   value,
   leading = "1.15",
+  prefix,
 }: Readonly<PartnerFieldRowProps>) {
   return (
     <p
@@ -28,6 +34,9 @@ export function PartnerFieldRow({
       <span className="font-bold" style={{ color: STAR_COLORS.primaryBlue500 }}>
         {label}:
       </span>{" "}
+      {prefix && (
+        <span className="inline-flex align-middle mr-1 -mt-px">{prefix}</span>
+      )}
       <span className="font-normal" style={{ color: STAR_COLORS.bodyText }}>
         {value}
       </span>
@@ -46,6 +55,7 @@ export function PartnerInstitutionCard({
 }: Readonly<PartnerInstitutionCardProps>) {
   const institutionType = getInstitutionType(institution);
   const headquarter = getInstitutionHeadquarter(institution);
+  const isoAlpha2 = getInstitutionIsoAlpha2(institution);
   const displayName = getPartnerDisplayName(institution);
 
   if (!displayName) return null;
@@ -59,7 +69,7 @@ export function PartnerInstitutionCard({
         >
           {displayName}
         </p>
-        {(institutionType || headquarter) && (
+        {(institutionType || headquarter || isoAlpha2) && (
           <div className="flex flex-col gap-[8px]">
             {institutionType && (
               <PartnerFieldRow
@@ -67,11 +77,12 @@ export function PartnerInstitutionCard({
                 value={institutionType}
               />
             )}
-            {headquarter && (
+            {(headquarter || isoAlpha2) && (
               <PartnerFieldRow
                 label="Headquarter"
-                value={headquarter}
+                value={headquarter ?? ""}
                 leading="1.25"
+                prefix={isoAlpha2 ? <CountryFlag isoAlpha2={isoAlpha2} /> : undefined}
               />
             )}
           </div>

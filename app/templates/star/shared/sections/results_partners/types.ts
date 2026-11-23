@@ -12,6 +12,11 @@ export interface Institution {
   country_name?: string;
   country?: string;
   type?: string;
+  /** Headquarter country ISO alpha-2 (STAR `isoAlpha2`) — shows the flag next to Headquarter. */
+  isoAlpha2?: string | null;
+  iso_alpha_2?: string | null;
+  /** Headquarter country name (STAR `institution_location_name`). */
+  institution_location_name?: string | null;
 }
 
 /** STAR backend interface */
