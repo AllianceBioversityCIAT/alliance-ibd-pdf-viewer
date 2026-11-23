@@ -209,7 +209,13 @@
       "title": "Climate-resilient drought-tolerant maize varieties for smallholder farmers",
       "result_status": {
         "result_status_id": 6,
-        "name": "Approved"
+        "name": "Approved",
+        "config": {
+          "color": {
+            "border": "#6FA17A",
+            "text": "#6FA17A"
+          }
+        }
       },
       "report_year": 2025
     },
