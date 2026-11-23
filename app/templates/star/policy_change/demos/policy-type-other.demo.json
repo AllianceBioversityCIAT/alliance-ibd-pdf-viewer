@@ -181,7 +181,8 @@
           "acronym": "MoALD",
           "name": "Ministry of Agriculture and Livestock Development, Kenya",
           "institution_type_name": "Government (National)",
-          "headquarters": "Kenya"
+          "headquarters": "Kenya",
+          "isoAlpha2": "KE"
         }
       }
     ],
@@ -197,7 +198,8 @@
         "acronym": "WUR",
         "name": "Wageningen University and Research Centre",
         "institution_type_name": "Research organizations and universities International (Universities)",
-        "headquarters": "Netherlands"
+        "headquarters": "Netherlands",
+        "isoAlpha2": "NL"
       },
       {
         "institution_id": 102,
@@ -205,7 +207,8 @@
         "acronym": "GRA",
         "name": "Global Research Alliance on Agricultural Greenhouse Gases",
         "institution_type_name": "Other",
-        "headquarters": "New Zealand"
+        "headquarters": "New Zealand",
+        "isoAlpha2": "NZ"
       }
     ]
   },
