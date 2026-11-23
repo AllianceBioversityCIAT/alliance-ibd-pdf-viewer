@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { SUPERVISOR_AVATAR_COLOR } from "../assets";
 import { STAR_COLORS } from "../../shared/tokens";
+import { CountryFlag } from "../../shared/components/country-flag";
 
 interface TrainingDetailIconValueProps {
   iconSrc: string;
@@ -56,20 +57,6 @@ export function SupervisorDetailValue({
       </span>
       <span className="break-words">{display}</span>
     </span>
-  );
-}
-
-function CountryFlag({ isoAlpha2 }: Readonly<{ isoAlpha2: string }>) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={`https://flagcdn.com/w20/${isoAlpha2.trim().toLowerCase()}.png`}
-      alt=""
-      width={16}
-      height={13}
-      className="w-4 h-[13px] object-cover rounded-[2px] shrink-0"
-      aria-hidden
-    />
   );
 }
 

@@ -14,6 +14,13 @@ export function shouldRenderLeverIcon(icon: string | null | undefined): boolean 
   return getLeverIconUrl(icon) !== null;
 }
 
+/** ISO 3166-1 alpha-2 code, lowercased ("ke"), or null when the value is not a 2-letter code. */
+export function normalizeIsoAlpha2(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const iso = value.trim().toLowerCase();
+  return /^[a-z]{2}$/.test(iso) ? iso : null;
+}
+
 export function hasArrayItems<T>(value: T[] | null | undefined): boolean {
   return Array.isArray(value) && value.length > 0;
 }
