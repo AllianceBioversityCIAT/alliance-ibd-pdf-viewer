@@ -5,8 +5,9 @@ import {
   getLinkedResultYear,
 } from "../rules";
 import { InfoCard } from "../../shared/components/info-card";
-import { PartnerFieldRow } from "../../shared/components/partner-institution-card";
 import { FieldLabel } from "../../shared/components/label-value";
+import { StatusBadge } from "../../shared/components/status-badge";
+import { PlatformCodeBadge } from "../../shared/components/platform-code-badge";
 import { STAR_COLORS } from "../../shared/tokens";
 
 interface PolicyLinkedResultFieldProps {
@@ -16,7 +17,19 @@ interface PolicyLinkedResultFieldProps {
   emptyText: string;
 }
 
-/** One STAR link field: label + result card ("STAR 90146 - title", Status, Reporting year), or an empty note. */
+/** Reporting year in the same pill shape as the status tag, neutral grey, no label. */
+function YearPill({ year }: Readonly<{ year: string }>) {
+  return (
+    <span
+      className="inline-flex w-fit items-center rounded-full border px-2 py-[2px] text-[9px] font-bold leading-none tracking-[0.02em]"
+      style={{ borderColor: STAR_COLORS.grey500, color: STAR_COLORS.greyMuted }}
+    >
+      {year}
+    </span>
+  );
+}
+
+/** One STAR link field: label + card (status tag + year pill, platform code badge, title), or an empty note. */
 export function PolicyLinkedResultField({
   label,
   result,
@@ -33,19 +46,26 @@ export function PolicyLinkedResultField({
       {title ? (
         <InfoCard className="flex-1">
           <div className="flex flex-col gap-[10px]">
+            {/* One top row: [PLATFORM | code], status tag, year */}
+            {(code || status || year) && (
+              <div className="flex flex-wrap items-center gap-[6px]">
+                {code && <PlatformCodeBadge platform={code.platform} code={code.code} />}
+                {status && (
+                  <StatusBadge
+                    name={status.name}
+                    borderColor={status.borderColor}
+                    textColor={status.textColor}
+                  />
+                )}
+                {year && <YearPill year={year} />}
+              </div>
+            )}
             <p
               className="text-[12px] font-semibold leading-[1.15] break-words m-0"
               style={{ color: STAR_COLORS.cardTitle }}
             >
-              {code && <span style={{ color: STAR_COLORS.primaryBlue500 }}>{code} - </span>}
               {title}
             </p>
-            {(status || year) && (
-              <div className="flex flex-col gap-[8px]">
-                {status && <PartnerFieldRow label="Status" value={status} />}
-                {year && <PartnerFieldRow label="Reporting year" value={year} />}
-              </div>
-            )}
           </div>
         </InfoCard>
       ) : (

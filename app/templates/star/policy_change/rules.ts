@@ -7,6 +7,7 @@ import {
 import type {
   ImplementingOrganization,
   Institution,
+  LinkedResultStatus,
   PolicyCatalogOption,
   PolicyChangePayload,
   PolicyLinkedResult,
@@ -143,18 +144,35 @@ export function getLinkedResult(value: unknown): PolicyLinkedResult | null {
   return text(value.title) ? value : null;
 }
 
-/** "STAR 90146" — platform code + official code, same as the STAR picker. */
-export function getLinkedResultCode(result: PolicyLinkedResult): string | null {
+/** Platform (STAR, TIP, PRMS, AICCRA…) + official code, for the two-part code badge. */
+export function getLinkedResultCode(
+  result: PolicyLinkedResult,
+): { platform: string | null; code: string } | null {
   const code = text(result.result_official_code);
   if (!code) return null;
-  const platform = text(result.platform_code);
-  return platform ? `${platform} ${code}` : code;
+  return { platform: text(result.platform_code), code };
 }
 
-export function getLinkedResultStatus(result: PolicyLinkedResult): string | null {
-  return isObject<{ name?: string | null }>(result.result_status)
-    ? text(result.result_status.name)
+export interface LinkedResultStatusTag {
+  name: string;
+  borderColor: string | null;
+  textColor: string | null;
+}
+
+/** Status tag: name + colors from `result_status.config.color`, or the flat `status_*_color` fields. */
+export function getLinkedResultStatus(result: PolicyLinkedResult): LinkedResultStatusTag | null {
+  const status = result.result_status;
+  if (!isObject<LinkedResultStatus>(status)) return null;
+  const name = text(status.name);
+  if (!name) return null;
+  const color = isObject<{ border?: unknown; text?: unknown }>(status.config?.color)
+    ? status.config.color
     : null;
+  return {
+    name,
+    borderColor: text(color?.border) ?? text(status.status_border_color),
+    textColor: text(color?.text) ?? text(status.status_text_color),
+  };
 }
 
 export function getLinkedResultYear(result: PolicyLinkedResult): string | null {

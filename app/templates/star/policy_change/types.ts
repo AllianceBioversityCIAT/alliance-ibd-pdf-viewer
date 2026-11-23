@@ -20,9 +20,16 @@ export interface ImplementingOrganization extends Partial<Institution> {
   institution?: Partial<Institution> | null;
 }
 
+/** STAR `result_status` row. Colors come from `config.color` (same as the STAR status tag). */
 export interface LinkedResultStatus {
   result_status_id?: number | null;
   name?: string | null;
+  config?: {
+    color?: { border?: string | null; text?: string | null; background?: string | null } | null;
+  } | null;
+  /** Flat alternative, same names as general_information.status */
+  status_border_color?: string | null;
+  status_text_color?: string | null;
 }
 
 /**

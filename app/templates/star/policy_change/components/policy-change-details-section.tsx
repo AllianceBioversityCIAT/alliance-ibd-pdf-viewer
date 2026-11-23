@@ -19,6 +19,12 @@ import {
 } from "../../shared/components/partner-institution-card";
 import { PolicyLinkedResultField } from "./policy-linked-result-card";
 
+function pairs<T>(items: T[]): T[][] {
+  const rows: T[][] = [];
+  for (let i = 0; i < items.length; i += 2) rows.push(items.slice(i, i + 2));
+  return rows;
+}
+
 interface PolicyChangeDetailsSectionProps {
   data: PolicyChangePayload | null | undefined;
 }
@@ -66,14 +72,23 @@ export function PolicyChangeDetailsSection({ data }: Readonly<PolicyChangeDetail
       {organizations.length > 0 && (
         <div className={`flex flex-col gap-[10px] ${PARTNER_CARD_WIDTH_CLASS}`}>
           <SubSectionLabel>{L.implementingOrganizations}</SubSectionLabel>
-          <div className="flex flex-col gap-[8px]">
-            {organizations.map((institution, i) => (
-              <PartnerInstitutionCard
-                key={`${institution.institution_id ?? "org"}-${i}`}
-                institution={institution}
-              />
-            ))}
-          </div>
+          {/* Two compact cards per row; each row is one paginator block */}
+          {pairs(organizations).map((row, r) => (
+            <div
+              key={row.map((org, i) => `${org.institution_id ?? "org"}-${r}-${i}`).join("|")}
+              data-paginator-block
+              className="grid grid-cols-2 gap-[8px]"
+            >
+              {row.map((institution, i) => (
+                <PartnerInstitutionCard
+                  key={`${institution.institution_id ?? "org"}-${r}-${i}`}
+                  institution={institution}
+                  className="w-full h-full"
+                  compact
+                />
+              ))}
+            </div>
+          ))}
         </div>
       )}
 
