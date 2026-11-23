@@ -442,7 +442,7 @@
             "Policy Change Details",
             "Linked Results card"
           ],
-          "description": "Full linked Innovation Development result (STAR's GET only returns its id): result_official_code, platform_code, title, result_status.name, optional report_year. Card shows 'STAR-9150 - title'. A bare id is ignored.",
+          "description": "Full linked Innovation Development result (STAR's GET only returns its id): result_official_code, platform_code, title, result_status { name, config.color { border, text } } as in STAR's result_status table, optional report_year. Card shows a top row with an outlined 'STAR 9150' pill in the platform color (STAR, TIP, PRMS, AICCRA; others grey), the status tag and the year pill, then the title and the status as a colored tag (default STAR blue when no color). A bare id is ignored.",
           "example": {
             "result_id": 30339,
             "result_official_code": 9150,
@@ -450,7 +450,13 @@
             "title": "Climate-resilient drought-tolerant maize varieties for smallholder farmers",
             "result_status": {
               "result_status_id": 6,
-              "name": "Approved"
+              "name": "Approved",
+              "config": {
+                "color": {
+                  "border": "#6FA17A",
+                  "text": "#6FA17A"
+                }
+              }
             },
             "report_year": 2025
           }

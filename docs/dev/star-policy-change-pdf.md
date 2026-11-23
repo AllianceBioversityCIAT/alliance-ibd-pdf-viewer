@@ -19,7 +19,7 @@ Route: `/policy_change?uuid=…` · Demo: `/policy_change?demo=true`
 |---|---|---|
 | Policy Details (DataTable, same as CapSharing tables) | Policy Type, Stage in Policy Process, USD Amount, Status, Evidence for stage | Each row only when it has data. USD Amount and Status only when policy type id = 3 |
 | Whose policy is this? (implementing organizations) | `PartnerInstitutionCard` (same as Results Partners / CapSharing organizations) | Rows with a real name. Rows with only an id are skipped |
-| Linked Results | Two columns, same as the STAR form: "Link to a reported Innovation Development output" and "Link to a reported Innovation Use". Each column (`PolicyLinkedResultField`) has its label and a card with "STAR 9150 - title", Status and Reporting year. One paginator block | The block shows when at least one full result with `title` is sent. A missing one shows "No result linked." |
+| Linked Results | Two columns, same as the STAR form: "Link to a reported Innovation Development output" and "Link to a reported Innovation Use". Each column (`PolicyLinkedResultField`) has its label and a card with a top row (platform code pill, status tag, year pill) and the title below. One paginator block | The block shows when at least one full result with `title` is sent. A missing one shows "No result linked." |
 
 ## Rules (`rules.ts`)
 
@@ -48,6 +48,22 @@ The demo uses the existing P2 Policy Change Alliance Alignment demo. Results Par
 - The shared `PartnerInstitutionCard` now does the same next to **Headquarter**, using `CountryFlag` (`shared/components/country-flag.tsx`, flagcdn PNG). CapSharing already used flagcdn for the trainee nationality, and that copy now reuses the shared component.
 - With only `isoAlpha2` and no country name, the card shows the flag alone, same as STAR. Invalid codes show no flag.
 - Applies to every STAR partner card (Results Partners, CapSharing organizations, Policy implementing organizations), but only when `isoAlpha2` is sent. `institution_location_name` is accepted as a headquarter name fallback.
+
+## Status tag on linked results (2026-11-23)
+
+- The status shows as the same outlined pill as the PDF header status, not as a "Status:" row. `StatusBadge` was extracted from `page-shell.tsx` into `shared/components/status-badge.tsx`, and the header uses it too, with the same look.
+- Colors come from STAR `result_status.config.color { border, text }`, or the flat `status_border_color` / `status_text_color`. Invalid or missing colors fall back to STAR blue `#1689CA`.
+
+## Linked result card layout (2026-11-23)
+
+- Top row: platform code badge, status tag, year pill. The title goes below.
+- `shared/components/platform-code-badge.tsx` renders "STAR 9150" as an outlined pill, the same shape as the status tag. Border and text use the platform color from the STAR client `platform-colors.ts`: STAR `#1689CA`, TIP `#F58220`, PRMS `#7F92FE`, AICCRA `#699863`. Unknown platforms, or no platform, render grey `#555554`.
+- The year is a neutral grey pill with no "Reporting year" label.
+- In the demo, Innovation Use is a TIP result, so a second color shows.
+
+## Compact organization cards (2026-11-23)
+
+Policy implementing organizations use `PartnerInstitutionCard compact`: two per row, each row one paginator block. They use the same typography as the Strategic Objectives cards (12px semibold title, 10px muted lines) with no field labels. Results Partners and CapSharing keep the labeled card.
 
 ## Open items
 
