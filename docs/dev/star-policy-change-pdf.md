@@ -42,6 +42,13 @@ The demo uses the existing P2 Policy Change Alliance Alignment demo. Results Par
 - Server render (`renderToStaticMarkup`) of the section with all 3 demos and with bad data: renders, or is empty, without crashing.
 - Visual check in the browser is pending: the dev server was not running.
 
+## Country flags on partner cards (2026-11-23)
+
+- The STAR client shows the headquarter flag from the institution's `isoAlpha2` (`partner-selected-item`).
+- The shared `PartnerInstitutionCard` now does the same next to **Headquarter**, using `CountryFlag` (`shared/components/country-flag.tsx`, flagcdn PNG). CapSharing already used flagcdn for the trainee nationality, and that copy now reuses the shared component.
+- With only `isoAlpha2` and no country name, the card shows the flag alone, same as STAR. Invalid codes show no flag.
+- Applies to every STAR partner card (Results Partners, CapSharing organizations, Policy implementing organizations), but only when `isoAlpha2` is sent. `institution_location_name` is accepted as a headquarter name fallback.
+
 ## Open items
 
 - Confirm the real names of STAR's `policyTypes` and `policyAmountStatus` catalogs.

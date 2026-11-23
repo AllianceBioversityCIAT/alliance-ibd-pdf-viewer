@@ -419,7 +419,7 @@
             "Policy Change Details",
             "Whose policy is this? cards"
           ],
-          "description": "STAR junction rows (institution_id, institution_role_id) plus the institution data, flat on the row or nested in `institution`: acronym, name (or full_name / html_full_name), institution_type_name, headquarters. Rows with no name are skipped (ids are never shown). is_active false is skipped.",
+          "description": "STAR junction rows (institution_id, institution_role_id) plus the institution data, flat on the row or nested in `institution`: acronym, name (or full_name / html_full_name), institution_type_name, headquarters, isoAlpha2 (flag). Rows with no name are skipped (ids are never shown). is_active false is skipped.",
           "example": [
             {
               "institution_id": 7,
@@ -428,7 +428,8 @@
                 "acronym": "MoALD",
                 "name": "Ministry of Agriculture and Livestock Development, Kenya",
                 "institution_type_name": "Government (National)",
-                "headquarters": "Kenya"
+                "headquarters": "Kenya",
+                "isoAlpha2": "KE"
               }
             }
           ]
@@ -531,6 +532,16 @@
           ],
           "description": "Preferred headquarter label. Falls back to headquarter, country_name, or country.",
           "example": "Netherlands"
+        },
+        {
+          "path": "results_partners.institutions[].isoAlpha2",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "Partner cards — Headquarter flag"
+          ],
+          "description": "Headquarter country ISO 3166-1 alpha-2 (STAR institution `isoAlpha2`, also accepts `iso_alpha_2`). Shows the country flag next to Headquarter; invalid codes are ignored.",
+          "example": "KE"
         }
       ]
     },
