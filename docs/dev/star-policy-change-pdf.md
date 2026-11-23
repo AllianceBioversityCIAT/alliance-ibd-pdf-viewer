@@ -63,7 +63,10 @@ The demo uses the existing P2 Policy Change Alliance Alignment demo. Results Par
 
 ## Compact organization cards (2026-11-23)
 
-Policy implementing organizations use `PartnerInstitutionCard compact`: two per row, each row one paginator block. They use the same typography as the Strategic Objectives cards (12px semibold title, 10px muted lines) with no field labels. Results Partners and CapSharing keep the labeled card.
+Policy implementing organizations use `PartnerInstitutionCard compact`: two per row, each row one paginator block.
+- Title: 12px semibold. Below it one 10px muted line: `[flag] Headquarter - Institution type` (e.g. "🇰🇪 Kenya - Government (National)"), with no field labels.
+- Same padding as the Linked Results cards (default `InfoCard`, 15px / 19px), with the content centered vertically, so a shorter card lines up with its taller neighbor.
+- Results Partners and CapSharing keep the labeled card.
 
 ## Open items
 

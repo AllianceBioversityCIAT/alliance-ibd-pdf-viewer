@@ -65,7 +65,8 @@ function CompactInstitutionCard({
 }: Readonly<CompactInstitutionCardProps>) {
   const lineClass = "text-[10px] leading-[1.3] break-words m-0";
   return (
-    <InfoCard className={`${className} py-[10px]! px-[14px]!`}>
+    // Default InfoCard padding (same as the Linked Results cards); content centered vertically
+    <InfoCard className={`${className} flex flex-col justify-center`}>
       <div className="flex flex-col gap-[4px] min-w-0">
         <p
           className="text-[12px] font-semibold leading-[1.15] break-words m-0"
@@ -73,15 +74,15 @@ function CompactInstitutionCard({
         >
           {displayName}
         </p>
-        {institutionType && (
+        {/* One line: [flag] Headquarter - Institution type */}
+        {(isoAlpha2 || headquarter || institutionType) && (
           <p className={lineClass} style={{ color: STAR_COLORS.greyMuted }}>
-            {institutionType}
-          </p>
-        )}
-        {(headquarter || isoAlpha2) && (
-          <p className={`${lineClass} flex items-center gap-1`} style={{ color: STAR_COLORS.greyMuted }}>
-            {isoAlpha2 && <CountryFlag isoAlpha2={isoAlpha2} />}
-            {headquarter && <span>{headquarter}</span>}
+            {isoAlpha2 && (
+              <span className="inline-flex align-middle mr-1 -mt-px">
+                <CountryFlag isoAlpha2={isoAlpha2} />
+              </span>
+            )}
+            {[headquarter, institutionType].filter(Boolean).join(" - ")}
           </p>
         )}
       </div>
