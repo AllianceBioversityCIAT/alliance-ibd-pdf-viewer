@@ -4,6 +4,7 @@ import {
   getActorDisaggregationFields,
   getActorNumberLabel,
   getActorTypeDisplay,
+  getActorTypeIcon,
   shouldRenderActorCustomName,
 } from "../rules";
 import { InfoCard } from "../../shared/components/info-card";
@@ -56,6 +57,20 @@ function InlineFieldsRow({ fields }: Readonly<InlineFieldsRowProps>) {
   );
 }
 
+/** The S3 images are white icons on transparent, so they sit on a blue tile. */
+function ActorTypeIcon({ src }: Readonly<{ src: string }>) {
+  return (
+    <span
+      className="flex items-center justify-center shrink-0 w-[34px] h-[34px] rounded-full"
+      style={{ backgroundColor: STAR_COLORS.lightBlue300 }}
+      aria-hidden
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- static PDF render */}
+      <img src={src} alt="" className="block w-[22px] h-[22px] object-contain" />
+    </span>
+  );
+}
+
 interface ActorCardProps {
   payload: InnovationDetailsPayload;
   actor: Actor;
@@ -70,6 +85,7 @@ export function ActorCard({
   const actorType = getActorTypeDisplay(payload, actor);
   const customName = getActorCustomName(actor);
   const disaggregationFields = getActorDisaggregationFields(actor);
+  const icon = getActorTypeIcon(payload, actor);
 
   const fields: { label: string; value: string }[] = [];
   if (actorType) fields.push({ label: "Actor type", value: actorType });
@@ -82,9 +98,12 @@ export function ActorCard({
 
   return (
     <InfoCard className={CONTENT_WIDTH_CLASS}>
-      <div className="flex flex-col gap-[10px]">
-        <CardNumberLabel label={getActorNumberLabel(index)} />
-        <InlineFieldsRow fields={fields} />
+      <div className="flex items-center gap-[12px]">
+        {icon && <ActorTypeIcon src={icon} />}
+        <div className="flex flex-col gap-[10px] min-w-0">
+          <CardNumberLabel label={getActorNumberLabel(index)} />
+          <InlineFieldsRow fields={fields} />
+        </div>
       </div>
     </InfoCard>
   );

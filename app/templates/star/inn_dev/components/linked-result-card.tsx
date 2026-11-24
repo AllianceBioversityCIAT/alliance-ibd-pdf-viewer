@@ -1,9 +1,11 @@
 import type { LinkToResult } from "../types";
 import {
   getLinkedResultDisplayTitle,
+  getLinkedResultPdfUrl,
   getLinkedResultReportingProjectName,
 } from "../rules";
 import { InfoCard } from "../../shared/components/info-card";
+import { AccessLink } from "../../shared/components/access-link";
 import {
   PARTNER_CARD_WIDTH_CLASS,
   PartnerFieldRow,
@@ -43,6 +45,7 @@ export function LinkedResultCard({ entry }: Readonly<LinkedResultCardProps>) {
   const resultType = entry.result_type_label?.trim();
   const statusValue = entry.qa_status_label?.trim();
   const reportingProjectName = getLinkedResultReportingProjectName(entry);
+  const pdfUrl = getLinkedResultPdfUrl(entry);
 
   const showStatus = hasText(statusValue);
   const showReportingProject = !!reportingProjectName;
@@ -51,15 +54,23 @@ export function LinkedResultCard({ entry }: Readonly<LinkedResultCardProps>) {
   return (
     <InfoCard className={PARTNER_CARD_WIDTH_CLASS}>
       <div className="flex flex-col gap-[10px]">
-        {resultType && (
-          <div className="flex items-center gap-1.5">
-            <ResultTypeFlagIcon />
-            <p
-              className="text-[8px] font-[450] leading-[1.15] uppercase tracking-wide m-0"
-              style={{ color: STAR_COLORS.greyMuted }}
-            >
-              {resultType}
-            </p>
+        {/* Top row: result type on the left, "Access link" to the result PDF on the right (like Evidence) */}
+        {(resultType || pdfUrl) && (
+          <div className="flex items-center justify-between gap-3">
+            {resultType ? (
+              <div className="flex items-center gap-1.5">
+                <ResultTypeFlagIcon />
+                <p
+                  className="text-[8px] font-[450] leading-[1.15] uppercase tracking-wide m-0"
+                  style={{ color: STAR_COLORS.greyMuted }}
+                >
+                  {resultType}
+                </p>
+              </div>
+            ) : (
+              <span />
+            )}
+            {pdfUrl && <AccessLink href={pdfUrl} />}
           </div>
         )}
 

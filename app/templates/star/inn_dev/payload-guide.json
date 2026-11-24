@@ -354,6 +354,16 @@
           "description": "Map of actor_type_id to display label."
         },
         {
+          "path": "innovation_details.actor_type_icons",
+          "type": "Record<number, string>",
+          "required": false,
+          "used_in": ["Actor cards — actor type image"],
+          "description": "Map of actor_type_id to an absolute S3 image URL (white icon on transparent; the PDF draws it on a blue circle). Use the public/ prefix in production and public-dev/ in dev. A per-actor actors[].actor_type_icon wins over this map. Non-http(s) values are ignored.",
+          "example": {
+            "1": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/public/images/users-farmers.png"
+          }
+        },
+        {
           "path": "innovation_details.institution_types",
           "type": "InstitutionType[]",
           "required": false,
@@ -464,7 +474,7 @@
             {
               "path": "link_to_result",
               "type": "LinkToResult[]",
-              "description": "Linked tools shown as cards. Each item: other_result_id/result_code + linked_result_title, optional result_type_label, qa_status_label, reporting_project_name."
+              "description": "Linked tools shown as cards. Each item: other_result_id/result_code + linked_result_title, optional result_type_label, qa_status_label, reporting_project_name, pdf_url (absolute http(s) URL of the linked result's PDF; shows an 'Access link' that opens in a new tab, hidden when missing)."
             },
             {
               "path": "other_tools",

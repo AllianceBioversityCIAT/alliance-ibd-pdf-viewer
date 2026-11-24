@@ -154,6 +154,10 @@
       "1": "Farmer",
       "5": "Other"
     },
+    "actor_type_icons": {
+      "1": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/public/images/users-farmers.png",
+      "5": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/public/images/users-other.png"
+    },
     "institution_type_labels": {
       "37": "National extension service",
       "78": "Other"
@@ -292,7 +296,8 @@
           "linked_result_title": "A holistic framework for valuing ecosystem services in livestock farming",
           "result_type_label": "INNOVATION DEVELOPMENT",
           "qa_status_label": "QAED IN PRMS",
-          "reporting_project_name": "CIFOR Hosted - HQ (A1048)"
+          "reporting_project_name": "CIFOR Hosted - HQ (A1048)",
+          "pdf_url": "https://example.org/star/results/26053.pdf"
         },
         {
           "link_result_id": 147,

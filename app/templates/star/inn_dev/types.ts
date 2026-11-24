@@ -48,6 +48,8 @@ export interface LinkToResult {
   reporting_project_name?: string;
   /** @deprecated Use reporting_project_name for the project value */
   reporting_project_label?: string;
+  /** Absolute URL of the linked result's PDF. Shown as "Access link" (new tab) when present. */
+  pdf_url?: string | null;
 }
 
 export interface KnowledgeSharingForm {
@@ -86,6 +88,8 @@ export interface Actor {
   men_not_youth?: boolean | number;
   actor_role_id?: number;
   actor_type_custom_name?: string;
+  /** Absolute S3 URL of the actor type image (white icon on transparent). Wins over `actor_type_icons`. */
+  actor_type_icon?: string | null;
 }
 
 export interface InstitutionType {
@@ -125,6 +129,8 @@ export interface InnovationDetailsPdfContext {
   anticipated_users_label?: string;
   is_new_or_improved_variety_label?: string;
   actor_type_labels?: Record<number, string>;
+  /** Map of actor_type_id to absolute S3 image URL (e.g. …/public/images/users-farmers.png). */
+  actor_type_icons?: Record<number, string>;
   institution_type_labels?: Record<number, string>;
   sub_institution_type_labels?: Record<number, string>;
   /** CLARISA institution type description by id — rendered as "Name: description" (same as STAR). */
