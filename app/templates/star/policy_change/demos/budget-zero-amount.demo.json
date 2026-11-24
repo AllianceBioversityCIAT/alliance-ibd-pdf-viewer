@@ -1,0 +1,327 @@
+{
+  "general_information": {
+    "title": "National budget allocation for climate-smart agriculture extension adopted in Kenya",
+    "description": "Evidence from Alliance research on climate-smart practices informed the Ministry of Agriculture's decision to allocate a dedicated budget line for climate-smart agriculture extension in five counties.",
+    "keywords": [
+      "Climate-smart agriculture",
+      "Agricultural policies",
+      "Public expenditure"
+    ],
+    "user_id": "o.chinyere@cgiar.org",
+    "year": "2026",
+    "main_contact_person": {
+      "user_id": "o.chinyere@cgiar.org"
+    },
+    "indicator_id": 4,
+    "result_code": 30341,
+    "result_type": "Policy Change",
+    "generated_at": "Monday, November 23rd, 2026, at 15:17 CET",
+    "main_contact_display": "Obilo Chinyere (o.chinyere@cgiar.org)",
+    "status": {
+      "status_name": "OICR Accepted",
+      "status_description": "This result has been accepted. The status reflects the current review outcome in STAR and may change if the result is updated or reviewed again.",
+      "status_border_color": "#6FA17A",
+      "status_text_color": "#6FA17A"
+    }
+  },
+  "alliance_alignment": {
+    "indicator_id": 4,
+    "portfolio": {
+      "id": 2,
+      "name": "Portfolio 2",
+      "start_year": 2026,
+      "end_year": 2030
+    },
+    "contracts": [
+      {
+        "is_active": true,
+        "result_contract_id": 1,
+        "result_id": 8245,
+        "contract_id": "A1048",
+        "contract_role_id": 1,
+        "is_primary": true,
+        "is_pool_funding_contributor": true,
+        "agreement_id": "A1048",
+        "description": "CIFOR Hosted - HQ",
+        "contract_status": "Active",
+        "project_lead_description": "Grespan, Gabriele",
+        "start_date": "31/12/2024",
+        "end_date": "31/12/2026",
+        "levers": {
+          "lever_id": 4,
+          "short_name": "Lever 4 - Agrobiodiversity",
+          "full_name": "Lever 4 - Agrobiodiversity",
+          "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+        }
+      },
+      {
+        "is_active": true,
+        "result_contract_id": 2,
+        "result_id": 8245,
+        "contract_id": "S231",
+        "contract_role_id": 2,
+        "is_primary": false,
+        "agresso_contract": {
+          "agreement_id": "S231",
+          "description": "BI (IFAD) - Private sector incentives",
+          "project_lead_description": "Mockshell, Jonathan",
+          "start_date": "31/12/2021",
+          "endDateGlobal": "31/12/2026"
+        }
+      }
+    ],
+    "research_areas": [
+      {
+        "result_lever_id": 11,
+        "result_id": 8245,
+        "lever_id": 12,
+        "lever_role_id": 3,
+        "is_primary": false,
+        "portfolio_id": 2,
+        "short_name": "Biodiversity for Food and Agriculture",
+        "full_name": "Conservation and use of crop and tree genetic resources",
+        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+      },
+      {
+        "result_lever_id": 12,
+        "result_id": 8245,
+        "lever_id": 14,
+        "lever_role_id": 3,
+        "is_primary": false,
+        "portfolio_id": 2,
+        "short_name": "Climate Action",
+        "full_name": "Adaptation and mitigation across agri-food systems",
+        "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L3-Climate-Action_COLOR.png"
+      },
+      {
+        "result_lever_id": 13,
+        "result_id": 8245,
+        "lever_id": 18,
+        "lever_role_id": 3,
+        "is_primary": false,
+        "portfolio_id": 2,
+        "short_name": "Other",
+        "full_name": null,
+        "custom_lever_name": "Seed Systems Unit - Andean Hub"
+      }
+    ],
+    "strategic_objectives": [
+      {
+        "id": 1,
+        "strategic_objective_id": 1,
+        "portfolio_id": 2,
+        "name": "Transform food systems for healthy, sustainable diets",
+        "description": "Shift production and consumption towards diverse, nutritious and affordable diets."
+      },
+      {
+        "id": 3,
+        "strategic_objective_id": 3,
+        "portfolio_id": 2,
+        "name": "Build climate-resilient and biodiverse landscapes",
+        "description": "Restore ecosystems and secure agrobiodiversity as the foundation of resilient livelihoods."
+      }
+    ],
+    "impact_outcomes": [
+      {
+        "id": 2,
+        "impact_outcome_id": 2,
+        "portfolio_id": 2,
+        "name": "Improved policy environments for agrobiodiversity",
+        "description": "National and subnational policies integrate genetic diversity conservation and use."
+      }
+    ],
+    "result_sdgs": [
+      {
+        "id": 2,
+        "clarisa_sdg_id": 2,
+        "result_sdg_id": 102,
+        "smo_code": 2,
+        "financial_code": "SDG2",
+        "short_name": "Goal 2: Zero Hunger",
+        "full_name": "End hunger, achieve food security and improved nutrition and promote sustainable agriculture",
+        "icon": "https://reporting.cgiar.org/assets/sdg/2.png",
+        "color": "#DDA63A",
+        "description": "Goal 2 seeks to end hunger and all forms of malnutrition and to achieve sustainable food production by 2030. It is premised on the idea that everyone should have access to sufficient nutritious food, which will require widespread promotion of sustainable agriculture, a doubling of agricultural productivity, increased investments and properly functioning food markets.",
+        "is_active": true
+      },
+      {
+        "id": 15,
+        "clarisa_sdg_id": 15,
+        "result_sdg_id": 115,
+        "smo_code": 15,
+        "financial_code": "SDG15",
+        "short_name": "Goal 15: Life on Land",
+        "full_name": "Protect, restore and promote sustainable use of terrestrial ecosystems, sustainably manage forests, combat desertification, and halt and reverse land degradation and halt biodiversity loss",
+        "icon": "https://reporting.cgiar.org/assets/sdg/15.png",
+        "color": "#56C02B",
+        "description": "Goal 15 focuses on managing forests sustainably, restoring degraded lands and successfully combating desertification, reducing degraded natural habitats and ending biodiversity loss. All of these efforts in combination will help ensure that livelihoods are preserved for those that depend directly on forests and other ecosystems, that biodiversity will thrive, and that the benefits of these natural resources will be enjoyed for generations to come.",
+        "is_active": true
+      }
+    ]
+  },
+  "policy_change": {
+    "policy_type_id": 3,
+    "policy_type": {
+      "id": 3,
+      "name": "Program, Budget, or Investment"
+    },
+    "policy_stage_id": 2,
+    "policy_stage": {
+      "id": 2,
+      "name": "Stage 2: Policy enacted"
+    },
+    "usd_amount": 0,
+    "amount_status": "Unknown",
+    "evidence_stage": "The 2026/27 national budget estimates include a dedicated line for climate-smart agriculture extension, citing the Alliance county climate risk profiles as the evidence base.",
+    "implementing_organization": [
+      {
+        "result_institution_id": 10948,
+        "result_id": 30341,
+        "institution_id": 7,
+        "institution_role_id": 4,
+        "is_active": true,
+        "institution": {
+          "institution_id": 7,
+          "acronym": "MoALD",
+          "name": "Ministry of Agriculture and Livestock Development, Kenya",
+          "institution_type_name": "Government (National)",
+          "headquarters": "Kenya",
+          "isoAlpha2": "KE"
+        }
+      },
+      {
+        "result_institution_id": 10949,
+        "result_id": 30341,
+        "institution_id": 1201,
+        "institution_role_id": 4,
+        "is_active": true,
+        "acronym": "CoG",
+        "name": "Council of Governors",
+        "institution_type_name": "Government (Sub-national)",
+        "headquarters": "Kenya",
+        "isoAlpha2": "KE"
+      }
+    ],
+    "innovation_development": {
+      "result_id": 30339,
+      "result_official_code": 9150,
+      "platform_code": "STAR",
+      "title": "Climate-resilient drought-tolerant maize varieties for smallholder farmers",
+      "result_status": {
+        "result_status_id": 6,
+        "name": "Approved",
+        "config": {
+          "color": {
+            "border": "#6FA17A",
+            "text": "#6FA17A"
+          }
+        }
+      },
+      "report_year": 2025
+    },
+    "innovation_use": null
+  },
+  "results_partners": {
+    "is_partner_not_applicable": false,
+    "institutions": [
+      {
+        "institution_id": 101,
+        "institution_role_id": 1,
+        "acronym": "WUR",
+        "name": "Wageningen University and Research Centre",
+        "institution_type_name": "Research organizations and universities International (Universities)",
+        "headquarters": "Netherlands",
+        "isoAlpha2": "NL"
+      },
+      {
+        "institution_id": 102,
+        "institution_role_id": 2,
+        "acronym": "GRA",
+        "name": "Global Research Alliance on Agricultural Greenhouse Gases",
+        "institution_type_name": "Other",
+        "headquarters": "New Zealand",
+        "isoAlpha2": "NZ"
+      }
+    ]
+  },
+  "geographic_scope": {
+    "geo_scope_id": "5",
+    "regions": [
+      {
+        "region_id": 1,
+        "name": "Eastern Africa"
+      },
+      {
+        "region_id": 2,
+        "name": "Southern Africa"
+      },
+      {
+        "region_id": 3,
+        "name": "Western Africa"
+      }
+    ],
+    "countries": [
+      {
+        "isoAlpha2": "ET",
+        "name": "Ethiopia",
+        "result_countries_sub_nationals": [
+          {
+            "region_id": 101,
+            "sub_national_id": 1001,
+            "name": "Tigray"
+          },
+          {
+            "region_id": 102,
+            "sub_national_id": 1002,
+            "name": "Oromiya"
+          }
+        ]
+      },
+      {
+        "isoAlpha2": "ZA",
+        "name": "South Africa",
+        "result_countries_sub_nationals": [
+          {
+            "region_id": 201,
+            "sub_national_id": 2001,
+            "name": "Eastern Cape"
+          },
+          {
+            "region_id": 202,
+            "sub_national_id": 2002,
+            "name": "Western Cape"
+          },
+          {
+            "region_id": 203,
+            "sub_national_id": 2003,
+            "name": "Gauteng"
+          }
+        ]
+      }
+    ],
+    "comment_geo_scope": "Highland zones only."
+  },
+  "evidence": {
+    "evidence": [
+      {
+        "is_active": true,
+        "result_evidence_id": 1681,
+        "result_id": 8245,
+        "evidence_description": "this is a private evidence",
+        "evidence_url": "google.com",
+        "evidence_role_id": 1,
+        "is_private": true
+      },
+      {
+        "is_active": true,
+        "result_evidence_id": 1682,
+        "result_id": 8245,
+        "evidence_description": "It is a public evidence of the result 8245.",
+        "evidence_url": "as.com",
+        "evidence_role_id": 1,
+        "is_private": false
+      }
+    ],
+    "notable_references": []
+  }
+}

@@ -1,0 +1,759 @@
+{
+  "$schema": "STAR Policy Change PDF payload guide",
+  "template": "policy_change",
+  "description": "Complete payload for the STAR Policy Change PDF template (indicator 4). Sections: general_information, alliance_alignment, policy_change, results_partners, geographic_scope, evidence (no IP Rights). Shared sections are documented the same way as in cap_sharing/payload-guide.json. The backend sends full display data; the template never maps lookup ids to names.",
+  "sections": {
+    "general_information": {
+      "interface": "GeneralInformation + GeneralInformationPdfContext",
+      "fields": [
+        {
+          "path": "general_information.title",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "PageShell hero",
+            "General Information section"
+          ],
+          "description": "Result title displayed as H1 in the page header.",
+          "example": "Merging time-tested agricultural practices with modern technologies to drive productivity"
+        },
+        {
+          "path": "general_information.description",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "General Information section"
+          ],
+          "description": "Result description. Hidden when indicator_id === 5.",
+          "example": "The content of the Planting Date Advisories was developed..."
+        },
+        {
+          "path": "general_information.keywords",
+          "type": "string[]",
+          "required": false,
+          "used_in": [
+            "General Information section"
+          ],
+          "description": "Multiple-value keywords rendered as chips. Shown only when length > 0.",
+          "example": [
+            "Science",
+            "Agroecological Transition"
+          ]
+        },
+        {
+          "path": "general_information.user_id",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "General Information section"
+          ],
+          "description": "Fallback main contact user id when main_contact_person.user_id is empty.",
+          "example": "o.chinyere@cgiar.org"
+        },
+        {
+          "path": "general_information.year",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "General Information section"
+          ],
+          "description": "Reporting year.",
+          "example": "2025"
+        },
+        {
+          "path": "general_information.main_contact_person.user_id",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "General Information section"
+          ],
+          "description": "Primary source for main contact resolution.",
+          "example": "o.chinyere@cgiar.org"
+        },
+        {
+          "path": "general_information.indicator_id",
+          "type": "number",
+          "required": false,
+          "used_in": [
+            "General Information rules"
+          ],
+          "description": "4 for Policy Change. When equal to 5, description is not rendered in the PDF.",
+          "example": 4
+        },
+        {
+          "path": "general_information.result_code",
+          "type": "string | number",
+          "required": false,
+          "used_in": [
+            "PageShell metadata"
+          ],
+          "description": "PDF display enrichment for the compact “Result code:” metadata line.",
+          "example": 30341
+        },
+        {
+          "path": "general_information.result_type",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "PageShell metadata"
+          ],
+          "description": "PDF display enrichment for the compact “Indicator:” metadata line.",
+          "example": "Policy Change"
+        },
+        {
+          "path": "general_information.generated_at",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "PageShell disclaimer"
+          ],
+          "description": "Pre-formatted generation timestamp for the report disclaimer.",
+          "example": "Tuesday, February 18th, 2025, at 21:18 CET"
+        },
+        {
+          "path": "general_information.main_contact_display",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "General Information section"
+          ],
+          "description": "Optional resolved display string for main contact (name + email).",
+          "example": "Obilo Chinyere (o.chinyere@cgiar.org)"
+        },
+        {
+          "path": "general_information.status.status_name",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "PageShell status badge"
+          ],
+          "description": "Status label rendered as an uppercase pill at the start of the PDF.",
+          "example": "OICR Accepted"
+        },
+        {
+          "path": "general_information.status.status_description",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "PageShell status disclaimer"
+          ],
+          "description": "Short explanatory note describing what the current status means.",
+          "example": "This result has been accepted. The status reflects the current review outcome in STAR and may change if the result is updated or reviewed again."
+        },
+        {
+          "path": "general_information.status.status_border_color",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "PageShell status badge"
+          ],
+          "description": "Optional hex border color for the transparent status pill and icon. Falls back to the STAR light blue palette when missing or invalid.",
+          "example": "#6FA17A"
+        },
+        {
+          "path": "general_information.status.status_text_color",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "PageShell status badge",
+            "PageShell status disclaimer"
+          ],
+          "description": "Optional hex text/accent color for the status pill and disclaimer icon/rule. Falls back to the STAR light blue palette when missing or invalid.",
+          "example": "#6FA17A"
+        }
+      ]
+    },
+    "alliance_alignment": {
+      "interface": "GetAllianceAlignment + AllianceAlignmentPdfContext",
+      "visibility_matrix": {
+        "note": "Portfolio comes from STAR (report year vs `portfolios` table) — never hardcoded. portfolio.id 2 → Portfolio 2 view; any other value or missing → Portfolio 1 view (same as the STAR client).",
+        "always": [
+          "Contributing Projects"
+        ],
+        "portfolio_1": {
+          "always": [
+            "Primary Levers",
+            "Contributing Levers (\"Other Contributing Levers\" in OICR)"
+          ],
+          "oicr_only": [
+            "Strategic Outcome(s) per primary lever (not lever 9 'Other')",
+            "SDG target(s) per lever"
+          ]
+        },
+        "portfolio_2": {
+          "always": [
+            "Research Areas",
+            "Strategic Objectives"
+          ],
+          "indicators_4_5_6": [
+            "Impact Outcomes"
+          ],
+          "oicr_only": [
+            "SDG Targets (result level, grouped by SDG)"
+          ]
+        },
+        "all_except_oicr": [
+          "Contribution to SDG"
+        ]
+      },
+      "fields": [
+        {
+          "path": "alliance_alignment.indicator_id",
+          "type": "number",
+          "required": true,
+          "used_in": [
+            "Alliance Alignment — visibility"
+          ],
+          "description": "1 Capacity Sharing, 2 Innovation Dev, 4 Policy Change, 5 OICR, 6 Innovation Use.",
+          "example": 2
+        },
+        {
+          "path": "alliance_alignment.portfolio",
+          "type": "{ id, name?, start_year?, end_year? }",
+          "required": true,
+          "used_in": [
+            "Alliance Alignment — visibility + header tag"
+          ],
+          "description": "`metadata.portfolio` from STAR. Aliases accepted: portfolio_id / portfolioId. name + years render as a small tag next to the title.",
+          "example": {
+            "id": 2,
+            "name": "Portfolio 2",
+            "start_year": 2026,
+            "end_year": 2030
+          }
+        },
+        {
+          "path": "alliance_alignment.contracts",
+          "type": "Contract[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Contributing Projects"
+          ],
+          "description": "Active contracts (is_active !== false). is_primary shows the PRIMARY badge and sorts first. is_pool_funding_contributor (boolean) shows the 'Contributing to CGIAR Portfolio' tag next to the PRIMARY badge. Agresso data may come flat or nested in `agresso_contract`.",
+          "example": [
+            {
+              "contract_id": "A1048",
+              "agreement_id": "A1048",
+              "description": "CIFOR Hosted - HQ",
+              "is_primary": true,
+              "is_pool_funding_contributor": true,
+              "project_lead_description": "Grespan, Gabriele",
+              "start_date": "31/12/2024",
+              "end_date": "31/12/2026"
+            }
+          ]
+        },
+        {
+          "path": "alliance_alignment.primary_levers",
+          "type": "Lever[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Primary Levers (P1)"
+          ],
+          "description": "result_levers role 1, is_primary=true. icon (or lever_url) = S3 URL. OICR: result_lever_strategic_outcomes[].strategic_outcome ('SO1: text') and result_lever_sdg_targets[] { sdg_target_code, sdg_target, clarisa_sdg { icon, short_name } }. Lever 9 'Other' → custom_lever_name.",
+          "example": [
+            {
+              "lever_id": 4,
+              "short_name": "Lever 4 - Agrobiodiversity",
+              "icon": "https://alliance-files-storage.s3.us-east-1.amazonaws.com/images/levers/L4-Agrobiodiversity_COLOR.png"
+            }
+          ]
+        },
+        {
+          "path": "alliance_alignment.contributor_levers",
+          "type": "Lever[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Contributing Levers (P1)"
+          ],
+          "description": "result_levers role 1, is_primary=false. Same shape as primary_levers (no strategic outcomes)."
+        },
+        {
+          "path": "alliance_alignment.research_areas",
+          "type": "Lever[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Research Areas (P2)"
+          ],
+          "description": "result_levers role 3. Fallback: levers with lever_role_id 3 inside primary_levers/contributor_levers. Lever 18 'Other' → custom_lever_name.",
+          "example": [
+            {
+              "lever_id": 12,
+              "short_name": "Biodiversity for Food and Agriculture",
+              "full_name": "Conservation and use of crop and tree genetic resources",
+              "icon": "https://…"
+            }
+          ]
+        },
+        {
+          "path": "alliance_alignment.strategic_objectives",
+          "type": "{ id, name, description?, icon? }[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Strategic Objectives (P2)"
+          ],
+          "description": "Alias: result_strategic_objectives. Nested `strategic_objective` row also accepted."
+        },
+        {
+          "path": "alliance_alignment.impact_outcomes",
+          "type": "{ id, name, description?, icon? }[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Impact Outcomes (P2, indicators 4/5/6)"
+          ],
+          "description": "Alias: result_impact_outcomes. Ignored for other indicators even if sent."
+        },
+        {
+          "path": "alliance_alignment.result_sdg_targets",
+          "type": "SdgTarget[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — SDG Targets (P2, OICR)"
+          ],
+          "description": "Result-level targets { sdg_target_code, sdg_target, clarisa_sdg { short_name, icon, color } }. Alias: sdg_targets. Grouped by SDG in the PDF."
+        },
+        {
+          "path": "alliance_alignment.result_sdgs",
+          "type": "GetSdgs[]",
+          "required": false,
+          "used_in": [
+            "Alliance Alignment — Contribution to SDG (all except OICR)"
+          ],
+          "description": "CLARISA SDGs { smo_code, short_name ('Goal 2: Zero Hunger'), full_name, icon, color }. Also used as icon catalog for SDG targets. Ignored in OICR.",
+          "example": [
+            {
+              "smo_code": 2,
+              "short_name": "Goal 2: Zero Hunger",
+              "full_name": "End hunger, achieve food security and improved nutrition and promote sustainable agriculture",
+              "icon": "https://reporting.cgiar.org/assets/sdg/2.png",
+              "color": "#DDA63A"
+            }
+          ]
+        }
+      ],
+      "demos": "app/templates/star/shared/sections/alliance_alignment/demos/*.demo.json (p1-oicr, p1-innovation-dev, p2-oicr, p2-policy-change, p2-cap-sharing)"
+    },
+    "policy_change": {
+      "interface": "GetPolicyChange (STAR GET /api/results/policy-change/by-result-id/:id), enriched with full data",
+      "description": "Send full data, never bare ids: the PDF does not resolve ids. Fields that only carry an id are hidden.",
+      "fields": [
+        {
+          "path": "policy_change.policy_type",
+          "type": "{ id, name }",
+          "required": false,
+          "used_in": [
+            "Policy Change Details",
+            "Policy Details table"
+          ],
+          "description": "Policy type with its name. id 3 = Program, Budget, or Investment (turns on USD Amount and Status).",
+          "example": {
+            "id": 3,
+            "name": "Program, Budget, or Investment"
+          }
+        },
+        {
+          "path": "policy_change.policy_type_id",
+          "type": "number",
+          "required": false,
+          "used_in": [
+            "Policy Change Details"
+          ],
+          "description": "Fallback for the id-3 rule when policy_type is not sent. Not displayed.",
+          "example": 3
+        },
+        {
+          "path": "policy_change.policy_stage",
+          "type": "{ id, name }",
+          "required": false,
+          "used_in": [
+            "Policy Change Details",
+            "Policy Details table"
+          ],
+          "description": "Stage name. If only policy_stage_id is sent, the PDF uses the 3 names hard-coded in the STAR client.",
+          "example": {
+            "id": 2,
+            "name": "Stage 2: Policy enacted"
+          }
+        },
+        {
+          "path": "policy_change.usd_amount",
+          "type": "number",
+          "required": false,
+          "used_in": [
+            "Policy Change Details",
+            "Policy Details table"
+          ],
+          "description": "Shown as 'USD 1,250,000' only when the policy type is 3. 0 is a valid value and is shown; null hides it.",
+          "example": 1250000
+        },
+        {
+          "path": "policy_change.amount_status",
+          "type": "{ id, name } | string",
+          "required": false,
+          "used_in": [
+            "Policy Change Details",
+            "Policy Details table"
+          ],
+          "description": "Confirmed / Estimated / Unknown. Only when the policy type is 3.",
+          "example": {
+            "id": 1,
+            "name": "Confirmed"
+          }
+        },
+        {
+          "path": "policy_change.evidence_stage",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "Policy Change Details",
+            "Policy Details table"
+          ],
+          "description": "Evidence for stage text.",
+          "example": "The 2026/27 national budget estimates include..."
+        },
+        {
+          "path": "policy_change.implementing_organization",
+          "type": "Array<row + institution data>",
+          "required": false,
+          "used_in": [
+            "Policy Change Details",
+            "Whose policy is this? cards"
+          ],
+          "description": "STAR junction rows (institution_id, institution_role_id) plus the institution data, flat on the row or nested in `institution`: acronym, name (or full_name / html_full_name), institution_type_name, headquarters, isoAlpha2 (flag). Rows with no name are skipped (ids are never shown). is_active false is skipped.",
+          "example": [
+            {
+              "institution_id": 7,
+              "institution_role_id": 4,
+              "institution": {
+                "acronym": "MoALD",
+                "name": "Ministry of Agriculture and Livestock Development, Kenya",
+                "institution_type_name": "Government (National)",
+                "headquarters": "Kenya",
+                "isoAlpha2": "KE"
+              }
+            }
+          ]
+        },
+        {
+          "path": "policy_change.innovation_development",
+          "type": "PolicyLinkedResult",
+          "required": false,
+          "used_in": [
+            "Policy Change Details",
+            "Linked Results card"
+          ],
+          "description": "Full linked Innovation Development result (STAR's GET only returns its id): result_official_code, platform_code, title, result_status { name, config.color { border, text } } as in STAR's result_status table, optional report_year, optional pdf_url (absolute http(s) URL of the linked result's PDF; shows the Access link icon in the card's top-right corner (same as Evidence and Tools often used together), opens in a new tab, hidden when missing). Card shows a top row with an outlined 'STAR 9150' pill in the platform color (STAR, TIP, PRMS, AICCRA; others grey), the status tag and the year pill, then the title and the status as a colored tag (default STAR blue when no color). A bare id is ignored.",
+          "example": {
+            "result_id": 30339,
+            "result_official_code": 9150,
+            "platform_code": "STAR",
+            "title": "Climate-resilient drought-tolerant maize varieties for smallholder farmers",
+            "result_status": {
+              "result_status_id": 6,
+              "name": "Approved",
+              "config": {
+                "color": {
+                  "border": "#6FA17A",
+                  "text": "#6FA17A"
+                }
+              }
+            },
+            "report_year": 2025,
+            "pdf_url": "https://example.org/star/results/9150.pdf"
+          }
+        },
+        {
+          "path": "policy_change.innovation_use",
+          "type": "PolicyLinkedResult",
+          "required": false,
+          "used_in": [
+            "Policy Change Details",
+            "Linked Results card"
+          ],
+          "description": "Same shape as innovation_development, for the linked Innovation Use result."
+        }
+      ],
+      "visibility": {
+        "policy_type_id_3": "Shows USD Amount and Status",
+        "linked_results": "Each card shows only when the full result object (with title) is sent",
+        "section": "Hidden when no field has displayable data"
+      },
+      "demos": [
+        "template.demo.json (type 3, USD amount, both linked results)",
+        "demos/policy-type-other.demo.json (other type, stage id only, linked result as bare id -> hidden)",
+        "demos/budget-zero-amount.demo.json (USD 0, status as string)"
+      ]
+    },
+    "results_partners": {
+      "interface": "PatchPartners",
+      "fields": [
+        {
+          "path": "results_partners.is_partner_not_applicable",
+          "type": "boolean",
+          "required": false,
+          "used_in": [
+            "Results Partners section"
+          ],
+          "description": "When true, hides partner cards and shows “This section is not applicable.”",
+          "example": false,
+          "not_applicable_example": {
+            "is_partner_not_applicable": true,
+            "institutions": []
+          }
+        },
+        {
+          "path": "results_partners.institutions",
+          "type": "Institution[]",
+          "required": false,
+          "used_in": [
+            "Results Partners section"
+          ],
+          "description": "Partner institutions. Display name resolved from html_full_name, full_name, acronym + name, name, or institution_id.",
+          "example": [
+            {
+              "institution_id": 101,
+              "institution_role_id": 1,
+              "acronym": "WUR",
+              "name": "Wageningen University and Research Centre",
+              "institution_type_name": "Research organizations and universities International (Universities)",
+              "headquarters": "Netherlands"
+            }
+          ]
+        },
+        {
+          "path": "results_partners.institutions[].institution_type_name",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "Results Partners — Institution type"
+          ],
+          "description": "Preferred institution type label. Falls back to institution_type or type.",
+          "example": "Other"
+        },
+        {
+          "path": "results_partners.institutions[].headquarters",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "Results Partners — Headquarter"
+          ],
+          "description": "Preferred headquarter label. Falls back to headquarter, country_name, or country.",
+          "example": "Netherlands"
+        },
+        {
+          "path": "results_partners.institutions[].isoAlpha2",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "Partner cards — Headquarter flag"
+          ],
+          "description": "Headquarter country ISO 3166-1 alpha-2 (STAR institution `isoAlpha2`, also accepts `iso_alpha_2`). Shows the country flag next to Headquarter; invalid codes are ignored.",
+          "example": "KE"
+        }
+      ]
+    },
+    "geographic_scope": {
+      "interface": "GetGeoLocation + GeographicScopePdfContext",
+      "fields": [
+        {
+          "path": "geographic_scope.geo_scope_id",
+          "type": "number | string",
+          "required": false,
+          "used_in": [
+            "Geographic Location section"
+          ],
+          "description": "Geographic scope level id. Mapped in getGeoScopeVariant(): 1 Global, 2 Regional, 4 National, 5 Sub-national, 50 This is yet to be determined; default → to_be_determined.",
+          "example": 5
+        },
+        {
+          "path": "geographic_scope.regions",
+          "type": "Region[]",
+          "required": false,
+          "used_in": [
+            "Geographic Location — Global / Regional"
+          ],
+          "description": "Regions rendered as inline bullet lists using region.name.",
+          "example": [
+            {
+              "region_id": 1,
+              "name": "Sub-Saharan Africa"
+            }
+          ]
+        },
+        {
+          "path": "geographic_scope.countries",
+          "type": "Country[]",
+          "required": false,
+          "used_in": [
+            "Geographic Location — Global / National / Sub-national"
+          ],
+          "description": "Countries with optional sub-nationals. PDF uses result_countries_sub_nationals only (not Angular signal field).",
+          "example": [
+            {
+              "isoAlpha2": "ET",
+              "name": "Ethiopia",
+              "result_countries_sub_nationals": [
+                {
+                  "region_id": 1,
+                  "name": "Oromia",
+                  "sub_national_id": 101
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "geographic_scope.comment_geo_scope",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "Geographic Location — Comments"
+          ],
+          "description": "Optional free-text comment shown with label “Comments:”.",
+          "example": "Focus on eastern districts and highland zones."
+        }
+      ],
+      "demo_files": {
+        "global": "shared/sections/geographic_scope/demos/global.demo.json",
+        "regional": "shared/sections/geographic_scope/demos/regional.demo.json",
+        "national": "shared/sections/geographic_scope/demos/national.demo.json",
+        "subnational": "shared/sections/geographic_scope/demos/subnational.demo.json",
+        "to_be_determined": "shared/sections/geographic_scope/demos/to-be-determined.demo.json"
+      },
+      "examples": {
+        "global_with_regions_and_countries": {
+          "geo_scope_id": 1,
+          "regions": [
+            {
+              "region_id": 1,
+              "name": "Sub-Saharan Africa"
+            }
+          ],
+          "countries": [
+            {
+              "isoAlpha2": "KE",
+              "name": "Kenya",
+              "result_countries_sub_nationals": []
+            }
+          ],
+          "comment_geo_scope": "East Africa focus."
+        },
+        "global_empty": {
+          "geo_scope_id": 1,
+          "regions": [],
+          "countries": [],
+          "comment_geo_scope": ""
+        },
+        "regional_with_regions": {
+          "geo_scope_id": 2,
+          "regions": [
+            {
+              "region_id": 1,
+              "name": "Latin America and the Caribbean"
+            },
+            {
+              "region_id": 2,
+              "name": "West and Central Asia"
+            }
+          ],
+          "countries": [],
+          "comment_geo_scope": ""
+        },
+        "national_with_countries": {
+          "geo_scope_id": 4,
+          "regions": [],
+          "countries": [
+            {
+              "isoAlpha2": "IN",
+              "name": "India",
+              "result_countries_sub_nationals": []
+            },
+            {
+              "isoAlpha2": "ET",
+              "name": "Ethiopia",
+              "result_countries_sub_nationals": []
+            }
+          ],
+          "comment_geo_scope": "National rollout phase."
+        },
+        "sub_national": {
+          "geo_scope_id": 5,
+          "regions": [],
+          "countries": [
+            {
+              "isoAlpha2": "ET",
+              "name": "Ethiopia",
+              "result_countries_sub_nationals": [
+                {
+                  "region_id": 1,
+                  "name": "Oromia",
+                  "sub_national_id": 101
+                },
+                {
+                  "region_id": 2,
+                  "name": "Amhara",
+                  "sub_national_id": 102
+                }
+              ]
+            }
+          ],
+          "comment_geo_scope": "Highland zones only."
+        },
+        "yet_to_be_determined": {
+          "geo_scope_id": 50,
+          "regions": [],
+          "countries": [],
+          "comment_geo_scope": "Scope pending stakeholder review."
+        }
+      }
+    },
+    "evidence": {
+      "interface": "PatchResultEvidences",
+      "fields": [
+        {
+          "path": "evidence.evidence",
+          "type": "Evidence[]",
+          "required": false,
+          "used_in": [
+            "Evidence section cards"
+          ],
+          "description": "Each card: EVIDENCE #N, optional Access link (public only), Evidence description.",
+          "example": []
+        },
+        {
+          "path": "evidence.evidence.is_private",
+          "type": "boolean",
+          "required": false,
+          "used_in": [
+            "Evidence card — Access link"
+          ],
+          "description": "When true, Access link is hidden.",
+          "example": false
+        },
+        {
+          "path": "evidence.evidence.evidence_url",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "Evidence card — Access link href"
+          ],
+          "description": "Shown only when is_private is false.",
+          "example": "as.com"
+        },
+        {
+          "path": "evidence.evidence.evidence_description",
+          "type": "string",
+          "required": false,
+          "used_in": [
+            "Evidence card — Evidence description"
+          ],
+          "description": "Rendered inline after 'Evidence description:' label.",
+          "example": "public"
+        }
+      ],
+      "demo_files": {
+        "default": "shared/sections/evidence/demo.json"
+      }
+    }
+  }
+}

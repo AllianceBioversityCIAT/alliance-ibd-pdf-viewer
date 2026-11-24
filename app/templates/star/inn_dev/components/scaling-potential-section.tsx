@@ -36,7 +36,8 @@ function ScalingQuestionGroup({
   return (
     <div className="flex flex-col gap-[10px]">
       <FieldLabel label={title} />
-      <DataTable rows={rows} />
+      {/* Wider question column: long questions wrap less, the 5-square score fits easily */}
+      <DataTable rows={rows} labelColumnClass="shrink-0 w-[60%]" />
     </div>
   );
 }

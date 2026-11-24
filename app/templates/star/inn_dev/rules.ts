@@ -1,4 +1,4 @@
-import { hasArrayItems, hasText } from "../shared/utils";
+import { hasArrayItems, hasText, normalizeHttpUrl } from "../shared/utils";
 import {
   ACTOR_TYPE_OTHER,
   ANTICIPATED_USERS_EXPANDED,
@@ -196,6 +196,11 @@ export function getOrganizationNumberLabel(index: number): string {
   return `ORGANIZATION #${index + 1}`;
 }
 
+/** PDF of a "Tools often used together" result, when the backend sends a valid http(s) URL. */
+export function getLinkedResultPdfUrl(entry: LinkToResult | null | undefined): string | null {
+  return normalizeHttpUrl(entry?.pdf_url);
+}
+
 export function getActorTypeDisplay(
   payload: InnovationDetailsPayload,
   actor: Actor,
@@ -203,6 +208,21 @@ export function getActorTypeDisplay(
   if (actor.actor_type_id == null) return null;
   const mapped = payload.actor_type_labels?.[actor.actor_type_id];
   return hasText(mapped) ? mapped!.trim() : null;
+}
+
+/** Actor type image from S3: the actor's own `actor_type_icon` first, then `actor_type_icons[actor_type_id]`. */
+export function getActorTypeIcon(
+  payload: InnovationDetailsPayload | null | undefined,
+  actor: Actor | null | undefined,
+): string | null {
+  if (!actor) return null;
+  const own = normalizeHttpUrl(actor.actor_type_icon);
+  if (own) return own;
+  const id = actor.actor_type_id;
+  if (id == null) return null;
+  const icons = payload?.actor_type_icons;
+  if (!icons || typeof icons !== "object") return null;
+  return normalizeHttpUrl(icons[id]);
 }
 
 export function shouldRenderActorCustomName(actor: Actor): boolean {

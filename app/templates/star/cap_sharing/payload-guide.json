@@ -534,6 +534,14 @@
           "example": "Other"
         },
         {
+          "path": "results_partners.institutions[].isoAlpha2",
+          "type": "string",
+          "required": false,
+          "used_in": ["Partner cards — Headquarter flag"],
+          "description": "Headquarter country ISO 3166-1 alpha-2 (STAR institution `isoAlpha2`, also accepts `iso_alpha_2`). Shows the country flag next to Headquarter; invalid codes are ignored.",
+          "example": "NL"
+        },
+        {
           "path": "results_partners.institutions[].headquarters",
           "type": "string",
           "required": false,

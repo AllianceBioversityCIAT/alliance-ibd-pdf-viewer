@@ -164,12 +164,15 @@ function ContractCard({
 
 // ── Levers (P1) / Research Areas (P2) ──
 
-function LeverCard({ lever }: Readonly<{ lever: LeverDisplay }>) {
+function LeverCard({
+  lever,
+  className = "",
+}: Readonly<{ lever: LeverDisplay; className?: string }>) {
   const hasOutcomes = lever.showStrategicOutcomes && lever.strategicOutcomes.length > 0;
   const hasTargets = lever.showSdgTargets && lever.sdgTargets.length > 0;
 
   return (
-    <Card>
+    <Card className={className}>
       <div className="flex flex-col gap-[10px]">
         <div className="flex items-center gap-[8px] w-full">
           {lever.icon && <LeverIcon icon={lever.icon} size={28} />}
@@ -221,13 +224,40 @@ function LeverCard({ lever }: Readonly<{ lever: LeverDisplay }>) {
   );
 }
 
-function LeverList({ title, levers }: Readonly<{ title: string; levers: LeverDisplay[] }>) {
+function pairs<T>(items: T[]): T[][] {
+  const rows: T[][] = [];
+  for (let i = 0; i < items.length; i += 2) rows.push(items.slice(i, i + 2));
+  return rows;
+}
+
+/** `gridWhenMultiple`: one lever renders full width; two or more go two per row. */
+function LeverList({
+  title,
+  levers,
+  gridWhenMultiple = false,
+}: Readonly<{ title: string; levers: LeverDisplay[]; gridWhenMultiple?: boolean }>) {
   if (levers.length === 0) return null;
+  const twoColumns = gridWhenMultiple && levers.length >= 2;
   return (
     <SubSectionBlock title={title}>
-      {levers.map((lever) => (
-        <LeverCard key={lever.key} lever={lever} />
-      ))}
+      {twoColumns
+        ? // Two cards per row (like Contribution to SDG); each row is one paginator block
+          pairs(levers).map((row) => (
+            <div
+              key={row.map((lever) => lever.key).join("|")}
+              data-paginator-block
+              className={`grid grid-cols-2 gap-[10px] ${CONTENT_WIDTH_CLASS}`}
+            >
+              {row.map((lever) => (
+                <LeverCard
+                  key={lever.key}
+                  lever={lever}
+                  className="h-full flex flex-col justify-center"
+                />
+              ))}
+            </div>
+          ))
+        : levers.map((lever) => <LeverCard key={lever.key} lever={lever} />)}
     </SubSectionBlock>
   );
 }
@@ -303,12 +333,9 @@ function SdgCard({ sdg }: Readonly<{ sdg: SdgDisplay }>) {
 
 /** Two cards per row. Each row is one paginator block, so a row never splits across pages. */
 function SdgGrid({ sdgs }: Readonly<{ sdgs: SdgDisplay[] }>) {
-  const rows: SdgDisplay[][] = [];
-  for (let i = 0; i < sdgs.length; i += 2) rows.push(sdgs.slice(i, i + 2));
-
   return (
     <>
-      {rows.map((row) => (
+      {pairs(sdgs).map((row) => (
         <div
           key={row.map((sdg) => sdg.key).join("|")}
           data-paginator-block
@@ -328,8 +355,12 @@ function SdgGrid({ sdgs }: Readonly<{ sdgs: SdgDisplay[] }>) {
 function Portfolio1Body({ view }: Readonly<{ view: AllianceAlignmentView }>) {
   return (
     <>
-      <LeverList title={view.primaryLeversTitle} levers={view.primaryLevers} />
-      <LeverList title={view.contributorLeversTitle} levers={view.contributorLevers} />
+      <LeverList title={view.primaryLeversTitle} levers={view.primaryLevers} gridWhenMultiple />
+      <LeverList
+        title={view.contributorLeversTitle}
+        levers={view.contributorLevers}
+        gridWhenMultiple
+      />
     </>
   );
 }
