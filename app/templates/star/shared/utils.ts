@@ -21,6 +21,13 @@ export function normalizeIsoAlpha2(value: unknown): string | null {
   return /^[a-z]{2}$/.test(iso) ? iso : null;
 }
 
+/** Absolute http(s) URL, trimmed; anything else (ids, relative paths, text with spaces) is null. */
+export function normalizeHttpUrl(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const url = value.trim();
+  return /^https?:\/\/\S+$/i.test(url) ? url : null;
+}
+
 export function hasArrayItems<T>(value: T[] | null | undefined): boolean {
   return Array.isArray(value) && value.length > 0;
 }
