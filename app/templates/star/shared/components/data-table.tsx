@@ -8,6 +8,8 @@ export interface DataTableRow {
 
 interface DataTableProps {
   rows: DataTableRow[];
+  /** Overrides the label column width (default 34%, max 200px). */
+  labelColumnClass?: string;
 }
 
 const TABLE_BORDER = `0.5px solid ${STAR_COLORS.grey300}`;
@@ -15,7 +17,10 @@ const LABEL_COLUMN_BORDER = "0.5px solid rgb(136, 136, 136)";
 const TABLE_RADIUS = 1.5;
 const LABEL_COLUMN_CLASS = "shrink-0 w-[34%] max-w-[200px]";
 
-export function DataTable({ rows }: Readonly<DataTableProps>) {
+export function DataTable({
+  rows,
+  labelColumnClass = LABEL_COLUMN_CLASS,
+}: Readonly<DataTableProps>) {
   if (rows.length === 0) return null;
 
   return (
@@ -30,7 +35,7 @@ export function DataTable({ rows }: Readonly<DataTableProps>) {
       {rows.map((row, index) => (
         <div key={row.label} className="flex w-full min-h-[36px]">
           <div
-            className={`${LABEL_COLUMN_CLASS} flex items-center px-2.5 py-1 text-[10px] font-[350] leading-[1.2] text-white`}
+            className={`${labelColumnClass} flex items-center px-2.5 py-1 text-[10px] font-[350] leading-[1.2] text-white`}
             style={{
               backgroundColor: STAR_COLORS.primaryBlue600,
               borderRight: LABEL_COLUMN_BORDER,
