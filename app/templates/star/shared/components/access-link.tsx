@@ -1,10 +1,10 @@
 import { STAR_COLORS } from "../tokens";
 
-function LinkIcon() {
+function LinkIcon({ size = 10 }: Readonly<{ size?: number }>) {
   return (
     <svg
-      width={10}
-      height={10}
+      width={size}
+      height={size}
       viewBox="0 0 11 11"
       fill="none"
       aria-hidden
@@ -27,8 +27,27 @@ function LinkIcon() {
   );
 }
 
-/** "↗ Access link" in STAR light blue. Opens in a new tab. */
-export function AccessLink({ href }: Readonly<{ href: string }>) {
+/** "↗ Access link" in STAR light blue. Opens in a new tab. `iconOnly` drops the text. */
+export function AccessLink({
+  href,
+  iconOnly = false,
+}: Readonly<{ href: string; iconOnly?: boolean }>) {
+  if (iconOnly) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center shrink-0"
+        style={{ color: STAR_COLORS.lightBlue300 }}
+        aria-label="Access link"
+        title="Access link"
+      >
+        <LinkIcon size={12} />
+      </a>
+    );
+  }
+
   return (
     <a
       href={href}

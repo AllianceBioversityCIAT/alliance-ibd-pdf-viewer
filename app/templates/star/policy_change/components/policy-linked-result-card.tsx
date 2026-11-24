@@ -52,18 +52,27 @@ export function PolicyLinkedResultField({
       {title ? (
         <InfoCard className="flex-1">
           <div className="flex flex-col gap-[10px]">
-            {/* One top row: [PLATFORM code], status tag, year */}
-            {(code || status || year) && (
-              <div className="flex flex-wrap items-center gap-[6px]">
-                {code && <PlatformCodeBadge platform={code.platform} code={code.code} />}
-                {status && (
-                  <StatusBadge
-                    name={status.name}
-                    borderColor={status.borderColor}
-                    textColor={status.textColor}
-                  />
-                )}
-                {year && <YearPill year={year} />}
+            {/* Top row: [PLATFORM code], status tag, year · link icon on the right */}
+            {(code || status || year || pdfUrl) && (
+              <div className="flex items-start justify-between gap-[6px]">
+                <div className="flex flex-wrap items-center gap-[6px] min-w-0">
+                  {code && (
+                    <PlatformCodeBadge
+                      platform={code.platform}
+                      code={code.code}
+                    />
+                  )}
+                  {status && (
+                    <StatusBadge
+                      name={status.name}
+                      borderColor={status.borderColor}
+                      textColor={status.textColor}
+                    />
+                  )}
+                  {year && <YearPill year={year} />}
+                </div>
+                {/* Access link icon to the linked result's PDF, top-right corner */}
+                {pdfUrl && <AccessLink href={pdfUrl} iconOnly />}
               </div>
             )}
             <p
@@ -72,16 +81,13 @@ export function PolicyLinkedResultField({
             >
               {title}
             </p>
-            {/* Access link to the linked result's PDF, below the title */}
-            {pdfUrl && (
-              <div className="-mt-[4px]">
-                <AccessLink href={pdfUrl} />
-              </div>
-            )}
           </div>
         </InfoCard>
       ) : (
-        <p className="text-[10px] italic leading-[1.25] m-0" style={{ color: STAR_COLORS.greyMuted }}>
+        <p
+          className="text-[10px] italic leading-[1.25] m-0"
+          style={{ color: STAR_COLORS.greyMuted }}
+        >
           {emptyText}
         </p>
       )}
