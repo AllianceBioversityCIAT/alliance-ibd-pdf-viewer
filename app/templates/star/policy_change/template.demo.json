@@ -220,7 +220,8 @@
           }
         }
       },
-      "report_year": 2025
+      "report_year": 2025,
+      "pdf_url": "https://example.org/star/results/9150.pdf"
     },
     "innovation_use": {
       "result_id": 30342,

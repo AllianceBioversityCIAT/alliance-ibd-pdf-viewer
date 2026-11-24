@@ -442,7 +442,7 @@
             "Policy Change Details",
             "Linked Results card"
           ],
-          "description": "Full linked Innovation Development result (STAR's GET only returns its id): result_official_code, platform_code, title, result_status { name, config.color { border, text } } as in STAR's result_status table, optional report_year. Card shows a top row with an outlined 'STAR 9150' pill in the platform color (STAR, TIP, PRMS, AICCRA; others grey), the status tag and the year pill, then the title and the status as a colored tag (default STAR blue when no color). A bare id is ignored.",
+          "description": "Full linked Innovation Development result (STAR's GET only returns its id): result_official_code, platform_code, title, result_status { name, config.color { border, text } } as in STAR's result_status table, optional report_year, optional pdf_url (absolute http(s) URL of the linked result's PDF; shows an 'Access link' below the title (same as Evidence and Tools often used together), opens in a new tab, hidden when missing). Card shows a top row with an outlined 'STAR 9150' pill in the platform color (STAR, TIP, PRMS, AICCRA; others grey), the status tag and the year pill, then the title and the status as a colored tag (default STAR blue when no color). A bare id is ignored.",
           "example": {
             "result_id": 30339,
             "result_official_code": 9150,
@@ -458,7 +458,8 @@
                 }
               }
             },
-            "report_year": 2025
+            "report_year": 2025,
+            "pdf_url": "https://example.org/star/results/9150.pdf"
           }
         },
         {

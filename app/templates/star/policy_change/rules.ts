@@ -1,4 +1,4 @@
-import { hasText } from "../shared/utils";
+import { hasText, normalizeHttpUrl } from "../shared/utils";
 import { getPartnerDisplayName } from "../shared/sections/results_partners/rules";
 import {
   POLICY_STAGE_FALLBACK_NAMES,
@@ -177,6 +177,10 @@ export function getLinkedResultStatus(result: PolicyLinkedResult): LinkedResultS
 
 export function getLinkedResultYear(result: PolicyLinkedResult): string | null {
   return text(result.report_year);
+}
+
+export function getLinkedResultPdfUrl(result: PolicyLinkedResult): string | null {
+  return normalizeHttpUrl(result.pdf_url);
 }
 
 export function getInnovationDevelopment(

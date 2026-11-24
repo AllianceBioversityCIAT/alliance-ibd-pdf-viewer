@@ -120,6 +120,7 @@ export function PolicyChangeDetailsSection({ data }: Readonly<PolicyChangeDetail
               label={L.innovationDevelopment}
               result={innovationDevelopment}
               emptyText={L.noLinkedResult}
+              showPdfLink
             />
             <PolicyLinkedResultField
               label={L.innovationUse}

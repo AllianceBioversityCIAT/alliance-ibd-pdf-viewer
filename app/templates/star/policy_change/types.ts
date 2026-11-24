@@ -45,6 +45,8 @@ export interface PolicyLinkedResult {
   /** Optional enrichments, shown when present */
   report_year?: number | string | null;
   result_type?: string | null;
+  /** Absolute URL of the linked result's PDF. Shown as "Access link" (new tab) when present; Innovation Development only. */
+  pdf_url?: string | null;
 }
 
 /** STAR backend interface (`GET /api/results/policy-change/by-result-id/:id`), enriched with full data. */

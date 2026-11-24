@@ -1,6 +1,7 @@
 import type { PolicyLinkedResult } from "../types";
 import {
   getLinkedResultCode,
+  getLinkedResultPdfUrl,
   getLinkedResultStatus,
   getLinkedResultYear,
 } from "../rules";
@@ -8,6 +9,7 @@ import { InfoCard } from "../../shared/components/info-card";
 import { FieldLabel } from "../../shared/components/label-value";
 import { StatusBadge } from "../../shared/components/status-badge";
 import { PlatformCodeBadge } from "../../shared/components/platform-code-badge";
+import { AccessLink } from "../../shared/components/access-link";
 import { STAR_COLORS } from "../../shared/tokens";
 
 interface PolicyLinkedResultFieldProps {
@@ -15,6 +17,8 @@ interface PolicyLinkedResultFieldProps {
   label: string;
   result: PolicyLinkedResult | null;
   emptyText: string;
+  /** Show the "Access link" when the result has `pdf_url` (Innovation Development only for now). */
+  showPdfLink?: boolean;
 }
 
 /** Reporting year in the same pill shape as the status tag, neutral grey, no label. */
@@ -34,11 +38,13 @@ export function PolicyLinkedResultField({
   label,
   result,
   emptyText,
+  showPdfLink = false,
 }: Readonly<PolicyLinkedResultFieldProps>) {
   const title = result?.title?.trim();
   const code = result ? getLinkedResultCode(result) : null;
   const status = result ? getLinkedResultStatus(result) : null;
   const year = result ? getLinkedResultYear(result) : null;
+  const pdfUrl = showPdfLink && result ? getLinkedResultPdfUrl(result) : null;
 
   return (
     <div className="flex flex-col gap-[8px] min-w-0">
@@ -46,7 +52,7 @@ export function PolicyLinkedResultField({
       {title ? (
         <InfoCard className="flex-1">
           <div className="flex flex-col gap-[10px]">
-            {/* One top row: [PLATFORM | code], status tag, year */}
+            {/* One top row: [PLATFORM code], status tag, year */}
             {(code || status || year) && (
               <div className="flex flex-wrap items-center gap-[6px]">
                 {code && <PlatformCodeBadge platform={code.platform} code={code.code} />}
@@ -66,6 +72,12 @@ export function PolicyLinkedResultField({
             >
               {title}
             </p>
+            {/* Access link to the linked result's PDF, below the title */}
+            {pdfUrl && (
+              <div className="-mt-[4px]">
+                <AccessLink href={pdfUrl} />
+              </div>
+            )}
           </div>
         </InfoCard>
       ) : (
