@@ -48,6 +48,12 @@ Full field docs: `alliance_alignment` in `star/cap_sharing/payload-guide.json` a
 - Demos: `demos/{p1-oicr,p1-innovation-dev,p2-oicr,p2-policy-change,p2-cap-sharing}.demo.json`. They use real CLARISA SDG and target data. The P2 research area, objective and outcome names are illustrative.
 - `cap_sharing/template.demo.json` now uses P2 with indicator 1. `inn_dev/template.demo.json` now uses P1 with indicator 2. Only the `alliance_alignment` key changed.
 
+## Lever layout (P1)
+
+- **Primary Levers** and **Contributing Levers**: one lever renders full width. Two or more render two per row, like Contribution to SDG. Each row is a `data-paginator-block`, so a row never splits across pages. Cards in a row have the same height and their content is centered vertically.
+- Research Areas (P2) stay in one column.
+- With an odd count, the last card sits alone in the left column.
+
 ## Validation
 
 - `tsc --noEmit` and `eslint` pass on the section.
