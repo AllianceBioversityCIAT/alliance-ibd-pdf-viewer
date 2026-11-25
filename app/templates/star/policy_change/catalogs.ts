@@ -14,7 +14,6 @@ export const POLICY_STAGE_FALLBACK_NAMES: Record<number, string> = {
 /** Same labels as the STAR form. */
 export const POLICY_CHANGE_LABELS = {
   sectionTitle: "Policy Change Details",
-  policyDetails: "Policy Details",
   policyType: "Policy Type",
   policyStage: "Stage in Policy Process",
   usdAmount: "USD Amount",

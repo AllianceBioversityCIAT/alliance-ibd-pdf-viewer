@@ -42,8 +42,8 @@ function PolicyDetailRows({ data }: Readonly<{ data: PolicyChangePayload }>) {
   if (!policyType && !stage && !usdAmount && !amountStatus && !evidenceStage) return null;
 
   return (
-    <div className="flex flex-col gap-2.5" data-paginator-block>
-      <SubSectionLabel>{L.policyDetails}</SubSectionLabel>
+    // No "Policy Details" subtitle: redundant right under the "Policy Change Details" title
+    <div className="flex flex-col gap-2" data-paginator-block>
       <div className="flex flex-col gap-2">
         {policyType && <LabelValueRow label={L.policyType} value={policyType} />}
         {stage && <LabelValueRow label={L.policyStage} value={stage} />}
@@ -120,7 +120,6 @@ export function PolicyChangeDetailsSection({ data }: Readonly<PolicyChangeDetail
               label={L.innovationDevelopment}
               result={innovationDevelopment}
               emptyText={L.noLinkedResult}
-              showPdfLink
             />
             <PolicyLinkedResultField
               label={L.innovationUse}
