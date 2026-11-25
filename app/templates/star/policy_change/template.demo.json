@@ -238,7 +238,8 @@
           }
         }
       },
-      "report_year": 2026
+      "report_year": 2026,
+      "pdf_url": "https://example.org/tip/results/9301.pdf"
     }
   },
   "results_partners": {

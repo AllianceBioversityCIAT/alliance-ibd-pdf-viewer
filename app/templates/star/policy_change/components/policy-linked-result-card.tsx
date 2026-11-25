@@ -17,8 +17,6 @@ interface PolicyLinkedResultFieldProps {
   label: string;
   result: PolicyLinkedResult | null;
   emptyText: string;
-  /** Show the "Access link" when the result has `pdf_url` (Innovation Development only for now). */
-  showPdfLink?: boolean;
 }
 
 /** Reporting year in the same pill shape as the status tag, neutral grey, no label. */
@@ -38,13 +36,13 @@ export function PolicyLinkedResultField({
   label,
   result,
   emptyText,
-  showPdfLink = false,
 }: Readonly<PolicyLinkedResultFieldProps>) {
   const title = result?.title?.trim();
   const code = result ? getLinkedResultCode(result) : null;
   const status = result ? getLinkedResultStatus(result) : null;
   const year = result ? getLinkedResultYear(result) : null;
-  const pdfUrl = showPdfLink && result ? getLinkedResultPdfUrl(result) : null;
+  // Any platform (STAR, TIP, PRMS, AICCRA…): the link shows whenever pdf_url is a valid URL
+  const pdfUrl = result ? getLinkedResultPdfUrl(result) : null;
 
   return (
     <div className="flex flex-col gap-[8px] min-w-0">

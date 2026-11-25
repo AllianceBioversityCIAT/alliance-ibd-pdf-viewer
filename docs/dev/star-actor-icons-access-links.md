@@ -4,7 +4,7 @@
 
 - **Innovation Development, Actors**: each actor card shows its actor type image from S3 on the left.
 - **Innovation Development, "Tools often used together with this tool"**: each card shows "Access link" to the linked result's PDF, top right (same as Evidence).
-- **Policy Change, Linked Results**: the Innovation Development card shows the Access link icon (no text) in its top-right corner. Innovation Use has no PDF yet, so it never shows a link.
+- **Policy Change, Linked Results**: both cards (Innovation Development and Innovation Use) show the Access link icon (no text) in their top-right corner, for results from any platform (STAR, TIP, PRMS, AICCRA).
 - All links open in a new tab. When no valid URL arrives, nothing is shown.
 
 ## Payload
@@ -14,7 +14,7 @@
 | inn_dev | `innovation_details.actor_type_icons` | `Record<actor_type_id, url>`. Prefix `public/` in production, `public-dev/` in dev. |
 | inn_dev | `actors[].actor_type_icon` | Optional per-actor URL. Wins over the map. |
 | inn_dev | `knowledge_sharing_form.link_to_result[].pdf_url` | Absolute http(s) URL. |
-| policy_change | `policy_change.innovation_development.pdf_url` | Absolute http(s) URL. |
+| policy_change | `policy_change.innovation_development.pdf_url`, `policy_change.innovation_use.pdf_url` | Absolute http(s) URL, any platform. |
 
 Only absolute `http(s)` URLs are used (`normalizeHttpUrl` in `shared/utils.ts`). Ids, relative paths and text are ignored.
 

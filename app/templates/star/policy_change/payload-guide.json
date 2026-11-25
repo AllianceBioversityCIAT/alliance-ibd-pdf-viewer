@@ -470,7 +470,7 @@
             "Policy Change Details",
             "Linked Results card"
           ],
-          "description": "Same shape as innovation_development, for the linked Innovation Use result."
+          "description": "Same shape as innovation_development (including optional pdf_url, any platform: STAR, TIP, PRMS, AICCRA), for the linked Innovation Use result."
         }
       ],
       "visibility": {

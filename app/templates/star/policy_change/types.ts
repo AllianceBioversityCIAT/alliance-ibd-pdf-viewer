@@ -45,7 +45,7 @@ export interface PolicyLinkedResult {
   /** Optional enrichments, shown when present */
   report_year?: number | string | null;
   result_type?: string | null;
-  /** Absolute URL of the linked result's PDF. Shown as "Access link" (new tab) when present; Innovation Development only. */
+  /** Absolute URL of the linked result's PDF. Shown as the Access link icon (new tab) when present, for any platform. */
   pdf_url?: string | null;
 }
 
